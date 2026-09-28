@@ -1,0 +1,6 @@
+{
+  "name": "REALREACH - GPS-Tracked Letterbox & Flyer Distribution",
+  "description": "Milan and Italy's premier tech-driven flyer distribution and print marketing platform for real estate agencies and high-growth brands. Real-time GPS tracking, instant zone pricing, and verified delivery.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
