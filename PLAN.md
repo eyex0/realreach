@@ -208,17 +208,47 @@ Expo web — camera/GPS device pass deferred to a phone session).
 - **Verify:** checklist run completed; regression suite re-run in Stage 17.
 - **Commit:** `fix: device QA issues` (as found — see hashes above).
 
-## Stage 17 — Final verification & handoff
+## Stage 17 — Final verification & handoff **[COMPLETE]**
 **Goal:** one clean sweep and a written handoff.
 
-- [ ] Run everything: backend tsc + 22 tests, frontend lint+build, operator tsc+
-      export, all `tools/*.ps1` E2E scripts, servers healthy, git clean ×3,
-      CI green on push.
-- [ ] Handoff summary: what's live, how to run each piece, deferred items
-      (Supabase storage if deferred, EAS build, anything from QA), known limits
-      (pricing assumptions, no live tracking in v1).
-- **Verify:** every line of the sweep above is green.
-- **Commit:** final `chore: Stage 17 verification`.
+- [x] Backend: `tsc` clean, **27/27 vitest**, all seven E2E scripts green —
+      `test-authz` (no failures), `test-review-integrity` (verdict preserved),
+      `test-payouts` (double-approve 409, regenerate skips paid),
+      `test-reports` (overview + campaign report + estimate),
+      `test-hardening` (1.2 MB accepted, >8 MB → 413, 429 after 21),
+      `test-e2e-required` (**49 PASS**, restores optional mode),
+      `test-supabase-storage` (byte-identical round trip).
+- [x] Frontend: `tsc --noEmit` clean, `vite build` OK.
+- [x] Operator: `tsc --noEmit` clean (`expo export --platform android` green in
+      Stage 16b on the same code).
+- [x] Servers healthy: API :4000, web :3000 (200), Metro :8081 (200).
+- [x] Data hygiene: `purge-domain.sql` then `seed.mjs` → exactly one
+      `Pilot Demo Campaign` (4 tasks, 1 approved, 120 pieces, €4.80 pending
+      payout for walker 1). All E2E campaigns removed.
+- [x] git clean ×3, CI green on push.
+
+**Test-tooling bugs found and fixed during the sweep** (`d00b640`):
+- `test-reports.ps1` resolved the campaign id with
+  `Invoke-RestMethod ... | Where-Object {...}`. In Windows PowerShell 5.1 the
+  JSON array is delivered to the pipeline as a *single unenumerated item*, so
+  `$_.title -eq '...'` acted as an array filter and always matched — `$cid`
+  became four space-joined uuids and the report call failed with
+  `invalid input syntax for type uuid`. Fixed by prefetching into a variable
+  before filtering.
+- All five server-restarting scripts used a fixed `Start-Sleep -Seconds 2`
+  after `Start-Process`, which raced Express startup (connection refused).
+  Replaced with a `/health` readiness poll (60 × 500 ms).
+
+**Deferred / known limits at handoff**
+- **Stage 15 (deployment) still deferred by user** — no hosting target chosen;
+  device QA ran against the local API over LAN.
+- **No EAS build / store submission** — operator app is web-verified only;
+  Android export validates, but no signed APK/IPA.
+- **Operator sign-in is email-only** (no OTP, no identity check) — pilot-only.
+- **No live tracking in v1**: one session per proof, not continuous GPS.
+- **Pricing is an assumption**: flat €0.04/piece, no client billing.
+- Browser QA has no GPS, so machine verdicts land on `requires_review`; the
+  human approval path is the one exercised there.
 
 ---
 
