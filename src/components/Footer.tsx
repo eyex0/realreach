@@ -16,7 +16,7 @@ export const Footer: React.FC = () => {
             <Link to="/" className="inline-flex items-center gap-2.5 group">
               <RealReachLogo size={24} color="#0a0a0b" className="group-hover:-translate-y-0.5 transition-transform" />
               <span className="text-[22px] font-bold tracking-tight text-[#0a0a0b]">
-                REALREACH
+                Realreach
               </span>
             </Link>
 
@@ -27,7 +27,7 @@ export const Footer: React.FC = () => {
             {/* Social Icons matching PDF Page 11 */}
             <div className="mt-6 flex items-center gap-3">
               <a
-                href="https://www.instagram.com"
+                href="https://www.instagram.com/realreach.it/"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Instagram"
@@ -36,7 +36,7 @@ export const Footer: React.FC = () => {
                 <Instagram className="h-4 w-4" />
               </a>
               <a
-                href="https://www.linkedin.com"
+                href="https://www.linkedin.com/company/realreachit"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="LinkedIn"
@@ -78,18 +78,43 @@ export const Footer: React.FC = () => {
             <h3 className="mb-4 text-sm font-bold text-[#0a0a0b]">Resources</h3>
             <ul className="space-y-3 text-sm text-[#4b5563]">
               <li>
+                <Link to="/dashboard" className="hover:text-black transition-colors">
+                  Dashboard
+                </Link>
+              </li>
+              <li>
                 <Link to="/blog" className="hover:text-black transition-colors">
                   Blog
                 </Link>
               </li>
               <li>
-                <Link to="/#faq" className="hover:text-black transition-colors">
+                <Link to="/pricing" className="hover:text-black transition-colors">
+                  Pricing
+                </Link>
+              </li>
+              <li>
+                <Link to="/planner" className="hover:text-black transition-colors">
+                  Reach Planner
+                </Link>
+              </li>
+              <li>
+                <Link to="/gps-tracking" className="hover:text-black transition-colors">
+                  GPS Tracking
+                </Link>
+              </li>
+              <li>
+                <Link to="/faq" className="hover:text-black transition-colors">
                   FAQs
                 </Link>
               </li>
               <li>
                 <Link to="/for-distributors" className="hover:text-black transition-colors">
                   For Distributors
+                </Link>
+              </li>
+              <li>
+                <Link to="/missions" className="hover:text-black transition-colors">
+                  Missions Board
                 </Link>
               </li>
             </ul>
@@ -126,7 +151,7 @@ export const Footer: React.FC = () => {
 
         {/* PDF PAGE 11: COPYRIGHT NOTICE */}
         <div className="border-t border-[var(--color-border)] py-8 text-center text-sm text-[#6b7280]">
-          © 2026 REALREACH S.r.l. P.IVA IT 12849300965. All rights reserved.
+          © 2026 Realreach S.r.l. P.IVA IT 12849300965. All rights reserved.
         </div>
 
       </div>

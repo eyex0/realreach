@@ -161,7 +161,7 @@ export const LiveGpsDemo: React.FC = () => {
           </h2>
 
           <p className="mt-4 text-base sm:text-lg text-neutral-400 leading-relaxed max-w-2xl">
-            Watch REALREACH distributors walk Milan's street grid in real time. Every letterbox drop is GPS-logged, time-stamped, and photo-verified.
+            Watch Realreach distributors walk Milan's street grid in real time. Every letterbox drop is GPS-logged, time-stamped, and photo-verified.
           </p>
         </div>
 
@@ -505,7 +505,7 @@ export const LiveGpsDemo: React.FC = () => {
                 Distributori Attivi
               </span>
               <span className="text-xl sm:text-2xl font-extrabold text-emerald-400 font-mono mt-0.5 block">
-                {selectedSuburb.runners} REALREACH Walkers
+                {selectedSuburb.runners} Realreach Walkers
               </span>
             </div>
 

@@ -12,7 +12,7 @@ export const PrintStoreSection: React.FC<PrintStoreSectionProps> = ({ onOpenOrde
         
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           
-          {/* Left Column: REALREACH Print Copy */}
+          {/* Left Column: Realreach Print Copy */}
           <div className="lg:col-span-6 space-y-6">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-xs font-semibold text-blue-700">
               <Printer className="w-3.5 h-3.5" />
@@ -20,7 +20,7 @@ export const PrintStoreSection: React.FC<PrintStoreSectionProps> = ({ onOpenOrde
             </div>
 
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-950 tracking-tight leading-tight">
-              Order your flyers with REALREACH and we'll print them, bundle them and send them to you, ready for your distributor to collect.
+              Order your flyers with Realreach and we'll print them, bundle them and send them to you, ready for your distributor to collect.
             </h2>
 
             <p className="text-base text-slate-600 leading-relaxed">

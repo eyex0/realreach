@@ -86,7 +86,7 @@ export const OrderModal: React.FC<OrderModalProps> = ({
           <div className="flex items-center gap-3">
             <RealReachLogo size={28} />
             <div>
-              <span className="font-bold text-white text-sm">Launch Campaign · REALREACH</span>
+              <span className="font-bold text-white text-sm">Launch Campaign · Realreach</span>
               <p className="text-[11px] text-neutral-400">Campaign ID: {campaignId}</p>
             </div>
           </div>

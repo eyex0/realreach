@@ -4,19 +4,19 @@ import { Star } from 'lucide-react';
 const REVIEWS = [
   {
     quote:
-      "Using REALREACH has saved our team a significant amount of time and provided a far more reliable brochure delivery solution. They've streamlined the entire process, from organising distributors to handling payments, which has taken a lot of admin off our plate. The consistency and ease of working with REALREACH has been a big win for our office.",
+      "Using Realreach has saved our team a significant amount of time and provided a far more reliable brochure delivery solution. They've streamlined the entire process, from organising distributors to handling payments, which has taken a lot of admin off our plate. The consistency and ease of working with Realreach has been a big win for our office.",
     author: 'Kate Barber',
     agency: 'Belle Property & Engel & Völkers Milano',
   },
   {
     quote:
-      "REALREACH has made our letterbox drops across Milan far more organised and easy to manage. The REALREACH app is easy to use and gives us clear visibility on delivery progress in Navigli and Brera, which saves time and gives us confidence that our campaigns are being completed properly.",
+      "Realreach has made our letterbox drops across Milan far more organised and easy to manage. The Realreach app is easy to use and gives us clear visibility on delivery progress in Navigli and Brera, which saves time and gives us confidence that our campaigns are being completed properly.",
     author: 'Jazmin Fitzgerald',
     agency: 'Ray White / Tecnocasa Milano',
   },
   {
     quote:
-      'REALREACH is time efficient, and allows our team to focus on their higher priority prospecting tasks. The group at REALREACH are always prompt to respond, and happy to assist where needed.',
+      'Realreach is time efficient, and allows our team to focus on their higher priority prospecting tasks. The group at Realreach are always prompt to respond, and happy to assist where needed.',
     author: 'Zoe Dowd',
     agency: 'Gabetti & Remax Italia',
   },
@@ -43,7 +43,7 @@ export const AgencyCaseStudies: React.FC = () => {
         </h2>
 
         <p className="mt-3 text-white/90 text-base sm:text-xl max-w-xl mx-auto">
-          Real feedback from the businesses using REALREACH every week
+          Real feedback from the businesses using Realreach every week
         </p>
 
         {/* 5 Gold Stars */}

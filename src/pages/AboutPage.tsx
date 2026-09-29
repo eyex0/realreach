@@ -12,7 +12,7 @@ export const AboutPage: React.FC = () => {
             Our Story &amp; Mission
           </span>
           <h1 className="mt-3 text-4xl sm:text-5xl md:text-6xl font-extrabold text-[#0a0a0b] tracking-tight">
-            About REALREACH
+            About Realreach
           </h1>
           <p className="mt-4 text-lg sm:text-xl text-[#4b5563] max-w-2xl mx-auto leading-relaxed">
             Rebuilding the flyer distribution industry with live GPS telemetry, complete transparency, and guaranteed delivery across Milan and Italy.
@@ -24,13 +24,13 @@ export const AboutPage: React.FC = () => {
       <section className="py-20 max-w-4xl mx-auto px-5 sm:px-6">
         <div className="prose prose-lg text-slate-700 max-w-none space-y-6">
           <h2 className="text-2xl sm:text-3xl font-bold text-[#0a0a0b]">
-            Why we founded REALREACH in Milan
+            Why we founded Realreach in Milan
           </h2>
           <p className="text-base sm:text-lg leading-relaxed text-[#4b5563]">
             For decades, local businesses, real estate agencies, and retailers relied on letterbox marketing without any real way to know if their flyers were actually delivered or dumped in recycling bins.
           </p>
           <p className="text-base sm:text-lg leading-relaxed text-[#4b5563]">
-            We started REALREACH with a single goal: make pamphlet delivery as transparent and measurable as digital marketing. We engineered a platform that pairs every distributor with precision GPS telemetry, recording street-by-street breadcrumbs, speed, and house-count milestones in real time.
+            We started Realreach with a single goal: make pamphlet delivery as transparent and measurable as digital marketing. We engineered a platform that pairs every distributor with precision GPS telemetry, recording street-by-street breadcrumbs, speed, and house-count milestones in real time.
           </p>
 
           {/* Key Pillars */}
@@ -72,7 +72,7 @@ export const AboutPage: React.FC = () => {
           <p className="text-base text-[#4b5563] leading-relaxed">
             Our Italian dispatch and operations center is based in central Milan:
             <br />
-            <strong>REALREACH S.r.l.</strong>
+            <strong>Realreach S.r.l.</strong>
             <br />
             Via Monte Napoleone 8, 20121 Milano (MI), Italy
             <br />
@@ -87,7 +87,7 @@ export const AboutPage: React.FC = () => {
               Get in Touch with our Milan Team
             </Link>
             <Link
-              to="/#how-it-works"
+              to="/how-it-works"
               className="text-sm font-semibold text-slate-700 hover:text-black underline"
             >
               Learn How It Works &rarr;

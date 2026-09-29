@@ -39,7 +39,7 @@ export const DistributionPortalPage: React.FC = () => {
           {/* Brand Logo */}
           <Link to="/" className="flex items-center gap-2.5 px-3 py-3 mb-6">
             <RealReachLogo size={24} color="#0a0a0b" />
-            <span className="font-bold text-base tracking-tight text-[#0a0a0b]">REALREACH</span>
+            <span className="font-bold text-base tracking-tight text-[#0a0a0b]">Realreach</span>
           </Link>
 
           {/* Navigation Links */}

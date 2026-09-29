@@ -1,66 +1,51 @@
 import React from 'react';
 import Hero from '../components/Hero';
-import PickupSection from '../components/PickupSection';
-import HowItWorks from '../components/HowItWorks';
-import VolumeEstimationCard from '../components/VolumeEstimationCard';
-import NowPrintingSection from '../components/NowPrintingSection';
-import CapabilitiesBento from '../components/CapabilitiesBento';
-import AgencyCaseStudies from '../components/AgencyCaseStudies';
-import FaqSection from '../components/FaqSection';
-import CampaignCalculator from '../components/CampaignCalculator';
-import LiveGpsDemo from '../components/LiveGpsDemo';
 import RunnerSection from '../components/RunnerSection';
-import { CampaignData } from '../components/OrderModal';
+import AgencyCaseStudies from '../components/AgencyCaseStudies';
+import PlanSection from '../components/landing/PlanSection';
+import VerifyChain from '../components/landing/VerifyChain';
+import MeasureSection from '../components/landing/MeasureSection';
+import PlatformSection from '../components/landing/PlatformSection';
+import InfraSection from '../components/landing/InfraSection';
 
 interface HomePageProps {
   onOpenOrder: () => void;
-  onOpenOrderWithData: (data: CampaignData) => void;
-  onOpenOrderWithVolume: (volume?: string) => void;
-  onOpenPortal: () => void;
   onOpenRunnerModal: () => void;
 }
 
+/**
+ * Landing narrative (platform blueprint §8):
+ * HERO → PLAN → MOVE → VERIFY → MEASURE → PLATFORM → INFRASTRUCTURE → proof.
+ */
 export const HomePage: React.FC<HomePageProps> = ({
   onOpenOrder,
-  onOpenOrderWithData,
-  onOpenOrderWithVolume,
-  onOpenPortal,
   onOpenRunnerModal,
 }) => {
   return (
     <div className="flex-1">
-      {/* 1. PDF Pages 1 & 2: Hero Section & Milan Motion Map graphic */}
+      {/* HERO: Real-world marketing, measured */}
       <Hero onOpenOrder={onOpenOrder} />
 
-      {/* 2. PDF Page 3: Your flyers picked up & distributed */}
-      <PickupSection onOpenOrder={onOpenOrder} />
+      {/* 01 — PLAN: campaign + geography */}
+      <PlanSection />
 
-      {/* 3. PDF Pages 4 & 5: How to start distributing */}
-      <HowItWorks onOpenOrder={onOpenOrder} />
-
-      {/* 4. PDF Page 6: Monthly flyer estimation questionnaire */}
-      <VolumeEstimationCard onOpenOrder={onOpenOrderWithVolume} />
-
-      {/* 5. PDF Page 7: Now Printing */}
-      <NowPrintingSection onOpenOrder={onOpenOrder} />
-
-      {/* 6. FREE FEATURES & BENTO CAPABILITIES (Featuring User's Logo) */}
-      <CapabilitiesBento onOpenOrder={onOpenOrder} onOpenPortal={onOpenPortal} />
-
-      {/* 7. Interactive Live GPS Telemetry Demo (Milan live walkers) */}
-      <LiveGpsDemo />
-
-      {/* 8. Instant Suburb & Zone Pricing Calculator (Milan zones in € EUR) */}
-      <CampaignCalculator onOpenOrder={onOpenOrderWithData} />
-
-      {/* 9. For Distributors: Earn Money, Stay Active in Milan */}
+      {/* 02 — MOVE: paper plane + field network */}
       <RunnerSection onOpenRunnerModal={onOpenRunnerModal} />
 
-      {/* 10. PDF Pages 7 & 8: Loved by teams across Italy (Blue section) */}
-      <AgencyCaseStudies />
+      {/* 03 — VERIFY: GPS + proof + events */}
+      <VerifyChain />
 
-      {/* 11. PDF Pages 9 & 10: App badges & Frequently Asked Questions */}
-      <FaqSection />
+      {/* 04 — MEASURE: coverage + reach + response */}
+      <MeasureSection />
+
+      {/* 05 — THE PLATFORM: Command Center */}
+      <PlatformSection />
+
+      {/* 06 — THE INFRASTRUCTURE: architecture flow */}
+      <InfraSection />
+
+      {/* Social proof */}
+      <AgencyCaseStudies />
     </div>
   );
 };

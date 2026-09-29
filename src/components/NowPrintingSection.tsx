@@ -29,7 +29,7 @@ export const NowPrintingSection: React.FC<NowPrintingSectionProps> = ({ onOpenOr
             </h2>
 
             <p className="mt-4 text-[#4b5563] leading-relaxed text-base md:text-lg">
-              Print and distribute in one place. Order your flyers with REALREACH and we'll print them, bundle them and send them to you, ready for your distributor to collect.
+              Print and distribute in one place. Order your flyers with Realreach and we'll print them, bundle them and send them to you, ready for your distributor to collect.
             </p>
 
             <div className="mt-6 grid grid-cols-2 gap-3 text-sm text-[#4b5563]">

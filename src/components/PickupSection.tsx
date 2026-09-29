@@ -25,7 +25,7 @@ export const PickupSection: React.FC<PickupSectionProps> = ({ onOpenOrder }) => 
             </h2>
 
             <p className="mt-4 text-[#4b5563] text-base md:text-lg leading-relaxed">
-              Choose any pickup location and a REALREACH runner collects your flyers, ready to distribute in your campaign area.
+              Choose any pickup location and a Realreach runner collects your flyers, ready to distribute in your campaign area.
             </p>
 
             <div className="mt-8 space-y-4">

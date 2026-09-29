@@ -50,7 +50,7 @@ export const ForDistributorsPage: React.FC = () => {
       {/* Perks Grid */}
       <section className="py-20 max-w-[1200px] mx-auto px-5 sm:px-6">
         <div className="text-center mb-16">
-          <h2 className="text-3xl font-bold text-[#0a0a0b]">Why deliver with REALREACH?</h2>
+          <h2 className="text-3xl font-bold text-[#0a0a0b]">Why deliver with Realreach?</h2>
           <p className="mt-2 text-[#4b5563]">The fairest, most reliable flyer distribution community in Italy.</p>
         </div>
 

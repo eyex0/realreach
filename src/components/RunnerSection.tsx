@@ -96,7 +96,7 @@ export const RunnerSection: React.FC<RunnerSectionProps> = ({ onOpenRunnerModal 
             <div className="relative rounded-2xl overflow-hidden shadow-xl border border-slate-100 bg-neutral-50">
               <img
                 src="https://realrun.com.au/__l5e/assets-v1/0598d8fa-57f4-4e14-8af7-edf8bf13e61c/distributor-app-scene.png"
-                alt="REALREACH Distributor Mobile App"
+                alt="Realreach Distributor Mobile App"
                 className="w-full h-auto object-cover hover:scale-[1.02] transition-transform duration-300"
                 loading="lazy"
                 decoding="async"

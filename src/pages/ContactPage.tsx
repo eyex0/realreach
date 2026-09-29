@@ -30,7 +30,7 @@ export const ContactPage: React.FC = () => {
             Milan Support Team
           </span>
           <h1 className="mt-3 text-4xl sm:text-5xl md:text-6xl font-extrabold text-[#0a0a0b] tracking-tight">
-            Contact REALREACH
+            Contact Realreach
           </h1>
           <p className="mt-4 text-lg sm:text-xl text-[#4b5563] max-w-2xl mx-auto">
             Get in touch with our Milan operations and account management team. We respond within two business hours.

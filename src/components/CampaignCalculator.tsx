@@ -122,7 +122,7 @@ export const CampaignCalculator: React.FC<CampaignCalculatorProps> = ({ onOpenOr
     <section id="pricing" className="py-16 sm:py-24 bg-slate-50 border-b border-slate-200 text-slate-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Section Header - REALREACH Pricing */}
+        {/* Section Header - Realreach Pricing */}
         <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
           <div className="inline-flex items-center gap-2 text-xs font-bold tracking-wider uppercase text-blue-600 mb-2">
             <Calculator className="w-3.5 h-3.5" />
@@ -371,7 +371,7 @@ export const CampaignCalculator: React.FC<CampaignCalculatorProps> = ({ onOpenOr
             <div className="flex items-center justify-between border-b border-slate-200 pb-4">
               <div>
                 <span className="text-[10px] font-mono uppercase tracking-widest text-blue-600 font-bold">
-                  REALREACH GUARANTEE
+                  Realreach GUARANTEE
                 </span>
                 <h3 className="text-xl font-bold text-slate-950 mt-0.5">Campaign Summary</h3>
               </div>

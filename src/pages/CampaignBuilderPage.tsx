@@ -1,27 +1,179 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { RealReachLogo } from '../components/RealReachLogo';
-import { 
-  ArrowLeft, 
-  Search, 
-  Trash2, 
-  Globe, 
-  Filter, 
-  Home, 
-  Layers, 
-  Plus, 
-  Share2, 
-  MessageSquare, 
-  User, 
-  Check, 
+import RealBuilderMap from '../components/RealBuilderMap';
+import {
+  ArrowLeft,
+  Search,
+  Trash2,
+  Globe,
+  Filter,
+  Home,
+  Layers,
+  Plus,
+  Share2,
+  MessageSquare,
+  User,
+  Check,
   Building2,
   HelpCircle,
-  ArrowRight
+  ArrowRight,
+  Loader2,
+  CheckCircle2
 } from 'lucide-react';
+import { createCampaign, estimateCampaign, changeCampaignStatus, syncBackendUser, PriceEstimate } from '../lib/api';
+import { useUser } from '@clerk/clerk-react';
+
+/** Step 1 body: area cards + step navigation. Extracted so each step is a clean subtree. */
+const StepAreas: React.FC<{
+  activeArea: number;
+  setActiveArea: (n: number) => void;
+  setStep: (n: 1 | 2 | 3) => void;
+}> = ({ activeArea, setActiveArea, setStep }) => {
+  const card = (n: number, title: string, meta: string, price: string, perItem: string, tint: string) => (
+    <div
+      onClick={() => setActiveArea(n)}
+      className={`p-3.5 rounded-xl border transition-all cursor-pointer mb-2.5 flex items-center justify-between ${
+        activeArea === n ? 'border-black bg-slate-50 shadow-2xs' : 'border-slate-200 bg-white hover:border-slate-300'
+      }`}
+    >
+      <div className="flex items-center gap-3">
+        <div className={`h-10 w-10 rounded-lg border flex items-center justify-center font-bold text-xs ${tint}`}>
+          {n}
+        </div>
+        <div>
+          <h4 className="text-xs font-bold text-slate-900">{title}</h4>
+          <p className="text-[11px] text-slate-500">{meta}</p>
+          <span className="text-[10px] text-blue-600 font-semibold underline">View addresses</span>
+        </div>
+      </div>
+      <div className="text-right">
+        <span className="text-sm font-bold font-mono text-slate-900 block">{price}</span>
+        <span className="text-[10px] text-slate-400">{perItem}</span>
+      </div>
+    </div>
+  );
+
+  return (
+    <div>
+      <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-900 mb-3">
+        <span className="h-5 w-5 rounded-full bg-black text-white text-[11px] flex items-center justify-center">1</span>
+        <span>Create Areas</span>
+      </div>
+
+      {card(1, 'Milano Duomo', '1,100 Letterboxes • 9km', '€153.78', '€0.14 per item', 'bg-blue-50 border-blue-200 text-blue-600')}
+      {card(2, 'Milano Brera & Navigli', '1,000 Letterboxes • 5km', '€91.75', '€0.09 per item', 'bg-emerald-50 border-emerald-200 text-emerald-600')}
+
+      <div className="space-y-3 pt-2 text-xs text-slate-400 font-semibold">
+        <button
+          type="button"
+          onClick={() => setStep(2)}
+          className="flex items-center gap-2 hover:text-black cursor-pointer"
+        >
+          <span className="h-5 w-5 rounded-full border border-slate-300 text-[11px] flex items-center justify-center">2</span>
+          <span>Campaign Details</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => setStep(3)}
+          className="flex items-center gap-2 hover:text-black cursor-pointer"
+        >
+          <span className="h-5 w-5 rounded-full border border-slate-300 text-[11px] flex items-center justify-center">3</span>
+          <span>Invoice Details</span>
+        </button>
+      </div>
+    </div>
+  );
+};
 
 export const CampaignBuilderPage: React.FC = () => {
+  const { user: clerkUser } = useUser();
   const [selectedType, setSelectedType] = useState<'both' | 'houses' | 'units'>('both');
   const [activeArea, setActiveArea] = useState<number>(2);
+  const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [title, setTitle] = useState('Milano Centro Drop');
+  const [objective, setObjective] = useState('Property listing launch');
+  const [startDate, setStartDate] = useState('2026-10-05');
+  const [endDate, setEndDate] = useState('2026-10-12');
+  const [channels, setChannels] = useState({ print: true, qr: true, sampling: false });
+  const [budgetCap, setBudgetCap] = useState('1500');
+  const [kpi, setKpi] = useState('Verified coverage ≥ 95%');
+  const [publishing, setPublishing] = useState(false);
+  const [publishError, setPublishError] = useState('');
+  const [publishedId, setPublishedId] = useState<string | null>(null);
+  const [campaignStatus, setCampaignStatus] = useState<'draft' | 'submitted'>('draft');
+  const [submitting, setSubmitting] = useState(false);
+  const [drawnRings, setDrawnRings] = useState<number[][][] | null>(null);
+  const [estResult, setEstResult] = useState<PriceEstimate | null>(null);
+  const [estLoading, setEstLoading] = useState(false);
+
+  // Live backend estimate whenever step 3 is reached with a drawn area.
+  useEffect(() => {
+    if (step !== 3 || !drawnRings) {
+      setEstResult(null);
+      return;
+    }
+    let cancelled = false;
+    setEstLoading(true);
+    estimateCampaign(drawnRings)
+      .then((r) => { if (!cancelled) setEstResult(r); })
+      .catch(() => { if (!cancelled) setEstResult(null); })
+      .finally(() => { if (!cancelled) setEstLoading(false); });
+    return () => { cancelled = true; };
+  }, [step, drawnRings]);
+
+  const toggleChannel = (c: keyof typeof channels) =>
+    setChannels((prev) => ({ ...prev, [c]: !prev[c] }));
+
+  const handlePublish = async () => {
+    setPublishing(true);
+    setPublishError('');
+    try {
+      if (!clerkUser) throw new Error('Signed out. Please sign in again.');
+      if (!drawnRings) throw new Error('Draw your target area on the map first.');
+      const clientId = await syncBackendUser({
+        clerkId: clerkUser.id,
+        email: clerkUser.primaryEmailAddress?.emailAddress ?? `${clerkUser.id}@realreach.it`,
+        name: clerkUser.fullName ?? undefined,
+        role: 'client',
+      });
+      const channelList = [channels.print && 'Print flyers', channels.qr && 'QR tracking', channels.sampling && 'Sampling']
+        .filter(Boolean)
+        .join(', ');
+      const res = await createCampaign({
+        client_id: clientId,
+        title: title || 'Milano Drop',
+        area_geojson: { type: 'Polygon', coordinates: drawnRings },
+        activity_type: 'flyer_distribution',
+        objective,
+        start_date: startDate,
+        end_date: endDate,
+        budget_cap: Number(budgetCap) || undefined,
+        instructions: `Channels: ${channelList || '—'}. KPI: ${kpi}.`,
+      });
+      setPublishedId(res.id);
+      setCampaignStatus('draft');
+    } catch (e) {
+      setPublishError(e instanceof Error ? e.message : 'Publish failed. Is the API running on :4000?');
+    } finally {
+      setPublishing(false);
+    }
+  };
+
+  // Client submits the draft for operations approval.
+  const handleSubmitForApproval = async () => {
+    if (!publishedId || !clerkUser) return;
+    setSubmitting(true);
+    setPublishError('');
+    try {
+      await changeCampaignStatus(publishedId, 'submitted', { changed_by: clerkUser.id });
+      setCampaignStatus('submitted');
+    } catch (e) {
+      setPublishError(e instanceof Error ? e.message : 'Submit failed.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <div className="h-screen bg-slate-900 text-white flex flex-col font-sans overflow-hidden">
@@ -31,7 +183,7 @@ export const CampaignBuilderPage: React.FC = () => {
         <div className="flex items-center gap-8">
           <Link to="/" className="flex items-center gap-2">
             <RealReachLogo size={22} color="#ffffff" />
-            <span className="text-base font-bold tracking-tight text-white">REALREACH</span>
+            <span className="text-base font-bold tracking-tight text-white">Realreach</span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-6 text-xs font-semibold text-neutral-400">
@@ -88,72 +240,230 @@ export const CampaignBuilderPage: React.FC = () => {
             </div>
 
             {/* Step 1: Create Areas */}
-            <div>
-              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-900 mb-3">
-                <span className="h-5 w-5 rounded-full bg-black text-white text-[11px] flex items-center justify-center">1</span>
-                <span>Create Areas</span>
-              </div>
+            {step === 1 && <StepAreas activeArea={activeArea} setActiveArea={setActiveArea} setStep={setStep} />}
+            {/* End Step 1 */}
 
-              {/* Area 1 Card */}
-              <div 
-                onClick={() => setActiveArea(1)}
-                className={`p-3.5 rounded-xl border transition-all cursor-pointer mb-2.5 flex items-center justify-between ${
-                  activeArea === 1 ? 'border-black bg-slate-50 shadow-2xs' : 'border-slate-200 bg-white hover:border-slate-300'
-                }`}
+            {/* Step 2: Campaign Details */}
+            {step === 2 && (
+            <div className="animate-fadeIn">
+              <button
+                type="button"
+                onClick={() => setStep(1)}
+                className="text-[11px] font-bold text-slate-400 hover:text-black mb-3 cursor-pointer"
               >
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 font-bold text-xs">
-                    1
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-bold text-slate-900">Milano Duomo</h4>
-                    <p className="text-[11px] text-slate-500">1,100 Letterboxes &bull; 9km</p>
-                    <span className="text-[10px] text-blue-600 font-semibold underline">View addresses</span>
-                  </div>
-                </div>
-
-                <div className="text-right">
-                  <span className="text-sm font-bold font-mono text-slate-900 block">€153.78</span>
-                  <span className="text-[10px] text-slate-400">€0.14 per item</span>
-                </div>
-              </div>
-
-              {/* Area 2 Card (Active) */}
-              <div 
-                onClick={() => setActiveArea(2)}
-                className={`p-3.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between ${
-                  activeArea === 2 ? 'border-black ring-1 ring-black bg-slate-50 shadow-2xs' : 'border-slate-200 bg-white hover:border-slate-300'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 font-bold text-xs">
-                    2
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-bold text-slate-900">Milano Brera &amp; Navigli</h4>
-                    <p className="text-[11px] text-slate-500">1,000 Letterboxes &bull; 5km</p>
-                    <span className="text-[10px] text-emerald-600 font-semibold underline">View addresses</span>
-                  </div>
-                </div>
-
-                <div className="text-right">
-                  <span className="text-sm font-bold font-mono text-slate-900 block">€91.75</span>
-                  <span className="text-[10px] text-slate-400">€0.09 per item</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Inactive Future Steps */}
-            <div className="space-y-3 pt-2 text-xs text-slate-400 font-semibold">
-              <div className="flex items-center gap-2">
-                <span className="h-5 w-5 rounded-full border border-slate-300 text-[11px] flex items-center justify-center">2</span>
+                &larr; Back to areas
+              </button>
+              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-900 mb-4">
+                <span className="h-5 w-5 rounded-full bg-black text-white text-[11px] flex items-center justify-center">2</span>
                 <span>Campaign Details</span>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="h-5 w-5 rounded-full border border-slate-300 text-[11px] flex items-center justify-center">3</span>
-                <span>Invoice Details</span>
+
+              <div className="space-y-3.5">
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-900 mb-1">Campaign title</label>
+                  <input
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    className="w-full rounded-xl bg-slate-50 border border-slate-200 px-3.5 py-2.5 text-xs outline-none focus:border-black"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-900 mb-1">Objective</label>
+                  <select
+                    value={objective}
+                    onChange={(e) => setObjective(e.target.value)}
+                    className="w-full rounded-xl bg-slate-50 border border-slate-200 px-3.5 py-2.5 text-xs outline-none focus:border-black cursor-pointer"
+                  >
+                    <option>Property listing launch</option>
+                    <option>Store opening</option>
+                    <option>Event promotion</option>
+                    <option>Brand awareness</option>
+                  </select>
+                </div>
+                <div className="grid grid-cols-2 gap-2.5">
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-900 mb-1">Start</label>
+                    <input
+                      type="date"
+                      value={startDate}
+                      onChange={(e) => setStartDate(e.target.value)}
+                      className="w-full rounded-xl bg-slate-50 border border-slate-200 px-3 py-2.5 text-xs outline-none focus:border-black"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-900 mb-1">End</label>
+                    <input
+                      type="date"
+                      value={endDate}
+                      onChange={(e) => setEndDate(e.target.value)}
+                      className="w-full rounded-xl bg-slate-50 border border-slate-200 px-3 py-2.5 text-xs outline-none focus:border-black"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <span className="block text-[11px] font-bold text-slate-900 mb-1.5">Channels</span>
+                  <div className="flex flex-wrap gap-2">
+                    {(['print', 'qr', 'sampling'] as const).map((c) => (
+                      <button
+                        key={c}
+                        type="button"
+                        onClick={() => toggleChannel(c)}
+                        className={`px-3 py-1.5 rounded-full text-[11px] font-bold border transition-colors cursor-pointer ${
+                          channels[c] ? 'bg-black text-white border-black' : 'bg-white text-slate-500 border-slate-300'
+                        }`}
+                      >
+                        {c === 'print' ? 'Print flyers' : c === 'qr' ? 'QR tracking' : 'Sampling'}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2.5">
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-900 mb-1">Budget cap (€)</label>
+                    <input
+                      value={budgetCap}
+                      onChange={(e) => setBudgetCap(e.target.value)}
+                      inputMode="decimal"
+                      className="w-full rounded-xl bg-slate-50 border border-slate-200 px-3.5 py-2.5 text-xs outline-none focus:border-black"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-900 mb-1">KPI</label>
+                    <select
+                      value={kpi}
+                      onChange={(e) => setKpi(e.target.value)}
+                      className="w-full rounded-xl bg-slate-50 border border-slate-200 px-3 py-2.5 text-xs outline-none focus:border-black cursor-pointer"
+                    >
+                      <option>Verified coverage ≥ 95%</option>
+                      <option>Verified coverage ≥ 90%</option>
+                      <option>Reach 10k letterboxes</option>
+                    </select>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setStep(3)}
+                  className="w-full py-3 rounded-xl bg-[#0a0a0b] text-white text-xs font-bold hover:bg-neutral-800 transition-colors cursor-pointer"
+                >
+                  Continue to invoice
+                </button>
               </div>
             </div>
+            )}
+            {/* End Step 2 */}
+
+            {/* Step 3: Invoice + Publish */}
+            {step === 3 && (
+            <div className="animate-fadeIn">
+              <button
+                type="button"
+                onClick={() => setStep(2)}
+                className="text-[11px] font-bold text-slate-400 hover:text-black mb-3 cursor-pointer"
+              >
+                &larr; Back to details
+              </button>
+              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-900 mb-4">
+                <span className="h-5 w-5 rounded-full bg-black text-white text-[11px] flex items-center justify-center">3</span>
+                <span>Invoice Details</span>
+              </div>
+
+              {publishedId ? (
+                <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 text-center">
+                  <CheckCircle2 className="h-8 w-8 text-emerald-600 mx-auto" />
+                  <p className="mt-2 text-sm font-extrabold text-slate-900">
+                    {campaignStatus === 'draft' ? 'Draft saved' : 'Submitted for approval'}
+                  </p>
+                  <p className="mt-1 text-[11px] text-slate-500 font-mono break-all">{publishedId}</p>
+                  <p className="mt-1 text-[11px] text-slate-600">
+                    {campaignStatus === 'draft'
+                      ? 'Review your plan, then send it to operations for approval.'
+                      : 'Operations will approve the plan, then split it into tasks for operators.'}
+                  </p>
+
+                  {campaignStatus === 'draft' && (
+                    <button
+                      type="button"
+                      onClick={handleSubmitForApproval}
+                      disabled={submitting}
+                      className="mt-4 w-full py-2.5 rounded-xl bg-[#0a0a0b] text-white text-xs font-bold hover:bg-neutral-800 transition-colors disabled:opacity-50 cursor-pointer inline-flex items-center justify-center gap-2"
+                    >
+                      {submitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                      <span>Submit for approval</span>
+                    </button>
+                  )}
+
+                  <Link
+                    to="/dashboard"
+                    className="mt-3 block w-full py-2.5 rounded-xl border border-slate-300 bg-white text-slate-700 text-xs font-bold hover:bg-slate-50 transition-colors"
+                  >
+                    Open dashboard
+                  </Link>
+                </div>
+              ) : (
+                <div className="space-y-2.5 text-xs">
+                  {[
+                    ['Campaign', title || 'Milano Drop'],
+                    ['Objective', objective],
+                    ['Window', `${startDate} → ${endDate}`],
+                    ['Channels', [channels.print && 'Print', channels.qr && 'QR', channels.sampling && 'Sampling'].filter(Boolean).join(' · ') || '—'],
+                    ['Budget cap', `€${budgetCap}`],
+                    ['KPI', kpi],
+                  ].map(([k, v]) => (
+                    <div key={k} className="flex items-center justify-between rounded-xl bg-slate-50 border border-slate-200 px-3.5 py-2.5">
+                      <span className="font-semibold text-slate-500">{k}</span>
+                      <span className="font-bold text-right">{v}</span>
+                    </div>
+                  ))}
+
+                  <div className="rounded-xl border border-blue-200 bg-blue-50 px-3.5 py-3">
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold text-blue-700">Live estimate</span>
+                      {estLoading && <Loader2 className="h-3.5 w-3.5 animate-spin text-blue-600" />}
+                    </div>
+                    {estResult ? (
+                      <div className="mt-1.5 grid grid-cols-3 gap-2 text-center">
+                        <div>
+                          <p className="text-sm font-extrabold text-slate-900 font-mono">€{estResult.price_total.toFixed(2)}</p>
+                          <p className="text-[10px] text-slate-500">Total</p>
+                        </div>
+                        <div>
+                          <p className="text-sm font-extrabold text-slate-900 font-mono">{estResult.estimated_mailboxes}</p>
+                          <p className="text-[10px] text-slate-500">Letterboxes</p>
+                        </div>
+                        <div>
+                          <p className="text-sm font-extrabold text-slate-900 font-mono">€{estResult.price_per_mailbox.toFixed(3)}</p>
+                          <p className="text-[10px] text-slate-500">Per item</p>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="mt-1 text-[11px] text-blue-700">
+                        {drawnRings ? 'Calculating…' : 'Draw the target area on the map to price it.'}
+                      </p>
+                    )}
+                  </div>
+
+                  {publishError && (
+                    <p className="text-[11px] font-medium text-red-600">{publishError}</p>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={handlePublish}
+                    disabled={publishing}
+                    className="w-full py-3 rounded-xl bg-[#0a0a0b] text-white text-xs font-bold hover:bg-neutral-800 transition-colors disabled:opacity-50 cursor-pointer inline-flex items-center justify-center gap-2"
+                  >
+                    {publishing && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                    <span>{publishing ? 'Saving…' : 'Save draft campaign'}</span>
+                  </button>
+                  <p className="text-[10px] text-slate-400 text-center">
+                    Saves a draft in your organization. Submit it for approval next.
+                  </p>
+                </div>
+              )}
+            </div>
+            )}
+            {/* End Step 3 */}
 
           </div>
 
@@ -167,60 +477,13 @@ export const CampaignBuilderPage: React.FC = () => {
 
         </div>
 
-        {/* RIGHT FULL MAP CANVAS WITH POLYGON & BOTTOM CONTROLS (Matching Image 7 & 8) */}
-        <div className="flex-1 relative bg-slate-950 overflow-hidden">
-          
-          {/* Map Vector Satellite Simulation */}
-          <svg className="w-full h-full object-cover" viewBox="0 0 1000 700" xmlns="http://www.w3.org/2000/svg">
-            {/* Dark Map Tiles Background */}
-            <rect width="1000" height="700" fill="#1e293b" />
+        {/* RIGHT: REAL MILAN MAP WITH DRAW CONTROL */}
+        <div className="flex-1 relative bg-slate-200 overflow-hidden">
 
-            {/* Street Grid Lines */}
-            <g stroke="#334155" strokeWidth="2.5" opacity="0.6">
-              <line x1="0" y1="120" x2="1000" y2="120" />
-              <line x1="0" y1="240" x2="1000" y2="240" />
-              <line x1="0" y1="360" x2="1000" y2="360" />
-              <line x1="0" y1="480" x2="1000" y2="480" />
-              <line x1="0" y1="600" x2="1000" y2="600" />
-              <line x1="200" y1="0" x2="200" y2="700" />
-              <line x1="380" y1="0" x2="380" y2="700" />
-              <line x1="560" y1="0" x2="560" y2="700" />
-              <line x1="740" y1="0" x2="740" y2="700" />
-              <line x1="920" y1="0" x2="920" y2="700" />
-            </g>
-
-            {/* Milan Navigli Canal Waterway */}
-            <path d="M 0 620 Q 300 520 600 560 T 1000 640" stroke="#0284c7" strokeWidth="18" fill="none" opacity="0.4" />
-
-            {/* DRAWN POLYGON AREA 1 (Duomo) */}
-            <path
-              d="M 240 180 L 420 160 L 450 310 L 260 330 Z"
-              fill="#2563eb"
-              fillOpacity="0.25"
-              stroke="#3b82f6"
-              strokeWidth="3"
-            />
-            <circle cx="340" cy="245" r="16" fill="#0a0a0b" stroke="#ffffff" strokeWidth="2" />
-            <text x="340" y="250" fill="#ffffff" fontSize="12" fontWeight="bold" textAnchor="middle">1</text>
-
-            {/* DRAWN POLYGON AREA 2 (Active Brera & Navigli Area matching Image 7 & 8) */}
-            <path
-              d="M 480 220 L 780 240 L 740 440 L 460 410 Z"
-              fill="#0a0a0b"
-              fillOpacity="0.35"
-              stroke="#0a0a0b"
-              strokeWidth="4"
-            />
-            {/* Polygon Corner Pins */}
-            <circle cx="480" cy="220" r="6" fill="#ffffff" stroke="#000000" strokeWidth="3" />
-            <circle cx="780" cy="240" r="6" fill="#ffffff" stroke="#000000" strokeWidth="3" />
-            <circle cx="740" cy="440" r="6" fill="#ffffff" stroke="#000000" strokeWidth="3" />
-            <circle cx="460" cy="410" r="6" fill="#ffffff" stroke="#000000" strokeWidth="3" />
-            
-            {/* Area 2 Number Badge */}
-            <circle cx="610" cy="330" r="16" fill="#0a0a0b" stroke="#ffffff" strokeWidth="2" />
-            <text x="610" y="335" fill="#ffffff" fontSize="12" fontWeight="bold" textAnchor="middle">2</text>
-          </svg>
+          {/* Real map — click Draw area, click corners, Finish */}
+          <div className="absolute inset-0">
+            <RealBuilderMap rings={drawnRings} onChange={setDrawnRings} />
+          </div>
 
           {/* TOP ADDRESS SEARCH BAR & AREA PILL (Matching Image 7 & 8) */}
           <div className="absolute top-5 left-5 right-5 flex flex-wrap items-center justify-between gap-4 pointer-events-none z-10">
@@ -261,13 +524,6 @@ export const CampaignBuilderPage: React.FC = () => {
             </button>
             <button className="p-2 hover:bg-slate-100 rounded-lg text-slate-600 hover:text-black cursor-pointer" title="Add Area">
               <Plus className="h-4 w-4" />
-            </button>
-          </div>
-
-          {/* "Finish" Polygon Button on Map */}
-          <div className="absolute top-1/2 left-[58%] -translate-x-1/2 -translate-y-1/2 z-10">
-            <button className="rounded-full bg-[#0a0a0b] text-white px-5 py-1.5 text-xs font-bold shadow-2xl border border-neutral-700 hover:bg-neutral-800 cursor-pointer">
-              Finish
             </button>
           </div>
 
@@ -345,14 +601,17 @@ export const CampaignBuilderPage: React.FC = () => {
 
             </div>
 
-            {/* [Next] Button */}
-            <Link
-              to="/signup"
+            {/* [Next] Button — advances the studio steps */}
+            {step < 3 && (
+            <button
+              type="button"
+              onClick={() => setStep(step === 1 ? 2 : 3)}
               className="rounded-2xl bg-[#0a0a0b] text-white px-10 py-4 text-base font-bold hover:bg-neutral-800 transition-all shadow-2xl flex items-center gap-2 cursor-pointer hover:scale-103"
             >
               <span>Next</span>
               <ArrowRight className="h-4 w-4" />
-            </Link>
+            </button>
+            )}
 
           </div>
 

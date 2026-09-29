@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowRight } from 'lucide-react';
-import HeroMotionMap from './HeroMotionMap';
+import RealMilanMap from './RealMilanMap';
 
 interface HeroProps {
   onOpenOrder: () => void;
@@ -77,8 +77,8 @@ export const Hero: React.FC<HeroProps> = ({ onOpenOrder }) => {
         {/* PAGE 2: MAPPA GIUSTA CON IL MOTION (Right Map with Motion) */}
         <div className="relative mt-6 sm:mt-10 max-w-[1020px] mx-auto px-4">
           
-          {/* Live Motion 3D Perspective Map */}
-          <HeroMotionMap onOpenOrder={onOpenOrder} />
+          {/* Live Real Map of Milan */}
+          <RealMilanMap />
 
           {/* "Get instant pricing →" Black Pill Button (Page 2) */}
           <div className="mt-8 sm:mt-12 flex flex-col items-center justify-center">

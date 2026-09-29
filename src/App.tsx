@@ -1,30 +1,53 @@
 import React, { useState } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { SignedIn, SignedOut, RedirectToSignIn } from '@clerk/clerk-react';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import SignInPage from './pages/SignInPage';
+import DashboardPage from './pages/DashboardPage';
 import HomePage from './pages/HomePage';
 import ForDistributorsPage from './pages/ForDistributorsPage';
 import AboutPage from './pages/AboutPage';
 import BlogPage from './pages/BlogPage';
 import ContactPage from './pages/ContactPage';
-import LegalPage from './pages/LegalPage';
+import HowItWorksPage from './pages/HowItWorksPage';
+import FeaturesPage from './pages/FeaturesPage';
+import PricingPage from './pages/PricingPage';
+import PlannerPage from './pages/PlannerPage';
+import MissionsPage from './pages/MissionsPage';
+import TrackingPage from './pages/TrackingPage';
+import FaqPage from './pages/FaqPage';
+import TermsPage from './pages/legal/TermsPage';
+import PrivacyPage from './pages/legal/PrivacyPage';
+import CommunityClientsPage from './pages/legal/CommunityClientsPage';
+import CommunityDistributorsPage from './pages/legal/CommunityDistributorsPage';
+import LegalRedirect from './pages/legal/LegalRedirect';
 import SignUpPage from './pages/SignUpPage';
 import PrintStorePage from './pages/PrintStorePage';
 import CampaignBuilderPage from './pages/CampaignBuilderPage';
 import DistributionPortalPage from './pages/DistributionPortalPage';
+import OpsConsolePage from './pages/OpsConsolePage';
+import ReportsPage from './pages/ReportsPage';
 import OrderModal, { CampaignData } from './components/OrderModal';
-import ClientPortalModal from './components/ClientPortalModal';
 import RunnerApplyModal from './components/RunnerApplyModal';
 import ContactModal from './components/ContactModal';
-import SignUpModal from './components/SignUpModal';
+
+function RequireAuth({ children }: { children: React.ReactElement }) {
+  return (
+    <>
+      <SignedIn>{children}</SignedIn>
+      <SignedOut>
+        <RedirectToSignIn />
+      </SignedOut>
+    </>
+  );
+}
 
 function AppContent() {
   const location = useLocation();
-  const [isPortalOpen, setIsPortalOpen] = useState(false);
   const [isOrderOpen, setIsOrderOpen] = useState(false);
   const [isRunnerModalOpen, setIsRunnerModalOpen] = useState(false);
   const [isContactOpen, setIsContactOpen] = useState(false);
-  const [isSignUpModalOpen, setIsSignUpModalOpen] = useState(false);
 
   // Default Milan campaign data for order modal
   const [campaignData, setCampaignData] = useState<CampaignData>({
@@ -56,26 +79,25 @@ function AppContent() {
     setIsOrderOpen(true);
   };
 
-  // Dedicated app layouts: /signup, /print, /campaigns/new, /distribution-portal have their own full-screen layout
-  const isDedicatedAppPage = [
-    '/signup', 
-    '/signin', 
-    '/print', 
-    '/campaigns/new', 
-    '/distribution-portal'
-  ].includes(location.pathname);
+  // Dedicated app layouts have their own full-screen layout (no marketing navbar/footer)
+  const isDedicatedAppPage =
+    ['/signup', '/signin'].some((p) => location.pathname.startsWith(p)) ||
+    [
+      '/dashboard',
+      '/print',
+      '/planner',
+      '/missions',
+      '/campaigns/new',
+      '/distribution-portal',
+      '/ops',
+      '/reports',
+    ].includes(location.pathname);
 
   return (
     <div className="min-h-screen bg-white text-[#0a0a0b] flex flex-col selection:bg-[#0a0a0b] selection:text-white">
       
-      {/* Sticky REALREACH Navbar (hidden on dedicated full-screen auth / builder pages) */}
-      {!isDedicatedAppPage && (
-        <Navbar
-          onOpenPortal={() => setIsPortalOpen(true)}
-          onOpenOrder={() => setIsOrderOpen(true)}
-          onOpenSignUp={() => setIsSignUpModalOpen(true)}
-        />
-      )}
+      {/* Sticky Realreach Navbar (hidden on dedicated full-screen auth / builder pages) */}
+      {!isDedicatedAppPage && <Navbar />}
 
       {/* Multi-Page Routes */}
       <main className="flex-1">
@@ -85,31 +107,47 @@ function AppContent() {
             element={
               <HomePage
                 onOpenOrder={() => setIsOrderOpen(true)}
-                onOpenOrderWithData={handleOpenOrderWithData}
-                onOpenOrderWithVolume={handleOpenOrderWithVolume}
-                onOpenPortal={() => setIsPortalOpen(true)}
                 onOpenRunnerModal={() => setIsRunnerModalOpen(true)}
               />
             }
           />
           <Route path="/for-distributors" element={<ForDistributorsPage />} />
+          <Route path="/how-it-works" element={<HowItWorksPage onOpenOrder={() => setIsOrderOpen(true)} />} />
+          <Route path="/features" element={<FeaturesPage onOpenOrder={() => setIsOrderOpen(true)} />} />
+          <Route
+            path="/pricing"
+            element={
+              <PricingPage
+                onOpenOrderWithData={handleOpenOrderWithData}
+                onOpenOrderWithVolume={handleOpenOrderWithVolume}
+              />
+            }
+          />
+          <Route path="/gps-tracking" element={<TrackingPage />} />
+          <Route path="/planner" element={<RequireAuth><PlannerPage /></RequireAuth>} />
+          <Route path="/missions" element={<RequireAuth><MissionsPage /></RequireAuth>} />
+          <Route path="/faq" element={<FaqPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/contact" element={<ContactPage />} />
-          <Route path="/legal/:type" element={<LegalPage />} />
-          <Route path="/signup" element={<SignUpPage />} />
-          <Route path="/signin" element={<SignUpPage />} />
-          <Route path="/print" element={<PrintStorePage />} />
-          <Route path="/campaigns/new" element={<CampaignBuilderPage />} />
-          <Route path="/distribution-portal" element={<DistributionPortalPage />} />
+          <Route path="/legal/terms" element={<TermsPage />} />
+          <Route path="/legal/privacy" element={<PrivacyPage />} />
+          <Route path="/legal/community-clients" element={<CommunityClientsPage />} />
+          <Route path="/legal/community-distributors" element={<CommunityDistributorsPage />} />
+          <Route path="/legal/:type" element={<LegalRedirect />} />
+          <Route path="/signup/*" element={<SignUpPage />} />
+          <Route path="/signin/*" element={<SignInPage />} />
+          <Route path="/dashboard" element={<RequireAuth><DashboardPage /></RequireAuth>} />
+          <Route path="/print" element={<RequireAuth><PrintStorePage /></RequireAuth>} />
+          <Route path="/campaigns/new" element={<RequireAuth><CampaignBuilderPage /></RequireAuth>} />
+          <Route path="/distribution-portal" element={<RequireAuth><DistributionPortalPage /></RequireAuth>} />
+            <Route path="/ops" element={<RequireAuth><OpsConsolePage /></RequireAuth>} />
+            <Route path="/reports" element={<RequireAuth><ReportsPage /></RequireAuth>} />
           <Route
             path="*"
             element={
               <HomePage
                 onOpenOrder={() => setIsOrderOpen(true)}
-                onOpenOrderWithData={handleOpenOrderWithData}
-                onOpenOrderWithVolume={handleOpenOrderWithVolume}
-                onOpenPortal={() => setIsPortalOpen(true)}
                 onOpenRunnerModal={() => setIsRunnerModalOpen(true)}
               />
             }
@@ -117,19 +155,10 @@ function AppContent() {
         </Routes>
       </main>
 
-      {/* PDF Page 11: REALREACH Footer (hidden on dedicated app pages) */}
+      {/* PDF Page 11: Realreach Footer (hidden on dedicated app pages) */}
       {!isDedicatedAppPage && <Footer />}
 
       {/* Global Modals */}
-      <ClientPortalModal
-        isOpen={isPortalOpen}
-        onClose={() => setIsPortalOpen(false)}
-        onOpenOrder={() => {
-          setIsPortalOpen(false);
-          setIsOrderOpen(true);
-        }}
-      />
-
       <OrderModal
         isOpen={isOrderOpen}
         onClose={() => setIsOrderOpen(false)}
@@ -144,11 +173,6 @@ function AppContent() {
       <ContactModal
         isOpen={isContactOpen}
         onClose={() => setIsContactOpen(false)}
-      />
-
-      <SignUpModal
-        isOpen={isSignUpModalOpen}
-        onClose={() => setIsSignUpModalOpen(false)}
       />
 
     </div>

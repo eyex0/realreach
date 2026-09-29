@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight, Check } from 'lucide-react';
-import { RealReachLogo } from './RealReachLogo';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface HowItWorksProps {
   onOpenOrder?: () => void;
-  onOpenFeatureModal?: (featureTitle: string) => void;
 }
 
 const STEPS = [
@@ -21,7 +19,7 @@ const STEPS = [
     stepNumber: 'STEP 2',
     title: 'Get allocated Distributors',
     description:
-      "Your run is matched to verified 'REALREACH Walkers' in the Milan area and allocated ready for collection.",
+      "Your run is matched to verified 'Realreach Walkers' in the Milan area and allocated ready for collection.",
     videoUrl:
       'https://realrun.com.au/__l5e/assets-v1/9cff4208-3ca3-4db0-a4b4-77a281c5c691/step-assign-distributor.mp4',
     progressColor: 'bg-amber-500',
@@ -30,7 +28,7 @@ const STEPS = [
     stepNumber: 'STEP 3',
     title: 'Collection & Pickup',
     description:
-      'Choose any pickup location in Milan and a verified REALREACH runner collects your flyers, ready to distribute in your campaign area.',
+      'Choose any pickup location in Milan and a verified Realreach runner collects your flyers, ready to distribute in your campaign area.',
     videoUrl:
       'https://realrun.com.au/__l5e/assets-v1/38b8ca53-7ae2-4189-9d12-c4cc21a4bd51/step-collection-trim.mp4',
     progressColor: 'bg-blue-500',
@@ -46,19 +44,8 @@ const STEPS = [
   },
 ];
 
-const FREE_FEATURES = [
-  { title: 'Custom map area insights', desc: 'Select streets, calculate letterboxes, and exclude non-residential buildings.' },
-  { title: 'Live tracking you can rely on', desc: 'Real-time GPS coordinates of your distributor with street coverage overlays.' },
-  { title: 'Access to the print store', desc: 'Print flyers on 150-350 GSM premium paper stocks and bundle automatically.' },
-  { title: 'Distribution insights dashboard', desc: 'Detailed delivery heatmaps, completion reports, and vendor share links.' },
-  { title: 'Manage all runs in one place', desc: 'Schedule recurring drops across Milan, monitor multi-zone marketing.' },
-  { title: 'Create unlimited test campaigns', desc: 'Plan and save drafts without commitment or payment until you publish.' },
-  { title: 'Access to Sales & Run Support', desc: 'Direct assistance via phone +39 02 800 318 47 and WhatsApp live support.' },
-];
-
-export const HowItWorks: React.FC<HowItWorksProps> = ({ onOpenOrder, onOpenFeatureModal }) => {
+export const HowItWorks: React.FC<HowItWorksProps> = ({ onOpenOrder }) => {
   const [currentStepIdx, setCurrentStepIdx] = useState(1); // Default to Step 2 as shown in PDF Page 5!
-  const [activeFeature, setActiveFeature] = useState<string | null>(null);
 
   const prevStep = () => {
     setCurrentStepIdx((idx) => (idx === 0 ? STEPS.length - 1 : idx - 1));
@@ -169,71 +156,6 @@ export const HowItWorks: React.FC<HowItWorksProps> = ({ onOpenOrder, onOpenFeatu
               </div>
             </div>
 
-          </div>
-        </div>
-
-        {/* PAGE 5: FREE FEATURES LIST */}
-        <div className="max-w-4xl mx-auto pt-8 border-t border-[var(--color-border)]">
-          <div className="text-left mb-8">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 text-slate-800 text-xs font-semibold mb-3">
-              <RealReachLogo size={16} color="#0a0a0b" />
-              <span className="font-bold">REALREACH Free Features</span>
-            </div>
-            <h3 className="font-bold text-[#0a0a0b] text-3xl sm:text-4xl tracking-tight">
-              Free Features
-            </h3>
-            <p className="mt-2 text-base text-[#6b7280]">
-              When you create an account, get access to
-            </p>
-          </div>
-
-          <div className="space-y-3">
-            {FREE_FEATURES.map((feat) => (
-              <div
-                key={feat.title}
-                className="flex items-center justify-between p-4 sm:p-5 rounded-xl border border-slate-200 bg-white hover:border-slate-300 transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="h-5 w-5 rounded-full bg-slate-100 flex items-center justify-center shrink-0">
-                    <Check className="h-3.5 w-3.5 text-slate-800" strokeWidth={3} />
-                  </div>
-                  <span className="font-semibold text-base sm:text-lg text-[#0a0a0b]">
-                    {feat.title}
-                  </span>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => setActiveFeature(activeFeature === feat.title ? null : feat.title)}
-                  className="rounded-full border border-slate-300 px-4 py-1 text-xs sm:text-sm font-semibold text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer"
-                >
-                  See
-                </button>
-              </div>
-            ))}
-          </div>
-
-          {/* Modal / Popover preview for active feature */}
-          {activeFeature && (
-            <div className="mt-4 p-4 rounded-xl bg-slate-900 text-white text-sm flex items-center justify-between animate-fadeIn">
-              <span>
-                <strong>{activeFeature}:</strong>{' '}
-                {FREE_FEATURES.find((f) => f.title === activeFeature)?.desc}
-              </span>
-              <button
-                type="button"
-                onClick={() => setActiveFeature(null)}
-                className="ml-4 underline text-xs text-slate-300 hover:text-white cursor-pointer"
-              >
-                Close
-              </button>
-            </div>
-          )}
-
-          <div className="mt-8 text-center sm:text-left">
-            <p className="text-xs uppercase tracking-widest font-semibold text-slate-400">
-              Pay per delivery, not per month.
-            </p>
           </div>
         </div>
 

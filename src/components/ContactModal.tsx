@@ -43,7 +43,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) =
             Milan &amp; Italy Dispatch Support
           </span>
           <h3 className="mt-2 text-2xl font-bold text-[#0a0a0b] tracking-tight">
-            Contact REALREACH
+            Contact Realreach
           </h3>
           <p className="mt-1 text-sm text-[#4b5563]">
             Have questions about custom runs, agency accounts, or multi-zone drops across Milan?

@@ -4,7 +4,7 @@ import { ChevronDown, Apple } from 'lucide-react';
 const FAQS = [
   {
     q: 'How do I know my jobs have been delivered?',
-    a: 'Every REALREACH flyer distribution campaign is GPS tracked. You can follow the progress of your campaign through your REALREACH account and, once completed, view the delivery route and tracking data showing where your flyers were distributed.',
+    a: 'Every Realreach flyer distribution campaign is GPS tracked. You can follow the progress of your campaign through your Realreach account and, once completed, view the delivery route and tracking data showing where your flyers were distributed.',
   },
   {
     q: 'What happens if something goes wrong?',

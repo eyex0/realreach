@@ -31,7 +31,7 @@ export const PrintStorePage: React.FC = () => {
         <div className="flex items-center gap-8">
           <Link to="/" className="flex items-center gap-2.5">
             <RealReachLogo size={24} color="#0a0a0b" />
-            <span className="text-xl font-bold tracking-tight text-[#0a0a0b]">REALREACH</span>
+            <span className="text-xl font-bold tracking-tight text-[#0a0a0b]">Realreach</span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600">
