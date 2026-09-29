@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowRight } from 'lucide-react';
-import RealMilanMap from './RealMilanMap';
+import HeroCampaignMap from './HeroCampaignMap';
 
 interface HeroProps {
   onOpenOrder: () => void;
@@ -76,9 +76,9 @@ export const Hero: React.FC<HeroProps> = ({ onOpenOrder }) => {
 
         {/* PAGE 2: MAPPA GIUSTA CON IL MOTION (Right Map with Motion) */}
         <div className="relative mt-6 sm:mt-10 max-w-[1020px] mx-auto px-4">
-          
-          {/* Live Real Map of Milan */}
-          <RealMilanMap />
+
+          {/* Live map, with the campaign state floating around it */}
+          <HeroCampaignMap />
 
           {/* "Get instant pricing →" Black Pill Button (Page 2) */}
           <div className="mt-8 sm:mt-12 flex flex-col items-center justify-center">
