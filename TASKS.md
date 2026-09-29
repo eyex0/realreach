@@ -30,6 +30,7 @@ This is the shipped, verified vertical. Everything below was signed off on
 | Rate limiting, upload size caps, storage (Supabase) | `[x]` | `tools/test-hardening.ps1`, storage E2E |
 | Reports: overview, campaign, estimate | `[x]` | `tools/test-reports.ps1` |
 | Landing page + live Milan map | `[x]` | Rendered and screenshotted |
+| Landing map backed by real campaign data | `[x]` | `GET /map/live`, real geometry + last GPS track |
 | CI green on all three repos | `[x]` | GitHub Actions |
 | Data hygiene tools (purge + idempotent seed) | `[x]` | `tools/purge-domain.sql`, `tools/seed.mjs` |
 | Deployment / hosting | `[ ]` | Deferred by decision |
@@ -41,7 +42,9 @@ This is the shipped, verified vertical. Everything below was signed off on
 - Operator sign-in is email-only — no OTP, no identity check. Pilot-only.
 - One session per proof; v1 does not stream live GPS to the web console.
 - Rate is a hardcoded €0.04/piece. There is no client billing.
-- Demo map zones are hand-drawn rectangles, not real GIS boundaries.
+- Demo map zones are hand-drawn rectangles, not real GIS boundaries. The hero
+  map shows real campaign geometry when the API is reachable and falls back to
+  those demo zones when it is not.
 - Browser QA cannot produce GPS, so verdicts there are `requires_review`.
 
 ---

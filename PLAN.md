@@ -297,6 +297,24 @@ basemap, and the 500-item scope had no home in the repo.
 - [x] Map is now framed with `fitBounds` instead of a hardcoded centre, has
       `+`/`−` controls, hover-highlighted zones, and a background colour so it
       never flashes empty.
+- [x] **Map now renders real data, not hardcoded rectangles.** New public,
+      aggregate-only endpoint `GET /map/live` returns campaign target-area
+      geometry, task counts per status, the count of active sessions, and the
+      most recent *finished* GPS track with its distance and duration. The hero
+      map fetches it (4 s timeout, 60 s poll) and falls back to the static demo
+      zones when the API is unreachable, so the public page never breaks.
+- [x] **Privacy decision:** the landing page is unauthenticated, so the feed
+      returns **no operator names, ids or e-mail addresses, and never the
+      position of an in-progress session**. Publishing a live individual's
+      location would violate the platform's own GDPR rules
+      (`docs/CONTEXT.md` §17). Named/live positions belong behind a
+      client/admin token. Asserted by three new checks in
+      `tools/test-e2e-required.ps1` (public reachability, no identity leak, no
+      live positions).
+- [x] Fixed two bugs found by screenshotting the live page: GeoJSON rings are
+      `[lon, lat]` while Leaflet wants `[lat, lon]` (the polygon was being drawn
+      in Kenya and blew `fitBounds` out to a world view), and the framing locked
+      to the wide fallback bounds so live geometry rendered as a speck.
 - [x] Verified by headless-Edge screenshot of `http://127.0.0.1:3000/`: real
       Milan basemap, three zone polygons, runner markers, controls, attribution.
 - [x] Added `TASKS.md` (500-task board with verified pilot status, known
