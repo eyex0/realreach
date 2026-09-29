@@ -3,13 +3,14 @@ import { useUser } from '@clerk/clerk-react';
 import { Link } from 'react-router-dom';
 import {
   Loader2, AlertCircle, Target, Bookmark, BookmarkCheck, X, ChevronRight,
-  Sparkles, Flag, RefreshCw, CheckCircle2,
+  Sparkles, Flag, RefreshCw, CheckCircle2, Radio,
 } from 'lucide-react';
 import { syncBackendUser } from '../lib/api';
+import NotificationCenter from '../components/NotificationCenter';
 import {
   listTemplates, listIcps, createIcp, runDiscovery, getFeed, getOpportunity,
   markOpportunity, addOpportunityNote, getActivation, setPlatformUser,
-  createOutreachDraft, editOutreachDraft, approveOutreach, rejectOutreach,
+  createOutreachDraft, editOutreachDraft, approveOutreach, rejectOutreach, watchCompany,
   type FeedItem, type IcpTemplate, type OpportunityDetail, type Activation,
   type OutreachDraft, type ClaimViolation,
 } from '../lib/platformApi';
@@ -47,11 +48,12 @@ function Breakdown({ components }: { components: FeedItem['score_breakdown'] }) 
   );
 }
 
-function OpportunityCard({ item, onOpen, onSave, onIgnore, busy }: {
+function OpportunityCard({ item, onOpen, onSave, onIgnore, onWatch, busy }: {
   item: FeedItem;
   onOpen: () => void;
   onSave: () => void;
   onIgnore: () => void;
+  onWatch: () => void;
   busy: boolean;
 }) {
   return (
@@ -111,6 +113,16 @@ function OpportunityCard({ item, onOpen, onSave, onIgnore, busy }: {
         >
           <Sparkles className="h-3 w-3" />
           Research
+        </button>
+        <button
+          type="button"
+          onClick={onWatch}
+          disabled={busy}
+          title="Watch this company: get alerted when its signals, score or contacts change"
+          className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 px-3 py-1.5 text-[11px] font-bold hover:bg-slate-50 disabled:opacity-40 cursor-pointer"
+        >
+          <Radio className="h-3 w-3" />
+          Watch
         </button>
         <button
           type="button"
@@ -448,6 +460,7 @@ export const OpportunitiesPage: React.FC = () => {
   const [activation, setActivation] = useState<Activation | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState('');
+  const [flash, setFlash] = useState('');
 
   const refresh = useCallback(async () => {
     try {
@@ -479,6 +492,18 @@ export const OpportunitiesPage: React.FC = () => {
       setPlatformUser(null);
     };
   }, [user, refresh]);
+
+  const watch = async (companyId: string) => {
+    setBusyId(companyId);
+    try {
+      await watchCompany(companyId);
+      setFlash('Watching this company for changes');
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'could not watch company');
+    } finally {
+      setBusyId(null);
+    }
+  };
 
   const act = async (id: string, action: 'save' | 'ignore' | 'unsave') => {
     setBusyId(id);
@@ -529,6 +554,7 @@ export const OpportunitiesPage: React.FC = () => {
           >
             <RefreshCw className="h-3.5 w-3.5" />
           </button>
+          <NotificationCenter onChanged={() => void refresh()} />
         </div>
       </header>
 
@@ -559,6 +585,12 @@ export const OpportunitiesPage: React.FC = () => {
       {activation?.activated && (
         <p className="mt-6 inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-700">
           <CheckCircle2 className="h-4 w-4" /> Workspace activated — keep the feed moving.
+        </p>
+      )}
+
+      {flash && (
+        <p className="mt-4 rounded-xl bg-emerald-50 px-3 py-2 text-xs text-emerald-800 flex items-center gap-2">
+          <CheckCircle2 className="h-4 w-4" /> {flash}
         </p>
       )}
 
@@ -596,6 +628,7 @@ export const OpportunitiesPage: React.FC = () => {
                 onOpen={() => setOpenId(item.id)}
                 onSave={() => void act(item.id, item.saved ? 'unsave' : 'save')}
                 onIgnore={() => void act(item.id, 'ignore')}
+                onWatch={() => void watch(item.company_id)}
               />
             ))
           )}

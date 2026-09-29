@@ -293,3 +293,71 @@ export async function rejectOutreach(id: string, reason?: string): Promise<{ id:
     })
   );
 }
+
+export interface AppNotification {
+  id: string;
+  kind: 'signal' | 'score_change' | 'contact_change' | 'task_due' | 'digest' | string;
+  title: string;
+  body: string | null;
+  link: string | null;
+  read_at: string | null;
+  created_at: string;
+}
+
+export interface CompanyWatch {
+  id: string;
+  company_id: string;
+  canonical_name: string;
+  domain: string | null;
+  country: string | null;
+  last_checked_at: string | null;
+  last_notified_score: number | null;
+}
+
+export interface MonitoringResult {
+  watched: number;
+  signals: number;
+  score_changes: number;
+  contact_changes: number;
+  task_reminders: number;
+  digest_created: boolean;
+  notified: number;
+}
+
+export async function listNotifications(): Promise<AppNotification[]> {
+  return handle<AppNotification[]>(await fetch(`${API_BASE}/notifications?${authQuery()}`));
+}
+
+export async function markNotificationRead(id: string): Promise<void> {
+  await handle(
+    await fetch(`${API_BASE}/notifications/${id}/read`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: authBody({}),
+    })
+  );
+}
+
+export async function listWatches(): Promise<CompanyWatch[]> {
+  return handle<CompanyWatch[]>(await fetch(`${API_BASE}/platform/watches?${authQuery()}`));
+}
+
+export async function watchCompany(companyId: string): Promise<void> {
+  await handle(
+    await fetch(`${API_BASE}/platform/watches`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: authBody({ company_id: companyId }),
+    })
+  );
+}
+
+export async function runMonitoringNow(digest = false): Promise<MonitoringResult> {
+  return handle<MonitoringResult>(
+    await fetch(`${API_BASE}/platform/monitoring/run`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: authBody({ digest }),
+    })
+  );
+}

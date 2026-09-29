@@ -21,7 +21,7 @@ workflow — not another tool they tried once.
 | 2 | Make data trustworthy and sourced | `[x]` confidence, freshness, unknown-marker and bad-data reporting all shipped |
 | 3 | Make the opportunity feed the home screen | `[x]` `/opportunities`: score, why it matters, next action, save/dismiss |
 | 4 | Make AI transparent and evidence-based | `[~]` verdict + outreach evidence shown, unsupported claims blocked; LLM outputs not yet |
-| 5 | Add monitoring and alerts | `[~]` `notifications` table + API exist; no signal alerts, digest, or saved-company monitoring |
+| 5 | Add monitoring and alerts | `[x]` watches, watermarked passes, score/signal/contact/task alerts, weekly digest |
 | 6 | Build admin and support tools | `[~]` ops console covers campaigns, proofs, payouts, reports; no feature flags, job retry, or support tickets |
 | 7 | Improve data coverage by market | `[ ]` Italy only (Milan); no external sources |
 | 8 | Use feedback to improve scoring and matching | `[~]` bad-data reporting live; outcome capture needs the opportunity model |
@@ -164,9 +164,15 @@ Review opportunity →
 
 This turns RealReach from a search tool into a daily workflow.
 
-**Pilot status** — `notifications` (user, kind, title, body, link, read_at)
-already exists with a router; the kinds the platform needs (signal, score
-change, digest) are not produced by anything yet.
+**Status** - `[x]` shipped. The shared `notifications` table was extended with
+the platform's kinds rather than duplicated, so the pilot and the platform share
+one inbox. `company_watches` stores per-kind opt-outs and the watermarks that make
+a monitoring pass idempotent; a pass reports new signals, material score changes,
+new decision-makers, tasks due within 24h, and a weekly digest.
+
+The pass is a pure function of the database plus those watermarks, exposed as
+`POST /platform/monitoring/run` and `node tools/run-monitoring.mjs`. Wiring it to a
+cron, EventBridge or Azure Scheduler is configuration, not code.
 
 ## 6. Keep the platform simple
 
@@ -240,15 +246,16 @@ irrelevant · searches with no good results.
 Use it to improve scoring, signal relevance, contact matching, outreach
 quality, and search ranking. This becomes a long-term advantage.
 
-**Pilot status** — `[x]` the first half is live: any user (including the
+**Pilot status** - `[~]` the first half is live: any user (including the
 operator who produced the data) can flag bad data, the ops console shows an
 open-report count per proof and a queue with resolve/dismiss, and filing a
-report provably never changes the machine verdict. `[ ]` the second half needs
-the opportunity model — there is nothing to save, ignore or rate yet, so
-scoring has nothing to learn from. What is already capturable is: every
-`verified` / `requires_review` / `rejected` verdict paired with the human
-decision is a labelled signal sitting unused in the database.
+report provably never changes the machine verdict.
 
+`[x]` the platform half now exists too. Every opportunity records saved/ignored,
+every state change lands in `opportunity_activity`, and the feed collects those
+outcomes. The scoring engine is still deterministic and rule-based, so there is
+no learned model to retrain yet - the honest next step is a scoring service that
+reads these outcomes, not a claim that the loop is closed.
 ---
 
 ## How to use this file

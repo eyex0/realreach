@@ -484,6 +484,64 @@ pass, frontend `tsc` + build clean, CI green.
 
 ---
 
+## Stage 22 — Monitoring and alerts (Priority 5) **[COMPLETE]**
+
+**Goal:** "users should return weekly because the platform gives them new reasons
+to act." A tool you check once is a tool you abandon.
+
+- [x] **Watches** — `company_watches`, org-scoped, with per-kind opt-outs
+      (signals / score changes / contact changes) because someone watching for
+      hiring does not want a nudge about a two-point score drift.
+- [x] **Monitoring pass** (`src/lib/monitoring.ts`) reports new signals, material
+      score changes ("score 80 → 90"), new decision-makers, and tasks due
+      within 24h — then a **weekly digest** of all of it.
+- [x] **The pass is idempotent, and that is the whole contract.** Watermarks live
+      in the watch (`last_checked_at`, `last_notified_score`) and the digest is
+      keyed by its period, so a scheduler can call it daily and an operator can
+      press the button twice without sending the same news twice. Asserted in
+      E2E.
+- [x] **A new watch backfills 30 days once**, so subscribing produces immediate
+      value instead of a week of silence that reads as "monitoring is broken".
+- [x] **Score alerts cannot contradict the feed** — the alert recomputes with the
+      same deterministic scorer the card uses.
+- [x] **One alert per company, not per event.** Three new roles is one reason to
+      come back, not three near-identical rows in the inbox.
+- [x] **Trigger paths:** `POST /platform/monitoring/run` for a scheduler (cron /
+      EventBridge / Azure Scheduler) and `node tools/run-monitoring.mjs` for
+      local and manual runs. No background timer exists in this environment —
+      the job is a pure function of the database plus watermarks, so wiring it to
+      a scheduler is configuration, not code.
+- [x] **UI** — a notification bell with unread count, a list with mark-as-read, a
+      "Check now" button that runs a pass on demand, and a **Watch** action on
+      every opportunity card.
+- [x] **The shared `notifications` table was extended, not duplicated**: the
+      pilot's `kind` CHECK constraint only allowed pilot kinds, so the platform's
+      four kinds were added to the same enum — one inbox, one unread count, and
+      the pilot keeps working unchanged.
+
+**Bugs found and fixed while building this**
+1. **Silent data-corruption class bug:** `SELECT o.id, o.score, ..., i.*` — `icps`
+   also has an `id`, so `i.*` overwrote the opportunity id and every `UPDATE`
+   targeted nothing. The alert fired correctly while the baseline it was supposed
+   to record never persisted, so the same alert repeated forever. Columns are now
+   listed explicitly.
+2. **Six identical "score 80 → 90" alerts**, one per opportunity of the same
+   company, all comparing against a baseline that was only written after the
+   loop. Now one alert per company per pass.
+3. **Two different contacts produced two alerts with the same generic title**,
+   so a real inbox had indistinguishable rows. Signal and contact alerts are now
+   merged per company and self-describing.
+4. The platform's alert kinds violated the existing `notifications_kind_check`
+   constraint — caught immediately because the first run failed rather than
+   silently writing nothing.
+
+**Verify:** 75/75 vitest, **114/114 E2E-REQUIRED** (10 new monitoring checks,
+including "re-running reports no duplicate alerts" and "one pass never sends the
+same alert twice"), all other E2E scripts clean, storage pass, frontend `tsc` +
+build clean, CI green.
+
+---
+
 ### Out of scope (not in this plan unless requested)
 
 Live ops map/WebSocket, email/SMS notifications, Stripe billing, multi-org
