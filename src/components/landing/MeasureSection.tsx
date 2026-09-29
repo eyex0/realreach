@@ -2,18 +2,26 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 
-/** SECTION 5 — MEASURE: Execution → Verification → Reach → Response → Economics. */
+/**
+ * SECTION 5 — MEASURE.
+ *
+ * The old version was five identical cards, which made five numbers of very
+ * different weight look equally important. This reads as one line of evidence:
+ * the stages sit in a row separated by rules, the last one — the cost — is
+ * pulled out as the point of the whole funnel.
+ */
 const FUNNEL = [
   { value: '12,000', label: 'Executed', desc: 'Flyers distributed in zone' },
   { value: '10,840', label: 'Verified', desc: 'GPS + proof confirmed' },
   { value: '8,920', label: 'Estimated reach', desc: 'Unique letterboxes' },
   { value: '3,420', label: 'Responses', desc: 'QR scans & calls' },
-  { value: '€0.21', label: 'Cost / verified reach', desc: 'All-in economics' },
 ];
+
+const PAYOFF = { value: '€0.21', label: 'Cost per verified reach', desc: 'All-in economics' };
 
 export const MeasureSection: React.FC = () => {
   return (
-    <section className="py-20 md:py-28 bg-white border-b border-[var(--color-border)]">
+    <section id="measure" className="py-20 md:py-28 bg-white border-b border-[var(--color-border)]">
       <div className="mx-auto max-w-[1400px] px-5 sm:px-6 lg:px-8">
         <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#006de4]">04 — Measure</p>
         <h2 className="mt-3 font-extrabold text-[#0a0a0b] tracking-tight leading-[1.08] text-[clamp(2rem,4vw,3.25rem)] max-w-3xl">
@@ -23,26 +31,44 @@ export const MeasureSection: React.FC = () => {
           Execution → Verification → Reach → Response → Economics. One funnel, fully measurable.
         </p>
 
-        <div className="mt-12 grid grid-cols-2 lg:grid-cols-5 gap-4">
+        {/* The funnel stages, as a single line of evidence rather than cards. */}
+        <dl className="mt-14 grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-4">
           {FUNNEL.map((f, i) => (
-            <div key={f.label} className="relative rounded-2xl border border-slate-200 bg-slate-50 p-5 overflow-hidden">
-              <span className="font-mono text-xs font-bold text-[#006de4]">0{i + 1}</span>
-              <p className="mt-2 text-3xl sm:text-4xl font-extrabold text-[#0a0a0b] font-mono tracking-tight">
-                {f.value}
-              </p>
-              <p className="mt-1 text-sm font-bold">{f.label}</p>
-              <p className="text-xs text-slate-500 mt-0.5">{f.desc}</p>
-              {i < FUNNEL.length - 1 && (
-                <span className="hidden lg:block absolute top-1/2 -right-2 text-slate-300 font-bold z-10">›</span>
-              )}
+            <div
+              key={f.label}
+              className={`${i > 0 ? 'sm:border-l sm:border-slate-200 sm:pl-6' : ''}`}
+            >
+              <dt className="sr-only">{f.label}</dt>
+              <dd>
+                <p className="text-4xl sm:text-5xl font-extrabold text-[#0a0a0b] font-mono tracking-tight tabular-nums">
+                  {f.value}
+                </p>
+                <p className="mt-2 text-sm font-bold text-[#0a0a0b]">{f.label}</p>
+                <p className="text-xs text-slate-500 mt-0.5">{f.desc}</p>
+              </dd>
             </div>
           ))}
-        </div>
+        </dl>
 
-        <Link to="/dashboard" className="mt-8 inline-flex items-center gap-2 text-sm font-bold text-[#0a0a0b] underline underline-offset-4 hover:text-[#006de4]">
-          <span>Open analytics</span>
-          <ArrowRight className="h-4 w-4" />
-        </Link>
+        {/* The payoff, separated out: this is the number the funnel exists for. */}
+        <div className="mt-14 flex flex-col gap-6 rounded-2xl border border-slate-200 bg-slate-50 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
+          <div className="flex items-baseline gap-4">
+            <span className="text-5xl sm:text-6xl font-extrabold text-[#0a0a0b] font-mono tracking-tight tabular-nums">
+              {PAYOFF.value}
+            </span>
+            <span className="max-w-xs text-sm leading-relaxed text-slate-600">
+              <span className="block font-bold text-[#0a0a0b]">{PAYOFF.label}</span>
+              {PAYOFF.desc}
+            </span>
+          </div>
+          <Link
+            to="/dashboard"
+            className="inline-flex shrink-0 items-center gap-2 text-sm font-bold text-[#0a0a0b] underline underline-offset-4 hover:text-[#006de4]"
+          >
+            <span>Open analytics</span>
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
       </div>
     </section>
   );

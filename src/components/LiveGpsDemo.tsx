@@ -141,51 +141,50 @@ export const LiveGpsDemo: React.FC = () => {
   const percentage = Math.min(100, ((currentDelivered / selectedSuburb.targetCount) * 100)).toFixed(1);
 
   return (
-    <section id="live-tracking" className="relative py-20 md:py-28 bg-[#0a0a0b] text-white overflow-hidden border-b border-neutral-800">
-      
-      {/* Background ambient lighting */}
-      <div className="absolute top-0 right-1/4 w-96 h-96 bg-blue-600/10 blur-[130px] pointer-events-none rounded-full" />
-      <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-emerald-600/10 blur-[130px] pointer-events-none rounded-full" />
-
+    <section id="live-tracking" className="relative py-20 md:py-28 bg-white border-b border-slate-200">
       <div className="relative z-10 mx-auto max-w-[1400px] px-5 sm:px-6 lg:px-8">
-        
-        {/* Section Header */}
-        <div className="max-w-3xl mb-12 sm:mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold tracking-wide uppercase mb-4">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-            <span>Mappa dal Vivo &bull; Milano GPS Telemetry</span>
+
+        {/* Header: claim on the left, the control surface on the right. */}
+        <div className="mb-10 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-2xl">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-600">
+              Live tracking
+            </p>
+            <h2 className="mt-3 text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#0a0a0b] tracking-tight leading-[1.08]">
+              Watch the work happen, street by street.
+            </h2>
+            <p className="mt-4 text-base sm:text-lg text-slate-600 leading-relaxed">
+              Realreach distributors walk Milan&rsquo;s street grid in real time. Every letterbox
+              drop is GPS-logged, time-stamped, and photo-verified.
+            </p>
           </div>
 
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight leading-tight">
-            Live Distribution Map with Motion
-          </h2>
-
-          <p className="mt-4 text-base sm:text-lg text-neutral-400 leading-relaxed max-w-2xl">
-            Watch Realreach distributors walk Milan's street grid in real time. Every letterbox drop is GPS-logged, time-stamped, and photo-verified.
-          </p>
-        </div>
-
-        {/* Zone Selector Chips (Milan Key Areas) */}
-        <div className="flex flex-wrap items-center gap-2.5 mb-8">
-          {MILAN_ZONES.map((zone) => {
-            const isSelected = selectedSuburb.id === zone.id;
-            return (
-              <button
-                key={zone.id}
-                type="button"
-                onClick={() => handleZoneChange(zone)}
-                className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer flex items-center gap-2 ${
-                  isSelected
-                    ? 'bg-white text-black shadow-lg shadow-white/10 scale-102'
-                    : 'bg-neutral-900 border border-neutral-800 text-neutral-400 hover:text-white hover:border-neutral-700'
-                }`}
-              >
-                <MapPin className={`h-3.5 w-3.5 ${isSelected ? 'text-black' : 'text-neutral-500'}`} />
-                <span>{zone.name}</span>
-                <span className="text-[11px] opacity-70">({zone.state.split(' ')[0]})</span>
-              </button>
-            );
-          })}
+          {/* Zone selector — a flat segmented control, no pills or chips. */}
+          <div
+            role="tablist"
+            aria-label="Milan zones"
+            className="grid grid-cols-2 gap-1 rounded-2xl border border-slate-200 bg-slate-50 p-1 lg:flex lg:flex-wrap"
+          >
+            {MILAN_ZONES.map((zone) => {
+              const isSelected = selectedSuburb.id === zone.id;
+              return (
+                <button
+                  key={zone.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={isSelected}
+                  onClick={() => handleZoneChange(zone)}
+                  className={`px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer text-left ${
+                    isSelected
+                      ? 'bg-white text-[#0a0a0b] shadow-sm'
+                      : 'text-slate-500 hover:text-slate-800'
+                  }`}
+                >
+                  {zone.name.replace(/^Milano\s+/i, '')}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Main Interactive Map Frame */}
