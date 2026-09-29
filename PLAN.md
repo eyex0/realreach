@@ -42,66 +42,91 @@ when its Verify block passes** (approved by user).
 ## Stage 10 — Git hygiene & CI activation
 **Goal:** all three repos committed, secrets provably excluded, CI runnable.
 
-- [ ] **Backend**: create `.gitignore` first — `node_modules/`, `dist/`,
-      `storage/`, `.env`, `*.log`, `!.env.example` (`.env` holds the Clerk secret
-      and DB password: **must never be committed**). Then `git init`,
-      `git add -A`, initial commit `feat: API Stages 2-9 (campaigns, tasks, sync, verification, reports, payouts, authz)`.
-- [ ] **Frontend**: review `git status` (61 files), commit as
-      `feat: web platform Stages 2-9 (builder, ops console, reports, review UI, auth)`.
-- [ ] **Operator**: check status (template commit + our source), commit
-      `feat: operator app (offline queue, GPS, camera proof, earnings)`.
-- [ ] **CI**: confirm the three workflows (web: lint+build; backend: Postgres
-      service + migrations + tests; add a typecheck-only workflow for the
-      operator: `npm ci` + `npx tsc --noEmit`).
-- [ ] Check for a remote (`git remote -v`, `gh auth status`); if a remote exists
-      push, otherwise ask the user where to push.
-- **Verify:** `git status` clean ×3; backend `git check-ignore .env` says ignored;
-  `git log --oneline` sane; workflows are valid YAML.
-- **Commit:** per repo as above.
+- [x] **Backend**: `.gitignore` created (`node_modules/`, `dist/`, `storage/`,
+      `.env`, `*.log`, `!.env.example`); `git init -b main`; 44 files committed
+      as `2ee0f7a feat: API Stages 2-9 …` — `git check-ignore` proves
+      `.env`/`dist`/`storage`/`node_modules` excluded. **No remote yet.**
+- [x] **Frontend**: secret scan clean (only env-var *names* in PLAN.md); `.env`
+      ignored; committed `03c00c2 feat: web platform Stages 2-9 …` and **pushed**
+      to `origin` (eyex0/realreach).
+- [x] **Operator**: secret scan clean; committed `cb36752 feat: operator app …`
+      + `ci: typecheck workflow`. **No remote yet.**
+- [x] **CI**: three workflows in place (web: lint+build; backend: Postgres
+      service + migrations + typecheck + tests; operator: `npm ci` + tsc).
+- [x] Check for a remote — frontend pushed to `eyex0/realreach`; backend →
+      `eyex0/realreach-backend` (private, `main`), operator →
+      `eyex0/realreach-operator` (private, `master`), all pushed ✓
+      (note: `gh repo create --push` failed on missing `workflow` scope; plain
+      `git push` with stored credentials worked).
+- **Verify:** `git status` clean ×3 ✓; backend `git check-ignore .env` ✓;
+  workflows valid YAML ✓.
+- **Commit:** per repo as above ✓.
 
 ## Stage 11 — Production auth cutover
 **Goal:** prove the whole API works with `AUTH_MODE=required` (no legacy actor-id
-fallback), end to end, with tokens.
+fallback), end to end, with tokens. **[COMPLETE]**
 
-- [ ] New `tools/test-e2e-required.ps1`: start server with `AUTH_MODE=required`,
-      mint client+walker tokens (`tools/token-probe.mjs`), then the full flow:
-      campaign create→status→split→assign→accept→session→GPS→evidence→proof→
-      **walker 403 on review**→client approve→payout generate/approve/pay→reports.
-- [ ] 401 sweep: probe every mounted route family without a token → expect 401
-      except the public whitelist (`/health`, `/auth`, `/sync`, `POST /campaigns/estimate`).
-- [ ] Fix anything the sweep finds; keep `optional` mode as the dev fallback only.
-- [ ] Re-run backend tests + the existing scripts (`test-authz.ps1`,
-      `test-review-integrity.ps1`, `test-payouts.ps1`, `test-reports.ps1`).
-- [ ] Restart servers back in dev (optional) mode.
-- **Verify:** new script prints PASS end to end; vitest 22/22.
-- **Commit:** `feat: required-mode E2E suite` + any fixes.
+- [x] New `tools/test-e2e-required.ps1`: 49 checks, **ALL PASS** — 401 sweep of
+      every protected route family, public-path whitelist, bogus-Bearer 401,
+      role gates (walker Clerk + walker device token → 403 on gated actions),
+      full web flow (create→planned→split→assign→approve→payout→reports) on
+      Clerk tokens, full operator flow (accept→GPS→evidence→proof→earnings) on
+      device tokens.
+- [x] **Device tokens:** `src/lib/deviceToken.ts` (HMAC `d1.<payload>.<sig>`,
+      60-day TTL, secret `DEVICE_TOKEN_SECRET` fallback `CLERK_SECRET_KEY`,
+      timing-safe compare); `authenticate()` accepts `d1.` Bearer and
+      re-resolves the role from the DB; `/auth/sync` now returns
+      `device_token`; Expo app stores it in its session and attaches it on
+      every request; walker `PATCH /tasks/:id` prefers the token identity over
+      the body claim. +5 unit tests → **27/27**.
+- [x] Re-ran existing scripts: `test-authz` ✓, `test-review-integrity` ✓
+      (verdict preserved), `test-reports` ✓ — `test-payouts` rewritten to be
+      self-contained (old one tripped on an already-paid row; app behavior was
+      correct) → generate/approve/pay/409×2/regenerate/summary/audit all ✓.
+- [x] Servers restored to dev (optional) mode.
+- **Verify:** `E2E-REQUIRED: ALL PASS`, vitest 27/27, all scripts green.
+- **Commit:** backend + operator (see Stage 10 message style).
 
-## Stage 12 — Evidence storage on Supabase (decision gate)
+## Stage 12 — Evidence storage on Supabase (decision gate) **[COMPLETE]**
 **Goal:** proof photos stored in Supabase Storage instead of local disk.
 
-- [ ] Needs `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` in backend `.env`
-      (user must supply — MCP tools cannot expose the service-role key).
-- [ ] Create private bucket `evidence`; confirm `src/lib/storage.ts` Supabase
-      path (driver already written, dormant).
-- [ ] E2E: photo upload via `/sync/evidence` → row's `storage_key` points at
-      Supabase; download via `/sync/evidence/:id/file` returns identical bytes.
-- [ ] If keys are not available: mark stage **deferred** — local-disk driver is
-      acceptable for a single-node pilot; document it.
-- **Verify:** E2E photo round-trip passes (or deferral recorded in this file).
-- **Commit:** `feat: Supabase evidence storage` (or `docs: defer …`).
+- [x] Keys supplied by user into backend `.env` (`SUPABASE_URL` +
+      `SUPABASE_SERVICE_ROLE_KEY`); `.env.example` refreshed (all current vars).
+- [x] Private bucket `evidence` verified: 10 MB limit, mime allowlist
+      (jpeg/png/webp/pdf), created 2026-09-29.
+- [x] `storage.ts` made env-lazy (call-time reads — no import-order trap).
+- [x] E2E `tools/test-supabase-storage.mjs`: upload through `/sync/evidence`
+      → `storage_key` in `evidence/…` bucket → download **byte-identical**
+      (70/70) → 6 legacy local-disk rows still readable (mixed drivers).
+      **ALL PASS**; plus direct bucket probe round-trip MATCH
+      (`tools/setup-supabase-storage.mjs`, idempotent).
+- **Verify:** `node tools/test-supabase-storage.mjs` → ALL PASS; vitest 27/27.
+- **Commit:** `feat: Supabase evidence storage live (Stage 12)…` ✓ pushed.
 
-## Stage 13 — Data hygiene & pilot seed
+## Stage 13 — Data hygiene & pilot seed **[COMPLETE]**
 **Goal:** replace accumulated test rows with a clean, reproducible dataset.
 
-- [ ] Inventory current rows (campaigns include "Review Integrity Run",
-      "Stage6 …" etc.); decide keep-one-golden-demo vs full purge (ask user if
-      unclear).
-- [ ] `tools/seed.mjs`: idempotent pilot dataset — 1 client, 2 walkers,
-      1 campaign (Milan polygon) → planned → split (2×2) → assign 2 tasks →
-      one completed+approved proof so reports/payouts render meaningfully.
-- [ ] Verify post-seed: `/reports/overview`, `/payouts/generate`, review queue.
-- **Verify:** seed runs twice without error (idempotent); report numbers sane.
-- **Commit:** `chore: pilot seed + test data cleanup`.
+- [x] Inventory: 12 test campaigns / 8 users / 18 tasks etc. — user chose
+      **full purge + seed**.
+- [x] `tools/purge-domain.sql`: truncates all domain tables (keeps config
+      tables `campaign_transitions`, `spatial_ref_sys`), keeps only the two
+      Clerk-linked login users (emails), deletes the rest (audit FK handled).
+- [x] `tools/seed.mjs` (idempotent, requires API on :4000): 1 client + 2
+      walkers → "Pilot Demo Campaign" → planned → split 2×2 → walker 1 task
+      completed (11-min session, 12 GPS pts, photo+120 pcs+note → machine
+      **verified**) → human approved → payout **pending €4.80**; walker 2 task
+      left `assigned`. Writes ids to `%TEMP%\rr_seed.json`.
+- [x] Stale hardcoded uuids purged from all E2E scripts — they now resolve ids
+      via `/auth/sync` / `rr_seed.json` (works across any purge+seed cycle).
+- [x] Post-seed verified: overview `tasks=4 approved=1 pieces=120 payout=4.8`,
+      campaign report route/estimate sane, payout pending, review queue 0,
+      second seed run → "already present".
+- [x] Full regression re-run after purge: reports ✓, storage ✓ (legacy note:
+      local rows intentionally purged), payouts ✓, review-integrity ✓,
+      hardening ✓ (413/429; cleanup fixed for audit FK), e2e-required
+      **ALL PASS** (49 checks, restores optional mode).
+- **Verify:** all of the above green.
+- **Commit:** `chore: pilot seed + test data cleanup (Stage 13)`.
 
 ## Stage 14 — Configuration & documentation
 **Goal:** a fresh clone can be set up from docs alone.
