@@ -198,7 +198,7 @@ export const RunnerApplyModal: React.FC<RunnerApplyModalProps> = ({
 
               <div className="p-3 bg-neutral-900 rounded-xl border border-neutral-800 text-left text-xs space-y-1">
                 <div className="text-emerald-400 font-semibold">Next Step:</div>
-                <p className="text-neutral-400">Download the Realreach Runner App from the iOS App Store or Google Play and sign in with your mobile number.</p>
+                <p className="text-neutral-400">We will email you a six-character pairing code and the app build. Open the app, enter your work email and that code to pair your phone — the code works once and then expires.</p>
               </div>
 
               <button

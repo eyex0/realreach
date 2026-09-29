@@ -542,6 +542,75 @@ build clean, CI green.
 
 ---
 
+## Stage 23 — Operator login, animated sign-in, honest store access **[COMPLETE]**
+
+**Goal:** three defects a customer would have found. Anyone could become a
+walker, the sign-in art was a still image, and the site sent people to app
+stores that do not exist.
+
+- [x] **Operator login is now a real identity check** (migration
+      `011_operator_pairing.sql`, `src/lib/pairing.ts`).
+      - Previously `POST /auth/sync` accepted **any** email and returned a
+        device token, so a stranger who typed an address could collect delivery
+        jobs and money. That was a documented pilot limitation, and it was the
+        wrong thing to ship.
+      - Now an admin issues a **six-character code** and the operator spends it
+        **once**. Single use, expiring (1 h – 14 days), revocable, and
+        optionally bound to one email.
+      - **The code alphabet excludes `0/O` and `1/I/L`.** A code read aloud on a
+        noisy street cannot be mistyped into a different valid-looking code, and
+        the app tells the operator when a character cannot appear in a code.
+      - `POST /auth/pair/exchange` is public (the app has no session yet) and so
+        carries its own tight rate limit, and returns a **specific** reason —
+        unknown / used / revoked / expired / wrong email — because a coordinator
+        on the phone needs to know whether to re-send a code or fix the email.
+      - The code is spent **before** provisioning, in its own transaction, so a
+        failure later can never leave a code reusable.
+      - The spent code records the **device label**, so an operator can be
+        traced to a handset and a lost phone identified.
+      - A pilot-only code (`PILOT24`) keeps the local walkthrough working and is
+        **refused the moment `AUTH_MODE=required`**.
+- [x] **Operator app login** — email + code, uppercase, 6-character counter,
+      inline validation, a "codes never contain 0, O, 1, I or L" hint for a
+      misread character, a live character counter, disabled state until valid,
+      and a scroll view so the keyboard cannot cover the button.
+- [x] **Ops console** — an "Operator access codes" panel to issue, copy and
+      revoke codes, with each code's state (live / used / expired / revoked),
+      the email it is bound to, and the device it was spent on.
+- [x] **The sign-in walker is animated** — body bob, counter-swinging legs, arm
+      and parcel swing, a pulsing location pin, a shadow that contracts as he
+      steps, and a slow settle on the stacked parcels. All CSS on SVG groups, so
+      it costs nothing on a low-end phone, and it is **disabled wholesale under
+      `prefers-reduced-motion`**. The figure also got a real `role="img"` and
+      label.
+- [x] **Removed two false claims from the public site**:
+      - The App Store / Google Play badges linked to the stores' home pages.
+        There is no store build, so those were dead ends for anyone who
+        believed them. `/faq` now states what is true: the app runs on iOS and
+        Android, store listings are not published, access is handed out with a
+        pairing code.
+      - The runner application modal said "sign in with your mobile number".
+        It now describes the pairing flow that actually exists.
+- [x] **Deliberately not changed:** the "Trusted by businesses from" logos.
+      They were flagged as a risk and the user chose to leave them.
+
+**Bugs caught while building this**
+1. **The animation broke the illustration.** A CSS `transform` *replaces* an
+   element's SVG `transform` attribute, so the parcel flew to the corner of the
+   viewBox. Found by screenshotting, not by reading the code. The positioning
+   transform now lives on an outer group and only the inner group animates — the
+   same trap applies to the location pin.
+2. The pairing claim initially wrote the code's *email* into a column that
+   expects a *user id*, because the operator row does not exist until after the
+   code is spent. Claiming and attribution are now separate steps.
+
+**Verify:** 90/90 vitest (15 new pairing tests), **130/130 E2E-REQUIRED** (19
+new pairing checks: single use, expiry boundary, wrong-email refusal, revocation,
+device recording, role gates), all other E2E scripts clean, storage pass,
+frontend `tsc` + build clean, operator `tsc` clean, CI green.
+
+---
+
 ### Out of scope (not in this plan unless requested)
 
 Live ops map/WebSocket, email/SMS notifications, Stripe billing, multi-org

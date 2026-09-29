@@ -46,13 +46,18 @@ This is the shipped, verified vertical. Everything below was signed off on
 | Evidence-only outreach drafting (en/it/de) | `[x]` | `outreachDraft.ts`, 20 unit tests, 90-word cap |
 | Unsupported claims blocked, not warned | `[x]` | 422 with the offending claim, on drafts and edits |
 | Human approval required before queueing | `[x]` | DB constraint, not just API |
-| Deployment / hosting | `[ ]` | Deferred by decision |
+| Operator access codes (single use, expiry, revocation) | `[x]` | `operator_pairing_codes`, 15 unit + 19 E2E checks |
+| Ops console: issue / copy / revoke operator codes | `[x]` | `PairingPanel` in the ops console |
+| Store badges replaced with honest access path | `[x]` | `/faq` and the runner apply modal |
 | Installable store build (EAS APK/IPA) | `[~]` | Exports clean; not submitted to a store |
 | Live continuous tracking | `[ ]` | Out of scope for v1 |
+| Deployment / hosting | `[ ]` | Deferred by decision |
 
 ### Known limitations (deliberate, not bugs)
 
-- Operator sign-in is email-only — no OTP, no identity check. Pilot-only.
+- ~~Operator sign-in is email-only~~ - **fixed**: operators now pair with a single-use,
+  expiring, revocable code issued by an admin. No OTP and no password:
+  possession of a code plus a matching email is the whole check.
 - One session per proof; v1 does not stream live GPS to the web console.
 - Rate is a hardcoded €0.04/piece. There is no client billing.
 - Demo map zones are hand-drawn rectangles, not real GIS boundaries. The hero

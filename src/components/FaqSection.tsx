@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown, Apple } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 
 const FAQS = [
   {
@@ -31,48 +31,23 @@ export const FaqSection: React.FC = () => {
     <section id="faq" className="py-20 md:py-28 bg-white border-b border-[var(--color-border)]">
       <div className="mx-auto max-w-4xl px-5 sm:px-6 lg:px-8">
         
-        {/* PDF PAGE 9: APP STORE & GOOGLE PLAY DOWNLOAD BADGES */}
+        {/* OPERATOR APP ACCESS */}
+        {/* There is no App Store or Google Play listing yet: pointing at the
+            stores would be a dead end for anyone who believed it. Say what is
+            actually true, and how to get on. */}
         <div className="flex flex-wrap items-center justify-center gap-4 mb-16">
-          {/* Apple App Store */}
-          <a
-            href="https://apps.apple.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-3 hover:border-slate-300 hover:shadow-sm transition-all"
-          >
-            <Apple className="h-7 w-7 text-black fill-black" />
-            <div className="text-left">
-              <span className="block text-[10px] uppercase font-bold text-slate-400 tracking-wider">
-                Download on the
-              </span>
-              <span className="block text-base font-bold text-[#0a0a0b] leading-tight">
-                App Store
-              </span>
-            </div>
-          </a>
-
-          {/* Google Play */}
-          <a
-            href="https://play.google.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-3 hover:border-slate-300 hover:shadow-sm transition-all"
-          >
-            <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none">
-              <path d="M3.6 1.4L13.8 11.6L3.6 21.8C3.2 21.4 3 20.7 3 19.8V3.4C3 2.5 3.2 1.8 3.6 1.4Z" fill="#2196F3" />
-              <path d="M17.2 8.2L13.8 11.6L3.6 1.4C4.1 1.1 4.8 1.1 5.4 1.5L17.2 8.2Z" fill="#4CAF50" />
-              <path d="M17.2 15L5.4 21.7C4.8 22.1 4.1 22.1 3.6 21.8L13.8 11.6L17.2 15Z" fill="#F44336" />
-              <path d="M21.5 10.7L17.2 8.2L13.8 11.6L17.2 15L21.5 12.5C22.2 12.1 22.2 11.1 21.5 10.7Z" fill="#FFEB3B" />
-            </svg>
-            <div className="text-left">
-              <span className="block text-[10px] uppercase font-bold text-slate-400 tracking-wider">
-                Get it on
-              </span>
-              <span className="block text-base font-bold text-[#0a0a0b] leading-tight">
-                Google Play
-              </span>
-            </div>
-          </a>
+          <div className="w-full max-w-xl rounded-2xl border border-slate-200 bg-white px-6 py-5 text-left">
+            <p className="text-sm font-bold text-[#0a0a0b]">Realreach Runner app</p>
+            <p className="mt-1 text-xs text-slate-500 leading-relaxed">
+              The courier app runs on iOS and Android. Store listings are not published yet, so we
+              hand out access directly: ask your account contact for a pairing code, install the
+              build we send you, and sign in with your work email and that code.
+            </p>
+            <p className="mt-3 text-xs text-slate-500 leading-relaxed">
+              Already paired? Open the app and enter the same six-character code. It works once and
+              expires, so it is safe to read out over the phone.
+            </p>
+          </div>
         </div>
 
         {/* PDF PAGE 9: FAQ HEADING */}

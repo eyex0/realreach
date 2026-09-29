@@ -13,6 +13,7 @@ import {
   DataReport, DataReportKind,
 } from '../lib/api';
 import TrustMeter from '../components/TrustMeter';
+import PairingPanel from '../components/PairingPanel';
 
 const STATUS_BADGE: Record<string, string> = {
   draft: 'bg-slate-100 text-slate-700',
@@ -754,6 +755,8 @@ export const OpsConsolePage: React.FC = () => {
             </ul>
           )}
         </section>
+
+        <PairingPanel />
 
         {/* Bad-data queue — the feedback loop (Priority 10). Closing a report is
             an admin action and never rewrites the machine verdict. */}
