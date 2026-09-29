@@ -15,7 +15,10 @@ export const InfraSection: React.FC = () => {
   return (
     <section className="py-20 md:py-28 bg-white border-b border-[var(--color-border)]">
       <div className="mx-auto max-w-3xl px-5 sm:px-6 text-center">
-        <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#006de4]">06 — The infrastructure</p>
+        <p className="flex items-center gap-3 text-xs font-bold uppercase tracking-[0.2em] text-[#006de4]">
+              <span aria-hidden="true" className="h-px w-8 bg-[#006de4]/40" />
+              06 &mdash; The infrastructure
+            </p>
         <h2 className="mt-3 font-extrabold text-[#0a0a0b] tracking-tight leading-[1.08] text-[clamp(2rem,4vw,3.25rem)]">
           Physical activity, structured.
         </h2>

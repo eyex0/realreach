@@ -15,7 +15,10 @@ export const PlatformSection: React.FC = () => {
     <section className="py-20 md:py-28 bg-[#fafbfc] border-b border-[var(--color-border)]">
       <div className="mx-auto max-w-[1400px] px-5 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-12 items-center">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#006de4]">05 — The platform</p>
+          <p className="flex items-center gap-3 text-xs font-bold uppercase tracking-[0.2em] text-[#006de4]">
+              <span aria-hidden="true" className="h-px w-8 bg-[#006de4]/40" />
+              05 &mdash; The platform
+            </p>
           <h2 className="mt-3 font-extrabold text-[#0a0a0b] tracking-tight leading-[1.08] text-[clamp(2rem,4vw,3.25rem)]">
             Command Center, not another dashboard.
           </h2>

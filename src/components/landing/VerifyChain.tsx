@@ -37,7 +37,10 @@ export const VerifyChain: React.FC = () => {
         <div className="grid gap-12 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-16">
           {/* Left: the claim, then what a verdict can be. */}
           <div className="lg:sticky lg:top-24 lg:self-start">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-600">03 — Verify</p>
+            <p className="flex items-center gap-3 text-xs font-bold uppercase tracking-[0.2em] text-[#006de4]">
+              <span aria-hidden="true" className="h-px w-8 bg-[#006de4]/40" />
+              03 &mdash; Verify
+            </p>
             <h2 className="mt-3 font-extrabold tracking-tight leading-[1.08] text-[#0a0a0b] text-[clamp(2rem,4vw,3.25rem)]">
               Every physical action becomes an event.
             </h2>

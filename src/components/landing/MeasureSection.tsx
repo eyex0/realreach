@@ -23,7 +23,10 @@ export const MeasureSection: React.FC = () => {
   return (
     <section id="measure" className="py-20 md:py-28 bg-white border-b border-[var(--color-border)]">
       <div className="mx-auto max-w-[1400px] px-5 sm:px-6 lg:px-8">
-        <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#006de4]">04 — Measure</p>
+        <p className="flex items-center gap-3 text-xs font-bold uppercase tracking-[0.2em] text-[#006de4]">
+          <span aria-hidden="true" className="h-px w-8 bg-[#006de4]/40" />
+          04 &mdash; Measure
+        </p>
         <h2 className="mt-3 font-extrabold text-[#0a0a0b] tracking-tight leading-[1.08] text-[clamp(2rem,4vw,3.25rem)] max-w-3xl">
           Beyond “flyers distributed.”
         </h2>

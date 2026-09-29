@@ -202,6 +202,12 @@ export const HeroCampaignMap: React.FC = () => {
     { mailboxes: 0, area: 0, fee: 0 }
   );
 
+  // A zero would be a claim. If the API could not measure any area, show that
+  // we do not know rather than a number that looks measured.
+  const measured = loading || visible.some((a) => stats[a.id]);
+  const money = (n: number) =>
+    n.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
   const rate = visible.length > 0 ? stats[visible[0].id]?.price_per_mailbox : undefined;
 
   return (
@@ -235,7 +241,7 @@ export const HeroCampaignMap: React.FC = () => {
               <div>
                 <p className="text-[10px] font-semibold text-slate-500">Total letterboxes</p>
                 <p className="mt-0.5 text-3xl font-extrabold tracking-tight tabular-nums text-[#0a0a0b]">
-                  {loading ? '—' : totals.mailboxes.toLocaleString('en-GB')}
+                  {measured ? totals.mailboxes.toLocaleString('en-GB') : '—'}
                 </p>
               </div>
               <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#006de4] text-white">
@@ -248,7 +254,7 @@ export const HeroCampaignMap: React.FC = () => {
                 <Ruler className="h-3.5 w-3.5 text-slate-400" />
                 <dt className="text-[11px] text-slate-500">Area covered</dt>
                 <dd className="ml-auto text-[11px] font-bold tabular-nums">
-                  {loading ? '—' : `${Math.round(totals.area).toLocaleString('en-GB')} m²`}
+                  {measured ? `${Math.round(totals.area).toLocaleString('en-GB')} m²` : '—'}
                 </dd>
               </div>
               <div className="flex items-center gap-2">
@@ -260,7 +266,7 @@ export const HeroCampaignMap: React.FC = () => {
                 <Layers className="h-3.5 w-3.5 text-slate-400" />
                 <dt className="text-[11px] text-slate-500">Distribution fee</dt>
                 <dd className="ml-auto text-[11px] font-bold tabular-nums">
-                  {loading ? '—' : `€${totals.fee.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                  {measured ? `€${money(totals.fee)}` : '—'}
                 </dd>
               </div>
             </dl>
@@ -282,7 +288,7 @@ export const HeroCampaignMap: React.FC = () => {
               </span>
               <span className="block text-[10px] text-slate-500">
                 {visible.length} area{visible.length === 1 ? '' : 's'} ·{' '}
-                {loading ? '—' : totals.mailboxes.toLocaleString('en-GB')} letterboxes
+                {measured ? totals.mailboxes.toLocaleString('en-GB') : '—'} letterboxes
               </span>
             </span>
           </div>

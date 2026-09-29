@@ -44,7 +44,14 @@ export const RunnerSection: React.FC<RunnerSectionProps> = ({ onOpenRunnerModal 
           
           {/* Left: Content */}
           <div className="flex-1 text-left">
-            <span className="inline-block text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full mb-3">
+            {/* Section 02 of the narrative. This one was missing entirely, so
+                the page read 01, 03, 04 — the numbering has to be continuous
+                or it looks like a mistake. */}
+            <p className="flex items-center gap-3 text-xs font-bold uppercase tracking-[0.2em] text-[#006de4]">
+              <span aria-hidden="true" className="h-px w-8 bg-[#006de4]/40" />
+              02 &mdash; Move
+            </p>
+            <span className="mt-3 inline-block text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full">
               Join Our Walker Network
             </span>
 
