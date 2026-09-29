@@ -239,6 +239,16 @@ Expo web — camera/GPS device pass deferred to a phone session).
   after `Start-Process`, which raced Express startup (connection refused).
   Replaced with a `/health` readiness poll (60 × 500 ms).
 
+**CI defects found and fixed during the sweep**
+- Frontend CI had been **failing since the Stage 16b commit** and nobody
+  noticed: `npm ci` died with ERESOLVE because `package.json` pinned
+  `esbuild@^0.25.0` while `vite@8.3.1` requires `^0.27 || ^0.28`. Local builds
+  kept passing because the working tree had been installed with legacy peer
+  deps. Bumped to `^0.28.0` and regenerated the lockfile (`a3118f4`).
+- Operator CI had **never run**: `.github/workflows/ci.yml` triggered on
+  `branches: [main]` but the repo's default branch is `master`. Trigger
+  changed to `[main, master]` (`6a5cadf`) — first-ever green run.
+
 **Deferred / known limits at handoff**
 - **Stage 15 (deployment) still deferred by user** — no hosting target chosen;
   device QA ran against the local API over LAN.
