@@ -323,7 +323,55 @@ basemap, and the 500-item scope had no home in the repo.
 
 ---
 
-### Out of scope (not in this plan unless requested)
+## Stage 19 — Data trust + bad-data feedback (Platform Priorities 2 & 10) **[COMPLETE]**
+
+**Goal:** the two cheapest high-trust wins, built before any AI feature, because
+Priority 1's opportunity feed must not be built on data users are told not to
+trust.
+
+- [x] **Deterministic, versioned trust scores** (`src/lib/trust.ts`, `trust_v1`).
+      Confidence is a weighted sum of five components — required-check pass
+      ratio 50%, GPS density 20%, route match 15%, evidence completeness 10%,
+      optional checks 5% — and freshness halves every 7 days. No LLM, no
+      randomness: identical inputs always produce identical output, and every
+      component returns its own weight and human-readable detail so the UI can
+      show the breakdown instead of a bare number. Changing a weight requires a
+      new `TRUST_VERSION`.
+- [x] **Persisted** on `verification_results` (migration
+      `008_trust_and_feedback.sql`) as `confidence`, `freshness`,
+      `trust_version`, `trust_components`. Pre-trust rows stay `NULL` and render
+      as an explicit **unknown**, never a fabricated 0.
+- [x] **Freshness recomputed at read time** so a stored score cannot rot into a
+      misleading number; the stored value remains the as-verified snapshot.
+- [x] **`tools/backfill-trust.mjs`** scores historical rows (idempotent,
+      `--dry-run` supported) rather than leaving them permanently unknown.
+- [x] **Bad-data reports** — `POST /data-reports` open to any user *including the
+      operator who produced the data*; `GET` queue for ops; `PATCH` resolve /
+      dismiss for client+admin. Subjects are existence-checked so the queue
+      cannot fill with dead links, and every action is audit-logged.
+- [x] **A report never touches a verdict.** Machine verdict, human review
+      decision and data complaint remain three independent records.
+- [x] **Wire-format fix (real bug):** `pg` returns `numeric` as a string, so the
+      API was emitting `"confidence":"0.510"` and the console's `.toFixed()`
+      would have thrown. Fixed once at the driver in `src/db.ts` by parsing
+      `NUMERIC` and `INT8` to numbers, which also fixes money and area fields
+      app-wide.
+- [x] **Second real bug caught by the new tests:** an empty check set scored
+      0.05 instead of 0, because "no optional checks" defaulted to "all passed".
+- [x] **Third real bug caught by review:** report resolution was gated to
+      `admin`, but `client` is the ops role in this product — it already reviews
+      proofs and approves payouts. Widened to `client, admin`.
+- [x] **UI** — `TrustMeter` shows confidence and freshness with the component
+      breakdown; each proof shows its bad-data report count, a "Report data"
+      action, and the console gained a bad-data queue with resolve/dismiss.
+- [x] **Tests** — 13 new unit tests for the scorer (determinism, bounds, decay,
+      floor, weight sum, empty-set), and 12 new E2E checks including
+      *"filing a report does not change the machine verdict"*.
+- **Verify:** 40/40 vitest, 69/69 E2E-REQUIRED, all other E2E scripts clean,
+      storage E2E pass, frontend `tsc` + build clean, CI green.
+
+---
+
 
 Live ops map/WebSocket, email/SMS notifications, Stripe billing, multi-org
 management UI, algorithmic anything, continuous GPS tracking.

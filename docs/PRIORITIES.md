@@ -18,13 +18,13 @@ workflow — not another tool they tried once.
 | # | Priority | Pilot status |
 | --- | --- | --- |
 | 1 | Perfect the first-run experience | `[ ]` platform; pilot has a working operator first run |
-| 2 | Make data trustworthy and sourced | `[~]` evidence + verdict provenance exist; confidence/freshness scores do not |
+| 2 | Make data trustworthy and sourced | `[x]` confidence, freshness, unknown-marker and bad-data reporting all shipped |
 | 3 | Make the opportunity feed the home screen | `[~]` operator home + ops console exist; no scored opportunity feed |
 | 4 | Make AI transparent and evidence-based | `[~]` machine verdict shows checks and a reason code; no rationale/confidence UI |
 | 5 | Add monitoring and alerts | `[~]` `notifications` table + API exist; no signal alerts, digest, or saved-company monitoring |
 | 6 | Build admin and support tools | `[~]` ops console covers campaigns, proofs, payouts, reports; no feature flags, job retry, or support tickets |
 | 7 | Improve data coverage by market | `[ ]` Italy only (Milan); no external sources |
-| 8 | Use feedback to improve scoring and matching | `[ ]` no feedback capture at all |
+| 8 | Use feedback to improve scoring and matching | `[~]` bad-data reporting live; outcome capture needs the opportunity model |
 | 9 | Add CRM/integration depth | `[ ]` blocked until retention proves demand |
 | 10 | Expand geography and ICPs | `[ ]` blocked until coverage is reliable |
 
@@ -82,22 +82,19 @@ more AI features.
 Every company and person must answer: **where did this data come from? when was
 it last updated? how confident is it? can the user report an issue?**
 
-**Pilot status** — partially satisfied, and by design rather than luck:
+**Pilot status**
 
 | Requirement | Pilot |
 | --- | --- |
 | Source attribution | `[x]` every evidence row stores `source`, `mime`, `storage_key`, `captured_at`, and the uploader |
 | Last-updated | `[x]` `created_at` / `captured_at` / `reviewed_at` on every row |
 | Machine decision provenance | `[x]` `verification_results.checks` + `reason_code`, never overwritten by a human decision |
-| Confidence score | `[ ]` not modelled — the verdict is a status, not a number |
-| Freshness score | `[ ]` not modelled |
+| Confidence score | `[x]` deterministic, versioned (`trust_v1`), with a per-component breakdown, stored on every verification |
+| Freshness score | `[x]` halves every 7 days, recomputed at read time so a stored score never goes stale |
+| Explicit "unknown" | `[x]` pre-trust rows report `null` and render as "unknown", never as 0 |
+| Report bad data | `[x]` `POST /data-reports`, flaggable by anyone incl. the operator; ops queue with resolve/dismiss |
 | Duplicate detection | `[~]` campaign/task dedupe exists; entity resolution does not |
-| Explicit "unknown" | `[ ]` fields are nullable with no explicit unknown marker |
-| Report bad data | `[ ]` a user cannot flag a bad record |
 | Refresh jobs | `[ ]` no scheduler exists |
-
-The three `[ ]` rows above (confidence, freshness, bad-data reporting) are the
-cheapest high-trust wins and should land before any AI feature.
 
 ## 3. Make the opportunity feed the home screen
 
@@ -140,7 +137,9 @@ If the AI mentions something without evidence, block it.
 **Pilot status** — the machine verifier is the template to copy: it returns
 `verified` / `requires_review` / `rejected` with per-check detail and a reason
 code, and a human approval is recorded separately without ever overwriting the
-machine verdict. There is no LLM in the pilot yet, so there is nothing to make
+machine verdict. Every verdict now also carries a confidence score with its
+per-component breakdown, so the "show your evidence" pattern is proven end to
+end. There is no LLM in the pilot yet, so there is nothing further to make
 transparent — but the *shape* of the guarantee is already proven.
 
 ## 5. Make the workflow sticky
@@ -234,10 +233,14 @@ irrelevant · searches with no good results.
 Use it to improve scoring, signal relevance, contact matching, outreach
 quality, and search ranking. This becomes a long-term advantage.
 
-**Pilot status** — `[ ]` nothing is captured. This is cheap to start and
-compounding: every `verified` / `requires_review` / `rejected` verdict and every
-human decision is already a labelled training signal sitting in the database,
-unused.
+**Pilot status** — `[x]` the first half is live: any user (including the
+operator who produced the data) can flag bad data, the ops console shows an
+open-report count per proof and a queue with resolve/dismiss, and filing a
+report provably never changes the machine verdict. `[ ]` the second half needs
+the opportunity model — there is nothing to save, ignore or rate yet, so
+scoring has nothing to learn from. What is already capturable is: every
+`verified` / `requires_review` / `rejected` verdict paired with the human
+decision is a labelled signal sitting unused in the database.
 
 ---
 

@@ -3,14 +3,16 @@ import { Link } from 'react-router-dom';
 import { RealReachLogo } from '../components/RealReachLogo';
 import {
   ArrowLeft, Loader2, AlertCircle, RefreshCw, Split, Send,
-  CheckCircle2, Map, Users, MapPin, Check, ShieldCheck, X, Coins,
+  CheckCircle2, Map, Users, MapPin, Check, ShieldCheck, X, Coins, Flag,
 } from 'lucide-react';
 import {
   listCampaigns, getCampaign, listTasks, listOperators, splitCampaign, assignTask,
   changeCampaignStatus, listProofs, reviewProof, listPayouts, generatePayouts, approvePayout, payPayout,
-  getProofDetail, fetchBlob,
+  getProofDetail, fetchBlob, createDataReport, listDataReports, updateDataReport,
   CampaignSummary, TaskItem, OperatorRow, ProofQueueItem, PayoutRow, ProofDetail,
+  DataReport, DataReportKind,
 } from '../lib/api';
+import TrustMeter from '../components/TrustMeter';
 
 const STATUS_BADGE: Record<string, string> = {
   draft: 'bg-slate-100 text-slate-700',
@@ -74,20 +76,23 @@ export const OpsConsolePage: React.FC = () => {
   const [error, setError] = useState('');
   const [flash, setFlash] = useState('');
   const [assignDraft, setAssignDraft] = useState<Record<string, string>>({});
+  const [reports, setReports] = useState<DataReport[] | null>(null);
 
   const loadAll = useCallback(async () => {
     setError('');
     try {
-      const [cs, ops, pr, po] = await Promise.all([
+      const [cs, ops, pr, po, dr] = await Promise.all([
         listCampaigns(),
         listOperators(),
         listProofs('pending').catch(() => [] as ProofQueueItem[]),
         listPayouts().catch(() => [] as PayoutRow[]),
+        listDataReports().catch(() => [] as DataReport[]),
       ]);
       setCampaigns(cs);
       setOperators(ops);
       setProofs(pr);
       setPayouts(po);
+      setReports(dr);
     } catch (e) {
       setCampaigns([]);
       setError(e instanceof Error ? e.message : 'API unreachable on :4000');
@@ -160,8 +165,36 @@ export const OpsConsolePage: React.FC = () => {
       await loadAll();
     });
 
-  const toggleProof = async (id: string) => {
-    if (openProof === id) {
+  /** Flag bad data. Reporting never changes a verdict — it files a record an
+   *  admin closes, so the machine verdict and the human decision stay separate. */
+  const doReportBadData = (proof: ProofQueueItem) =>
+    run(`report-${proof.id}`, async () => {
+      const kind = window.prompt(
+        'What is wrong with this data?\n\n' +
+          'bad_photo | bad_quantity | bad_location | wrong_task | missing_data | other',
+        'bad_location'
+      );
+      if (!kind) return;
+      const note = window.prompt('Anything else we should know? (optional)') ?? undefined;
+      await createDataReport({
+        kind: kind.trim() as DataReportKind,
+        subject_type: 'proof',
+        subject_id: proof.id,
+        note,
+      });
+      setFlash('Bad-data report filed');
+      setProofs(await listProofs('pending').catch(() => []));
+      if (openProof === proof.id) setProofDetail(await getProofDetail(proof.id));
+    });
+
+  const resolveReport = (report: DataReport, status: DataReport['status']) =>
+    run(`resolve-${report.id}`, async () => {
+      await updateDataReport(report.id, status);
+      setFlash(`Report ${status}`);
+      setReports(await listDataReports().catch(() => []));
+    });
+
+  const toggleProof = async (id: string) => {    if (openProof === id) {
       setOpenProof(null);
       setProofDetail(null);
       return;
@@ -474,6 +507,18 @@ export const OpsConsolePage: React.FC = () => {
                         </span>
                       ))}
                     </div>
+                    <TrustMeter
+                      confidence={p.confidence}
+                      freshness={p.freshness}
+                      components={p.trust_components}
+                      version={p.trust_version}
+                    />
+                    {p.data_reports > 0 && (
+                      <p className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-700">
+                        <Flag className="h-3 w-3" />
+                        {p.data_reports} bad-data report{p.data_reports === 1 ? '' : 's'}
+                      </p>
+                    )}
                   </div>
                   <div className="flex items-center gap-2 ml-auto">
                     <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${VERDICT[p.verification_status ?? ''] ?? 'bg-slate-100 text-slate-500'}`}>
@@ -486,6 +531,16 @@ export const OpsConsolePage: React.FC = () => {
                         human: {p.review_status}
                       </span>
                     )}
+                    <button
+                      type="button"
+                      disabled={busy !== null}
+                      onClick={() => void doReportBadData(p)}
+                      title="Flag this proof's data as wrong. The machine verdict is not changed."
+                      className="inline-flex items-center gap-1 rounded-xl border border-amber-200 text-amber-700 px-2.5 py-1.5 text-[11px] font-bold hover:bg-amber-50 disabled:opacity-40 cursor-pointer"
+                    >
+                      {busy === `report-${p.id}` ? <Loader2 className="h-3 w-3 animate-spin" /> : <Flag className="h-3 w-3" />}
+                      Report data
+                    </button>
                     <button
                       type="button"
                       disabled={busy !== null}
@@ -694,6 +749,80 @@ export const OpsConsolePage: React.FC = () => {
                   <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${badge(o.availability_today ?? 'available')}`}>
                     {o.availability_today ?? 'not set'}
                   </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+
+        {/* Bad-data queue — the feedback loop (Priority 10). Closing a report is
+            an admin action and never rewrites the machine verdict. */}
+        <section className="rounded-2xl bg-white border border-slate-200 overflow-hidden">
+          <div className="px-5 py-3.5 border-b border-slate-100 flex items-center gap-2">
+            <Flag className="h-4 w-4 text-slate-500" />
+            <h3 className="text-sm font-bold">Bad-data reports ({reports?.length ?? 0})</h3>
+            <span className="text-[11px] text-slate-500">
+              filed by users · close the loop without touching the verdict
+            </span>
+          </div>
+          {reports === null ? (
+            <p className="p-6 text-center text-xs text-slate-500">Loading…</p>
+          ) : reports.length === 0 ? (
+            <p className="p-6 text-center text-xs text-slate-500">
+              No bad-data reports. Anyone reviewing a proof can flag one.
+            </p>
+          ) : (
+            <ul className="divide-y divide-slate-50">
+              {reports.map((r) => (
+                <li key={r.id} className="px-5 py-3 flex flex-wrap items-center gap-3 text-xs">
+                  <span
+                    className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                      r.status === 'open'
+                        ? 'bg-amber-100 text-amber-800'
+                        : r.status === 'resolved'
+                          ? 'bg-emerald-100 text-emerald-800'
+                          : 'bg-slate-100 text-slate-600'
+                    }`}
+                  >
+                    {r.status}
+                  </span>
+                  <div className="flex-1 min-w-[180px]">
+                    <p className="font-bold">
+                      {r.kind.replace('_', ' ')}
+                      <span className="font-mono font-medium text-slate-400">
+                        {' '}· {r.subject_type} {r.subject_id?.slice(0, 8)}
+                      </span>
+                    </p>
+                    <p className="text-[11px] text-slate-500">
+                      {r.reporter_email} · {r.created_at.slice(0, 16).replace('T', ' ')}
+                      {r.reports_on_subject != null && r.reports_on_subject > 1
+                        ? ` · ${r.reports_on_subject} reports on this record`
+                        : ''}
+                    </p>
+                    {r.note && <p className="text-[11px] text-slate-600 mt-0.5">“{r.note}”</p>}
+                  </div>
+                  {r.status === 'open' && (
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        disabled={busy !== null}
+                        onClick={() => void resolveReport(r, 'resolved')}
+                        className="inline-flex items-center gap-1 rounded-xl border border-emerald-200 text-emerald-700 px-2.5 py-1.5 text-[11px] font-bold hover:bg-emerald-50 disabled:opacity-40 cursor-pointer"
+                      >
+                        {busy === `resolve-${r.id}` ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3 w-3" />}
+                        Resolve
+                      </button>
+                      <button
+                        type="button"
+                        disabled={busy !== null}
+                        onClick={() => void resolveReport(r, 'dismissed')}
+                        className="inline-flex items-center gap-1 rounded-xl border border-slate-200 text-slate-600 px-2.5 py-1.5 text-[11px] font-bold hover:bg-slate-50 disabled:opacity-40 cursor-pointer"
+                      >
+                        <X className="h-3 w-3" />
+                        Dismiss
+                      </button>
+                    </div>
+                  )}
                 </li>
               ))}
             </ul>

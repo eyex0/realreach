@@ -273,6 +273,14 @@ export interface ProofCheck {
   detail?: string;
 }
 
+export interface TrustComponent {
+  key: string;
+  label: string;
+  weight: number;
+  value: number;
+  detail: string;
+}
+
 export interface ProofQueueItem {
   id: string;
   task_id: string;
@@ -288,6 +296,68 @@ export interface ProofQueueItem {
   reason_code: string | null;
   checks: ProofCheck[] | null;
   evidence_count: number;
+  /** Data trust (Priority 2). null = not scored by this trust version. */
+  confidence: number | null;
+  freshness: number | null;
+  trust_version: string | null;
+  trust_components: TrustComponent[] | null;
+  data_reports: number;
+}
+
+export type DataReportKind =
+  | 'bad_photo'
+  | 'bad_quantity'
+  | 'bad_location'
+  | 'wrong_task'
+  | 'missing_data'
+  | 'other';
+
+export interface DataReport {
+  id: string;
+  kind: DataReportKind;
+  subject_type: 'proof' | 'task' | 'campaign';
+  subject_id: string | null;
+  note: string | null;
+  status: 'open' | 'acknowledged' | 'resolved' | 'dismissed';
+  resolution_note?: string | null;
+  reporter_email?: string;
+  reports_on_subject?: number;
+  created_at: string;
+}
+
+/** File a bad-data report. Anyone who can see the data can flag it. */
+export async function createDataReport(payload: {
+  kind: DataReportKind;
+  subject_type: 'proof' | 'task' | 'campaign';
+  subject_id?: string;
+  note?: string;
+}): Promise<DataReport> {
+  const res = await apiFetch('/data-reports', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  return handle<DataReport>(res);
+}
+
+export async function listDataReports(status?: string): Promise<DataReport[]> {
+  const params = new URLSearchParams();
+  if (status) params.set('status', status);
+  const res = await apiFetch(`/data-reports?${params.toString()}`);
+  return handle<DataReport[]>(res);
+}
+
+export async function updateDataReport(
+  id: string,
+  status: DataReport['status'],
+  resolution_note?: string
+): Promise<{ id: string; status: string }> {
+  const res = await apiFetch(`/data-reports/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status, resolution_note }),
+  });
+  return handle<{ id: string; status: string }>(res);
 }
 
 export async function listProofs(reviewStatus?: string, campaignId?: string): Promise<ProofQueueItem[]> {
@@ -460,6 +530,12 @@ export interface ProofDetail extends ProofQueueItem {
     status: string;
     reason_code: string | null;
     checks: ProofCheck[] | null;
+    confidence: number | null;
+    freshness: number | null;
+    trust_version: string | null;
+    trust_components: TrustComponent[] | null;
+    /** Freshness recomputed at read time, so a stored score never goes stale. */
+    freshness_now: number | null;
     reviewed_by: string | null;
     reviewed_at: string | null;
     created_at: string;

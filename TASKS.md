@@ -34,6 +34,9 @@ This is the shipped, verified vertical. Everything below was signed off on
 | Landing map backed by real campaign data | `[x]` | `GET /map/live`, real geometry + last GPS track |
 | CI green on all three repos | `[x]` | GitHub Actions |
 | Data hygiene tools (purge + idempotent seed) | `[x]` | `tools/purge-domain.sql`, `tools/seed.mjs` |
+| Deterministic confidence + freshness scores on every proof | `[x]` | `src/lib/trust.ts` (`trust_v1`), 13 unit tests |
+| Explicit "unknown" instead of a fabricated score | `[x]` | pre-trust rows are NULL and render as unknown |
+| Users can report bad data; ops closes the loop | `[x]` | `POST /data-reports`, ops queue, 12 E2E checks |
 | Deployment / hosting | `[ ]` | Deferred by decision |
 | Installable store build (EAS APK/IPA) | `[~]` | Exports clean; not submitted to a store |
 | Live continuous tracking | `[ ]` | Out of scope for v1 |
