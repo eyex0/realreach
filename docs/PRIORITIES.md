@@ -17,9 +17,9 @@ workflow — not another tool they tried once.
 
 | # | Priority | Pilot status |
 | --- | --- | --- |
-| 1 | Perfect the first-run experience | `[ ]` platform; pilot has a working operator first run |
+| 1 | Perfect the first-run experience | `[~]` template -> discovery -> feed -> save works; NL ICP needs an LLM |
 | 2 | Make data trustworthy and sourced | `[x]` confidence, freshness, unknown-marker and bad-data reporting all shipped |
-| 3 | Make the opportunity feed the home screen | `[~]` operator home + ops console exist; no scored opportunity feed |
+| 3 | Make the opportunity feed the home screen | `[x]` `/opportunities`: score, why it matters, next action, save/dismiss |
 | 4 | Make AI transparent and evidence-based | `[~]` machine verdict shows checks and a reason code; no rationale/confidence UI |
 | 5 | Add monitoring and alerts | `[~]` `notifications` table + API exist; no signal alerts, digest, or saved-company monitoring |
 | 6 | Build admin and support tools | `[~]` ops console covers campaigns, proofs, payouts, reports; no feature flags, job retry, or support tickets |
@@ -59,11 +59,18 @@ Sign up
 If this flow is slow, confusing, or produces weak results, nothing else
 matters.
 
-**Pilot status** — the field-ops app has a real first run (sign in → missions →
-accept → GPS session → proof → paid) and it is verified on a phone. None of the
-platform steps above exist yet: there is no ICP model, no discovery run, and
-nothing to save. Building this priority means building `T169`–`T207` before any
-AI work.
+**Status** - two first runs now exist. The field-ops app one (sign in -> missions
+-> accept -> GPS session -> proof -> paid) is verified on a real phone. The
+**platform** one lives at `/start`: pick one of six curated ICP templates, run
+discovery, review scored results, save what matters. Activation is measured live
+in the feed (1 discovery run, 5 saved opportunities, 1 approved outreach).
+
+What is still missing is the natural-language step. "Type a sentence, get
+structured filters" needs an LLM provider, which is not configured in this
+environment, so the wizard starts from templates instead. Everything behind it -
+the structured filters, the deterministic `score_v1` scoring with a full
+breakdown, the evidence links and the activation counter - is the real
+implementation, not a placeholder.
 
 ## 2. Make data trustworthy
 

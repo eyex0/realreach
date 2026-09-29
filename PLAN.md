@@ -372,15 +372,79 @@ trust.
 
 ---
 
+## Stage 20 — Platform core: first run + opportunity feed (Priorities 1 & 3) **[COMPLETE]**
+
+**Goal:** the product promise — "every time a user logs in they see a relevant
+opportunity, understand why it matters, and know the next action" — needs the
+ICP and opportunity models. Built as a vertical slice, deterministic end to end.
+
+- [x] **Migration `009_platform_core.sql`** — 12 org-scoped tables: `icps`,
+      `discovery_runs`, `companies`, `company_sources`, `signals`, `people`,
+      `opportunities`, `opportunity_notes`, `opportunity_tasks`,
+      `opportunity_activity`, `outreach_messages`, `workspace_activation`.
+      Two rules are enforced by the schema, not convention: every tenant table
+      carries `org_id`, and a company cannot exist without a named source
+      (`source_provider` NOT NULL) nor a signal without evidence.
+- [x] **Explainable scoring** (`src/lib/opportunityScore.ts`, `score_v1`):
+      ICP fit 30%, signal strength 30%, buying window 15%, contactability 15%,
+      data freshness 10%. Weights sum to 1 so a score cannot exceed 100. No
+      LLM, no randomness; every component returns its weight, value and a
+      readable sentence. Signals decay by type (hiring 45-day half-life, funding
+      180), and three weak signals deliberately cannot beat one strong fresh one.
+- [x] **Suppressed contacts are never recommended**, at any confidence.
+- [x] **Missing data is a non-match, never a wildcard** — a company with unknown
+      country fails ICP fit rather than passing it.
+- [x] **API** — ICP templates, ICP create-from-template, discovery run,
+      opportunity feed (feed/saved views), detail with signals, contacts,
+      activity, notes, save/ignore, activation meter.
+- [x] **Discovery is idempotent** — re-running updates scores in place via
+      `ON CONFLICT (org_id, icp_id, company_id)` and never duplicates the feed.
+- [x] **A user action outranks a recomputed score** — the upsert preserves
+      `saved`/`ignored`.
+- [x] **Tenant isolation** — every read filters on the caller's org; a second
+      workspace gets 404 on reads and 403 on writes. Asserted by 6 E2E checks.
+- [x] **First-run UI** — `/start`: pick one of 6 ICP templates → run discovery →
+      review results with scores. **Feed UI** — `/opportunities`: cards with
+      score, why-it-matters (linked to the signal), recommended contact, next
+      action, and Save / Research / Not relevant; a detail panel with the full
+      score breakdown, evidence, contact provenance and the activity trail; and
+      a live activation meter (1 discovery, 5 saved, 1 approved outreach).
+- [x] **Seed** — `tools/seed-platform.mjs`, idempotent: 6 ICP templates, 10
+      companies with sources, 15 signals with evidence, 10 contacts with
+      lawful basis and verification status.
+
+**Real bugs found and fixed while building this**
+1. `nextActionFor(hasContact, hasSignal)` had its parameters named in the
+   opposite order to the call site, so "draft outreach" and "identify a
+   decision-maker" came back swapped. Caught by a unit test.
+2. **Route shadowing:** `POST /platform/opportunities/:id/notes` was swallowed by
+   the earlier `/:action` param route, so notes could never be created. The
+   specific route now precedes the param route.
+3. **Activation counter never incremented** on first use — the upsert inserted
+   the row with the column default (0) instead of the incremented value.
+4. `technologies` was read by the scorer but missing from the `companies` table.
+
+**Verify:** 55/55 vitest (15 new scorer tests), **91/91 E2E-REQUIRED** (22 new
+platform checks), all other E2E scripts clean, storage pass, frontend `tsc` +
+build clean, CI green.
+
+---
+
+### Out of scope (not in this plan unless requested)
 
 Live ops map/WebSocket, email/SMS notifications, Stripe billing, multi-org
 management UI, algorithmic anything, continuous GPS tracking.
 
 ### Beyond this plan
 
-This plan covers the field-ops pilot only. The wider platform (first-run
-onboarding, ICP templates, discovery, opportunity feed, contacts, outreach,
-monitoring, admin tooling) is scoped in [`TASKS.md`](./TASKS.md) and sequenced
-in [`docs/PRIORITIES.md`](./docs/PRIORITIES.md). Priority 1 of that document
-(first run) requires the ICP and opportunity models, which do not exist yet, so
-it is a new body of work rather than an extension of this plan.
+This plan covers the field-ops pilot plus the platform core built in Stage 20.
+The rest of the wider platform — natural-language ICP parsing, LLM agents
+(research, qualification, outreach drafting), signal monitoring and alerts, email
+delivery, CRM sync, billing — is scoped in [`TASKS.md`](./TASKS.md) and
+sequenced in [`docs/PRIORITIES.md`](./docs/PRIORITIES.md).
+
+Note on honesty of the first run: discovery is **deterministic template
+matching**, not natural-language understanding. Priority 1's "type a sentence,
+get filters" step needs an LLM provider, which is not configured in this
+environment. The wizard therefore starts from curated templates, and the
+scoring, evidence and activation loop behind it is the real implementation.

@@ -97,6 +97,13 @@ export const Navbar: React.FC = () => {
           <SignedIn>
             <button
               type="button"
+              onClick={() => handleNavClick('/opportunities')}
+              className="text-[15px] font-bold text-[#0a0a0b] hover:opacity-70 transition-opacity cursor-pointer"
+            >
+              Opportunities
+            </button>
+            <button
+              type="button"
               onClick={() => handleNavClick('/dashboard')}
               className="text-[15px] font-bold text-[#0a0a0b] hover:opacity-70 transition-opacity cursor-pointer"
             >

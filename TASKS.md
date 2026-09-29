@@ -37,6 +37,12 @@ This is the shipped, verified vertical. Everything below was signed off on
 | Deterministic confidence + freshness scores on every proof | `[x]` | `src/lib/trust.ts` (`trust_v1`), 13 unit tests |
 | Explicit "unknown" instead of a fabricated score | `[x]` | pre-trust rows are NULL and render as unknown |
 | Users can report bad data; ops closes the loop | `[x]` | `POST /data-reports`, ops queue, 12 E2E checks |
+| ICP templates + discovery run | `[x]` | 6 templates, `POST /platform/discovery`, idempotent |
+| Explainable opportunity scoring | `[x]` | `score_v1`, 5 weighted components, 15 unit tests |
+| Opportunity feed as the home screen | `[x]` | `/opportunities`, next action on every card |
+| First-run wizard | `[~]` | `/start` works from templates; NL ICP needs an LLM |
+| Tenant isolation on platform routes | `[x]` | 6 E2E checks: 404 on reads, 403 on writes |
+| Activation meter (1 discovery, 5 saved, 1 outreach) | `[x]` | `workspace_activation`, live in the feed |
 | Deployment / hosting | `[ ]` | Deferred by decision |
 | Installable store build (EAS APK/IPA) | `[~]` | Exports clean; not submitted to a store |
 | Live continuous tracking | `[ ]` | Out of scope for v1 |
