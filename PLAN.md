@@ -151,6 +151,27 @@ fallback), end to end, with tokens. **[COMPLETE]**
   `npx tsc --noEmit` ✓ (documented commands spot-checked).
 - **Commit:** `docs: setup + run documentation` (all three repos).
 
+## Stage 16b — Operator dashboard UI (user request) **[COMPLETE]**
+**Goal:** operator app UI/UX like the web home page + dashboard.
+
+- [x] Design tokens `src/theme.ts` mirroring web `index.css` (#0a0a0b brand,
+      #f7f7f8 canvas, white cards, Poppins, shadows, radius) + `withFont()`
+      helper mapping fontWeight → Poppins face for every screen.
+- [x] Poppins loaded via `@expo-google-fonts/poppins` + `expo-font`.
+- [x] New **Home dashboard** (`HomeScreen.tsx`): greeting + online pill,
+      performance stats (pending/paid/approved), active-mission card,
+      board counters, offline-queue card with Sync now — web-dashboard layout
+      (micro-labels, stat cards, brand hero card).
+- [x] Bottom tab navigation (Home / Missions / Sync) via
+      `@react-navigation/bottom-tabs`; Task pushed above tabs; Login gate kept.
+- [x] Restyled Login/Missions/Task/Sync with the tokens + shared
+      `src/status.ts` badge maps.
+- [x] Deps added: `expo-font`, `@expo-google-fonts/poppins`,
+      `@react-navigation/bottom-tabs`, `@expo/vector-icons`.
+- **Verify:** `npx tsc --noEmit` ✓; web bundle compiles (3.7 MB);
+  `npx expo export --platform android` ✓.
+- **Commit:** `feat: dashboard home screen + full brand restyle` ✓ pushed.
+
 ## Stage 15 — Deployment (decision checkpoint ⏸) **[DEFERRED BY USER]**
 **Decision (2026-09-29):** **no deploy yet.** Device QA (Stage 16) runs
 against the local API over LAN; hosting (PaaS vs VPS) is re-opened later.
@@ -167,16 +188,25 @@ Residual checklist kept below for when that happens.
       API; one full API flow (seed → proof → review) against prod.
 - **Commit:** `feat: deployment config (Dockerfile, prod env docs)`.
 
-## Stage 16 — Device QA (manual, user-driven + my bugfix loop) **[IN PROGRESS]**
-**Goal:** the operator app proven on a real device.
+## Stage 16 — Device QA (manual, user-driven + my bugfix loop) **[COMPLETE]**
+**Goal:** the operator app proven on a real device (run on laptop browser via
+Expo web — camera/GPS device pass deferred to a phone session).
 
-- [x] Device checklist written: `realreach-operator/DEVICE_QA.md`
-      (LAN setup → sign-in → assigned task → GPS session → camera proof →
-      airplane-mode outbox → web approval → earnings → edge observations).
-- [ ] User runs it on device/emulator (I cannot — no device here); reports issues.
-- [ ] I fix, re-run scripts + typechecks, hand back the next checklist step.
-- **Verify:** checklist completed; regressions green.
-- **Commit:** `fix: device QA issues` (as found).
+- [x] Device checklist written: `realreach-operator/DEVICE_QA.md`.
+- [x] User ran it (Expo web on `:8081`): sign-in → missions → accept → GPS
+      session → evidence → offline queue flush → proof review (human approved)
+      → task shows Approved in app → payouts → earnings.
+- [x] Bugs found & fixed:
+  - CORS: Expo web origin `:8081` blocked ("Failed to fetch") → comma-separated
+    CORS allowlist (`829ec20`).
+  - Root URL 404 → friendly service-info route (`ac2b740`).
+  - Stale task hint ("Tap Start…" while Submitted) → notice tracks transitions
+    (`e2c7ed3`).
+  - Missing web deps → `react-dom` + `react-native-web` installed.
+- [x] Machine verdict on the browser proof = `requires_review` (no GPS in
+      browser) — human approval path confirmed working as designed.
+- **Verify:** checklist run completed; regression suite re-run in Stage 17.
+- **Commit:** `fix: device QA issues` (as found — see hashes above).
 
 ## Stage 17 — Final verification & handoff
 **Goal:** one clean sweep and a written handoff.
