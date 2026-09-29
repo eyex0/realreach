@@ -151,9 +151,10 @@ fallback), end to end, with tokens. **[COMPLETE]**
   `npx tsc --noEmit` ✓ (documented commands spot-checked).
 - **Commit:** `docs: setup + run documentation` (all three repos).
 
-## Stage 15 — Deployment (decision checkpoint ⏸)
-**Goal:** a live pilot URL. **Stop here and ask the user to choose:**
-PaaS (Railway/Render + Vercel) · VPS (Docker compose) · no deploy yet.
+## Stage 15 — Deployment (decision checkpoint ⏸) **[DEFERRED BY USER]**
+**Decision (2026-09-29):** **no deploy yet.** Device QA (Stage 16) runs
+against the local API over LAN; hosting (PaaS vs VPS) is re-opened later.
+Residual checklist kept below for when that happens.
 
 - [ ] Backend: `Dockerfile` (+`PORT` honored — check `index.ts`), migrations run
       on deploy, production env: `AUTH_MODE=required`, `FRONTEND_URL=<web origin>`,
@@ -163,15 +164,15 @@ PaaS (Railway/Render + Vercel) · VPS (Docker compose) · no deploy yet.
 - [ ] Operator: point `EXPO_PUBLIC_API_URL` at prod; build via EAS (needs the
       user's Expo account) or run against prod from Expo Go during pilot.
 - **Verify:** prod `/health` 200; prod 401-sweep green; web loads against prod
-  API; one full API flow (seed → proof → review) against prod.
+      API; one full API flow (seed → proof → review) against prod.
 - **Commit:** `feat: deployment config (Dockerfile, prod env docs)`.
 
-## Stage 16 — Device QA (manual, user-driven + my bugfix loop)
+## Stage 16 — Device QA (manual, user-driven + my bugfix loop) **[IN PROGRESS]**
 **Goal:** the operator app proven on a real device.
 
-- [ ] I prepare a device checklist: sign-in (Clerk) → pull missions → accept →
-      start (GPS) → camera proof → submit → airplane-mode test (outbox queues)
-      → back online (auto flush) → earnings visible.
+- [x] Device checklist written: `realreach-operator/DEVICE_QA.md`
+      (LAN setup → sign-in → assigned task → GPS session → camera proof →
+      airplane-mode outbox → web approval → earnings → edge observations).
 - [ ] User runs it on device/emulator (I cannot — no device here); reports issues.
 - [ ] I fix, re-run scripts + typechecks, hand back the next checklist step.
 - **Verify:** checklist completed; regressions green.
