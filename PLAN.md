@@ -327,3 +327,12 @@ basemap, and the 500-item scope had no home in the repo.
 
 Live ops map/WebSocket, email/SMS notifications, Stripe billing, multi-org
 management UI, algorithmic anything, continuous GPS tracking.
+
+### Beyond this plan
+
+This plan covers the field-ops pilot only. The wider platform (first-run
+onboarding, ICP templates, discovery, opportunity feed, contacts, outreach,
+monitoring, admin tooling) is scoped in [`TASKS.md`](./TASKS.md) and sequenced
+in [`docs/PRIORITIES.md`](./docs/PRIORITIES.md). Priority 1 of that document
+(first run) requires the ICP and opportunity models, which do not exist yet, so
+it is a new body of work rather than an extension of this plan.

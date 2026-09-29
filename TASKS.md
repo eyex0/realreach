@@ -2,7 +2,8 @@
 
 Source of truth for what is built, what is planned, and what is verified.
 Companion documents: [`PLAN.md`](./PLAN.md) (stage-by-stage engineering plan for
-the field-ops pilot) and the per-area context briefs in [`docs/`](./docs).
+the field-ops pilot), [`docs/PRIORITIES.md`](./docs/PRIORITIES.md) (the order to
+build the wider platform in) and the per-area briefs in [`docs/`](./docs).
 
 **Status legend** — `[x]` verified working · `[~]` built, not yet verified ·
 `[ ]` not started.
@@ -201,4 +202,6 @@ This is the shipped, verified vertical. Everything below was signed off on
 1. Tick a task only when its **Definition of Done** is satisfied.
 2. Update this file in the same commit as the code that closes the task.
 3. Link the verification (test name, screenshot, or manual run) in the commit body.
-4. Keep [`PLAN.md`](./PLAN.md) for engineering stages; this file for scope.
+4. Keep [`PLAN.md`](./PLAN.md) for engineering stages; this file for scope; and
+   [`docs/PRIORITIES.md`](./docs/PRIORITIES.md) for build order. Priorities 1–5
+   of that document map onto the phases below and gate the rest.

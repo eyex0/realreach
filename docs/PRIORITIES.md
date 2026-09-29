@@ -1,0 +1,250 @@
+# RealReach — Platform Priorities
+
+The ordered, opinionated list of what to build next and what **not** to build
+yet. This file is the source of truth for *sequence*; [`../TASKS.md`](../TASKS.md)
+is the source of truth for *scope*; [`CONTEXT.md`](./CONTEXT.md) holds the
+per-area briefs.
+
+## Platform goal
+
+> Every time a user logs in, they immediately see a relevant opportunity,
+> understand why it matters, and know the next action to take.
+
+Achieve that consistently and RealReach becomes part of the user's weekly sales
+workflow — not another tool they tried once.
+
+## The order (do these in exactly this sequence)
+
+| # | Priority | Pilot status |
+| --- | --- | --- |
+| 1 | Perfect the first-run experience | `[ ]` platform; pilot has a working operator first run |
+| 2 | Make data trustworthy and sourced | `[~]` evidence + verdict provenance exist; confidence/freshness scores do not |
+| 3 | Make the opportunity feed the home screen | `[~]` operator home + ops console exist; no scored opportunity feed |
+| 4 | Make AI transparent and evidence-based | `[~]` machine verdict shows checks and a reason code; no rationale/confidence UI |
+| 5 | Add monitoring and alerts | `[~]` `notifications` table + API exist; no signal alerts, digest, or saved-company monitoring |
+| 6 | Build admin and support tools | `[~]` ops console covers campaigns, proofs, payouts, reports; no feature flags, job retry, or support tickets |
+| 7 | Improve data coverage by market | `[ ]` Italy only (Milan); no external sources |
+| 8 | Use feedback to improve scoring and matching | `[ ]` no feedback capture at all |
+| 9 | Add CRM/integration depth | `[ ]` blocked until retention proves demand |
+| 10 | Expand geography and ICPs | `[ ]` blocked until coverage is reliable |
+
+---
+
+## 1. Perfect the first run
+
+> The most important platform job is ensuring a new user gets value in the
+> first 10 minutes.
+
+Build and optimise, in order:
+
+1. Clear onboarding
+2. ICP templates
+3. First discovery run
+4. Opportunity feed
+5. Save opportunities
+6. Contact recommendations
+7. Outreach draft
+
+**Activation flow**
+
+```text
+Sign up
+→ Choose ICP template
+→ Run discovery
+→ See 25 companies
+→ Save 5 opportunities
+→ Approve 1 outreach draft
+```
+
+If this flow is slow, confusing, or produces weak results, nothing else
+matters.
+
+**Pilot status** — the field-ops app has a real first run (sign in → missions →
+accept → GPS session → proof → paid) and it is verified on a phone. None of the
+platform steps above exist yet: there is no ICP model, no discovery run, and
+nothing to save. Building this priority means building `T169`–`T207` before any
+AI work.
+
+## 2. Make data trustworthy
+
+Users will only pay if they trust the data. This is more important than adding
+more AI features.
+
+1. Source attribution on every company and contact
+2. Last-updated date
+3. Confidence score
+4. Freshness score
+5. Duplicate detection
+6. Clear "unknown" fields
+7. Easy reporting of bad data
+8. Regular refresh jobs
+
+Every company and person must answer: **where did this data come from? when was
+it last updated? how confident is it? can the user report an issue?**
+
+**Pilot status** — partially satisfied, and by design rather than luck:
+
+| Requirement | Pilot |
+| --- | --- |
+| Source attribution | `[x]` every evidence row stores `source`, `mime`, `storage_key`, `captured_at`, and the uploader |
+| Last-updated | `[x]` `created_at` / `captured_at` / `reviewed_at` on every row |
+| Machine decision provenance | `[x]` `verification_results.checks` + `reason_code`, never overwritten by a human decision |
+| Confidence score | `[ ]` not modelled — the verdict is a status, not a number |
+| Freshness score | `[ ]` not modelled |
+| Duplicate detection | `[~]` campaign/task dedupe exists; entity resolution does not |
+| Explicit "unknown" | `[ ]` fields are nullable with no explicit unknown marker |
+| Report bad data | `[ ]` a user cannot flag a bad record |
+| Refresh jobs | `[ ]` no scheduler exists |
+
+The three `[ ]` rows above (confidence, freshness, bad-data reporting) are the
+cheapest high-trust wins and should land before any AI feature.
+
+## 3. Make the opportunity feed the home screen
+
+The platform must open to actionable opportunities, not an empty dashboard.
+
+Each card shows: company name · score · why it matters · primary signal ·
+recommended contact · next action · save / research / draft outreach.
+
+```text
+Company X — Score 82
+Hiring 3 customer-support specialists in Berlin
+Expanding into Germany
+Recommended contact: Head of Customer Operations
+Next action: Send introduction email
+```
+
+Users must immediately understand: **what should I do next?**
+
+**Pilot status** — the operator home screen already answers "what do I do next"
+with an active-mission hero card, which is the same idea applied to delivery
+work. The scored opportunity feed does not exist; it depends on priorities 1, 2
+and 4.
+
+## 4. Make AI transparent
+
+Never a black box. Every AI output shows: signals used · sources · confidence ·
+why the company is relevant · why now · what evidence supports the claim.
+
+Outreach must show its basis:
+
+```text
+This draft is based on:
+- Hiring signal: Customer Support Specialist, Berlin
+- Expansion signal: New German distributor
+- Source links
+```
+
+If the AI mentions something without evidence, block it.
+
+**Pilot status** — the machine verifier is the template to copy: it returns
+`verified` / `requires_review` / `rejected` with per-check detail and a reason
+code, and a human approval is recorded separately without ever overwriting the
+machine verdict. There is no LLM in the pilot yet, so there is nothing to make
+transparent — but the *shape* of the guarantee is already proven.
+
+## 5. Make the workflow sticky
+
+Users should return weekly because the platform gives them new reasons to act.
+
+Daily/weekly signal alerts · new opportunity notifications · saved-company
+monitoring · score changes · contact changes · task reminders · weekly digest.
+
+```text
+Company X just posted 2 customer-service roles in Germany.
+Opportunity score increased from 68 to 84.
+Review opportunity →
+```
+
+This turns RealReach from a search tool into a daily workflow.
+
+**Pilot status** — `notifications` (user, kind, title, body, link, read_at)
+already exists with a router; the kinds the platform needs (signal, score
+change, digest) are not produced by anything yet.
+
+## 6. Keep the platform simple
+
+Do not add every possible feature. For the first 6–12 months, focus on:
+
+```text
+Discover → Understand → Qualify → Contact → Reach → Track
+```
+
+Avoid building too early: complex CRM · custom agent builders · mobile app ·
+white-label portals · enterprise SSO · large analytics suites · dozens of
+integrations. Add these only when customers ask repeatedly and retention proves
+demand.
+
+**Pilot status** — the field-ops app is a deliberate exception: a mobile app is
+the product, because a walker cannot do delivery work from a browser. That is
+scope, not sprawl.
+
+## 7. Build platform health monitoring
+
+Know when the platform is failing before customers complain.
+
+Track: data freshness · failed ingestion jobs · API errors · queue backlog · AI
+costs · agent failures · bounce rates · credit usage · customer activation ·
+churn risk.
+
+Alert on: data older than X days · job failure rate above X% · AI cost per run
+above X · bounce rate above X% · customer inactive for X days.
+
+**Pilot status** — `[~]` structured request logging and rate limits exist; there
+is no metrics store, no dashboard, and no alerting.
+
+## 8. Build admin and support tools
+
+Customer search · workspace overview · credit adjustments · data-refresh
+controls · job retry tools · feature flags · error investigation · support
+ticket tracking · usage reports.
+
+Without admin tools, every customer issue becomes manual work.
+
+**Pilot status** — the ops console is the seed of this: campaigns, tasks,
+proofs with machine verdicts, payouts, and reports. Credit adjustments, feature
+flags, job retry, and support tickets are missing.
+
+## 9. Improve data coverage gradually
+
+```text
+Phase 1: Italy + Germany
+Phase 2: UK + France
+Phase 3: UAE + Saudi Arabia
+Phase 4: Broader Europe
+Phase 5: Global expansion
+```
+
+For each new market add: local company registry · local news sources · local job
+boards · local compliance rules · local contact providers.
+
+Do not claim global coverage before the data is reliable.
+
+**Pilot status** — Italy only, and only Milan, with no external data sources at
+all. The pilot's "data" is what its own operators record.
+
+## 10. Build a feedback loop
+
+Every user action should improve the platform.
+
+Track: opportunities saved · opportunities ignored · bad-data reports ·
+outreach approved · outreach edited · contacts marked wrong · signals marked
+irrelevant · searches with no good results.
+
+Use it to improve scoring, signal relevance, contact matching, outreach
+quality, and search ranking. This becomes a long-term advantage.
+
+**Pilot status** — `[ ]` nothing is captured. This is cheap to start and
+compounding: every `verified` / `requires_review` / `rejected` verdict and every
+human decision is already a labelled training signal sitting in the database,
+unused.
+
+---
+
+## How to use this file
+
+1. Do not start priority *n+1* while *n* has an open `[ ]` that blocks it.
+2. When a priority ships, tick it here and add the task IDs to
+   [`../TASKS.md`](../TASKS.md).
+3. Anything in "avoid building too early" needs repeated customer demand plus
+   proven retention before it is scheduled.
