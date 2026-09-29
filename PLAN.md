@@ -188,7 +188,21 @@ Residual checklist kept below for when that happens.
       API; one full API flow (seed → proof → review) against prod.
 - **Commit:** `feat: deployment config (Dockerfile, prod env docs)`.
 
-## Stage 16 — Device QA (manual, user-driven + my bugfix loop) **[COMPLETE]**
+## Stage 16 — Device QA (manual, user-driven + my bugfix loop) **[COMPLETE — verified on a real phone]**
+
+**Real-phone verification (2026-09-29):** the user completed the full
+`realreach-operator/DEVICE_QA.md` checklist on a physical phone via Expo Go
+against the local API over LAN — sign-in, accept, live GPS session, photo +
+quantity evidence, airplane-mode queue and replay, and human approval in the
+web console. **Machine verdict `verified` reached on a real walk.** The
+`requires_review` outcome seen during browser QA was a browser artefact (no GPS),
+not a defect.
+
+Run path for future device sessions: `npm run phone` (LAN) or
+`npm run phone:tunnel`; the API URL is baked in from `.env.local`
+(`EXPO_PUBLIC_API_URL=http://192.168.30.68:4000`) and can be overridden in-app
+on the Sync tab.
+
 **Goal:** the operator app proven on a real device (run on laptop browser via
 Expo web — camera/GPS device pass deferred to a phone session).
 
@@ -262,6 +276,36 @@ Expo web — camera/GPS device pass deferred to a phone session).
 
 ---
 
+## Stage 18 — Landing page map + task board **[COMPLETE]**
+
+**Goal:** the hero map on the landing page was rendering a blank/watermarked
+basemap, and the 500-item scope had no home in the repo.
+
+- [x] **Root-caused the dead map.** `basemaps.cartocdn.com` now answers every
+      keyless tile request with an `API KEY REQUIRED` watermark tile, so the
+      hero showed CARTO's placeholder over Milan. The old HTTP check returned
+      `200`, so this only showed up in a rendered screenshot.
+- [x] Replaced the tile source with a keyless chain: Esri `World_Light_Gray_Base`
+      + `World_Light_Gray_Reference` labels, falling back to OpenStreetMap after
+      6 tile errors.
+- [x] Extracted `src/lib/useLeafletMap.ts` and moved all three maps
+      (`RealMilanMap`, `RealPlannerMap`, `RealBuilderMap`) onto it. Fixes the
+      three latent faults the raw `L.map()` calls shared: no `invalidateSize()`
+      after the animated Hero settled (Leaflet measured a pre-transform
+      container and laid out no tiles), scroll-zoom off with no visible control,
+      and no tile fallback.
+- [x] Map is now framed with `fitBounds` instead of a hardcoded centre, has
+      `+`/`−` controls, hover-highlighted zones, and a background colour so it
+      never flashes empty.
+- [x] Verified by headless-Edge screenshot of `http://127.0.0.1:3000/`: real
+      Milan basemap, three zone polygons, runner markers, controls, attribution.
+- [x] Added `TASKS.md` (500-task board with verified pilot status, known
+      limitations, and a definition-of-done workflow) and `docs/CONTEXT.md`
+      (the 20-section platform context brief).
+
+---
+
 ### Out of scope (not in this plan unless requested)
+
 Live ops map/WebSocket, email/SMS notifications, Stripe billing, multi-org
 management UI, algorithmic anything, continuous GPS tracking.

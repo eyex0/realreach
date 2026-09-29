@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
+import { useLeafletMap } from '../lib/useLeafletMap';
 
 export type PlannerLayer = 'zones' | 'routes' | 'teams' | 'density';
 
@@ -48,28 +48,14 @@ interface Props {
 }
 
 export const RealPlannerMap: React.FC<Props> = ({ zones, selectedId, onSelect, layers }) => {
-  const divRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<L.Map | null>(null);
   const groupRef = useRef<L.LayerGroup | null>(null);
   const selectRef = useRef(onSelect);
   selectRef.current = onSelect;
 
-  useEffect(() => {
-    if (!divRef.current || mapRef.current) return;
-    const map = L.map(divRef.current, { center: [45.4642, 9.185], zoom: 13, scrollWheelZoom: false });
-    mapRef.current = map;
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
-      subdomains: 'abcd',
-      maxZoom: 20,
-    }).addTo(map);
-    map.on('click', () => map.scrollWheelZoom.enable());
-    map.on('mouseout', () => map.scrollWheelZoom.disable());
-    return () => {
-      map.remove();
-      mapRef.current = null;
-    };
-  }, []);
+  const { containerRef, mapRef } = useLeafletMap(() => {}, {
+    center: [45.4642, 9.185],
+    zoom: 13,
+  });
 
   useEffect(() => {
     const map = mapRef.current;
@@ -134,7 +120,7 @@ export const RealPlannerMap: React.FC<Props> = ({ zones, selectedId, onSelect, l
     }
   }, [zones, selectedId, layers]);
 
-  return <div ref={divRef} className="absolute inset-0 z-0" />;
+  return <div ref={containerRef} className="absolute inset-0 z-0 bg-slate-100" />;
 };
 
 export default RealPlannerMap;

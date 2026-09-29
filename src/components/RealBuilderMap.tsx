@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
+import { useLeafletMap } from '../lib/useLeafletMap';
 
 interface Props {
   rings: number[][][] | null;
@@ -9,8 +9,6 @@ interface Props {
 
 /** Click-to-draw polygon control over a real Milan map. */
 export const RealBuilderMap: React.FC<Props> = ({ rings, onChange }) => {
-  const divRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<L.Map | null>(null);
   const savedRef = useRef<L.LayerGroup | null>(null);
   const drawRef = useRef<L.LayerGroup | null>(null);
   const [drawing, setDrawing] = useState(false);
@@ -18,24 +16,10 @@ export const RealBuilderMap: React.FC<Props> = ({ rings, onChange }) => {
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
 
-  useEffect(() => {
-    if (!divRef.current || mapRef.current) return;
-    const map = L.map(divRef.current, { center: [45.4642, 9.185], zoom: 13, scrollWheelZoom: false });
-    mapRef.current = map;
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
-      subdomains: 'abcd',
-      maxZoom: 20,
-    }).addTo(map);
-    map.on('click', () => map.scrollWheelZoom.enable());
-    map.on('mouseout', () => map.scrollWheelZoom.disable());
+  const { containerRef, mapRef } = useLeafletMap((map) => {
     savedRef.current = L.layerGroup().addTo(map);
     drawRef.current = L.layerGroup().addTo(map);
-    return () => {
-      map.remove();
-      mapRef.current = null;
-    };
-  }, []);
+  }, { center: [45.4642, 9.185], zoom: 13 });
 
   // Render the saved polygon.
   useEffect(() => {
@@ -98,7 +82,7 @@ export const RealBuilderMap: React.FC<Props> = ({ rings, onChange }) => {
 
   return (
     <div className="relative h-full w-full">
-      <div ref={divRef} className="absolute inset-0 z-0" />
+      <div ref={containerRef} className="absolute inset-0 z-0 bg-slate-100" />
       <div className="absolute top-3 right-3 z-10 flex gap-2">
         {!drawing ? (
           <button
