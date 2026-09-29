@@ -128,19 +128,28 @@ fallback), end to end, with tokens. **[COMPLETE]**
 - **Verify:** all of the above green.
 - **Commit:** `chore: pilot seed + test data cleanup (Stage 13)`.
 
-## Stage 14 — Configuration & documentation
+## Stage 14 — Configuration & documentation **[COMPLETE]**
 **Goal:** a fresh clone can be set up from docs alone.
 
-- [ ] `.env.example` refresh both repos: `DATABASE_URL`, `CLERK_SECRET_KEY`,
-      `AUTH_MODE`, `FRONTEND_URL`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`;
-      frontend `.env.example`: `VITE_CLERK_PUBLISHABLE_KEY`, `VITE_API_BASE`;
-      operator: document `EXPO_PUBLIC_API_URL` (and add `.env.example`).
-- [ ] Frontend README rewrite (currently stale) — stack, run, routes, auth flow.
-- [ ] Operator README: setup, device run (`npx expo start`), offline behavior,
-      permissions (camera/location), how sign-in works.
-- [ ] Cross-link the three READMEs; backend README already current.
-- **Verify:** spot-check every documented command actually works.
-- **Commit:** `docs: setup + run documentation`.
+- [x] `.env.example` refresh both repos: backend already current (Stage 12 —
+      PORT/DATABASE_URL/CLERK/AUTH_MODE/FRONTEND_URL/DEVICE_TOKEN_SECRET/
+      SUPABASE_*); frontend `.env.example` rewritten (was AI Studio boilerplate:
+      `VITE_CLERK_PUBLISHABLE_KEY`, `VITE_API_URL`); operator `.env.example`
+      added (`EXPO_PUBLIC_API_URL`).
+- [x] Operator `src/config.ts` now honors `EXPO_PUBLIC_API_URL` as the initial
+      default (in-app setting still wins).
+- [x] Frontend README rewritten (was AI Studio boilerplate): stack, setup,
+      env table, Windows `&`-in-path workaround for npm scripts, route table,
+      auth flow, ops-console overview, cross-links.
+- [x] Operator README created: setup, device run (Expo Go), API URL/LAN note,
+      email-only sign-in + device tokens (with pilot limitation stated),
+      offline outbox behavior, permissions, dev checks, cross-links.
+- [x] Backend README updated: Stage range, PORT/DEVICE_TOKEN_SECRET env rows,
+      device-token auth section, full test-helper list (incl. purge/seed),
+      cross-links to the other two repos.
+- **Verify:** frontend `tsc --noEmit` ✓ + `vite build` ✓; operator
+  `npx tsc --noEmit` ✓ (documented commands spot-checked).
+- **Commit:** `docs: setup + run documentation` (all three repos).
 
 ## Stage 15 — Deployment (decision checkpoint ⏸)
 **Goal:** a live pilot URL. **Stop here and ask the user to choose:**
