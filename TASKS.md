@@ -43,6 +43,9 @@ This is the shipped, verified vertical. Everything below was signed off on
 | First-run wizard | `[~]` | `/start` works from templates; NL ICP needs an LLM |
 | Tenant isolation on platform routes | `[x]` | 6 E2E checks: 404 on reads, 403 on writes |
 | Activation meter (1 discovery, 5 saved, 1 outreach) | `[x]` | `workspace_activation`, live in the feed |
+| Evidence-only outreach drafting (en/it/de) | `[x]` | `outreachDraft.ts`, 20 unit tests, 90-word cap |
+| Unsupported claims blocked, not warned | `[x]` | 422 with the offending claim, on drafts and edits |
+| Human approval required before queueing | `[x]` | DB constraint, not just API |
 | Deployment / hosting | `[ ]` | Deferred by decision |
 | Installable store build (EAS APK/IPA) | `[~]` | Exports clean; not submitted to a store |
 | Live continuous tracking | `[ ]` | Out of scope for v1 |

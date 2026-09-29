@@ -144,9 +144,15 @@ async function handle<T>(res: Response): Promise<T> {
   if (!res.ok) {
     let detail = `${res.status}`;
     try {
-      detail = (await res.json()).error ?? detail;
-    } catch {
-      /* non-JSON error body */
+      const body = await res.json();
+      detail = body.error ?? detail;
+      if (Array.isArray(body.violations) && body.violations.length > 0) {
+        // Claim violations are data, not just a message: the UI shows the user
+        // exactly which words the evidence does not support.
+        throw Object.assign(new Error(body.detail ?? detail), { violations: body.violations });
+      }
+    } catch (e) {
+      if (e instanceof Error && 'violations' in e) throw e;
     }
     throw new Error(detail);
   }
@@ -214,4 +220,76 @@ export async function addOpportunityNote(id: string, body: string): Promise<void
 
 export async function getActivation(): Promise<Activation> {
   return handle<Activation>(await fetch(`${API_BASE}/platform/activation?${authQuery()}`));
+}
+
+export interface OutreachEvidence {
+  signal_id: string;
+  type: string;
+  title: string;
+  source_url: string | null;
+  confidence: number;
+}
+
+export interface OutreachDraft {
+  id: string;
+  opportunity_id: string;
+  contact_id: string | null;
+  channel: string;
+  language: string;
+  subject: string | null;
+  body: string;
+  status: string;
+  evidence: OutreachEvidence[];
+  word_count: number;
+  created_at: string;
+  approved_at?: string | null;
+  omitted_signals?: number;
+}
+
+export interface ClaimViolation {
+  claim: string;
+  reason: 'number_not_in_evidence' | 'entity_not_in_evidence';
+}
+
+export async function createOutreachDraft(
+  opportunityId: string,
+  opts: { language?: 'en' | 'it' | 'de'; tone?: 'direct' | 'warm' } = {}
+): Promise<OutreachDraft> {
+  return handle<OutreachDraft>(
+    await fetch(`${API_BASE}/platform/opportunities/${opportunityId}/outreach/draft`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: authBody(opts),
+    })
+  );
+}
+
+export async function editOutreachDraft(id: string, body: string): Promise<OutreachDraft> {
+  return handle<OutreachDraft>(
+    await fetch(`${API_BASE}/platform/outreach/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: authBody({ body }),
+    })
+  );
+}
+
+export async function approveOutreach(id: string): Promise<{ id: string; status: string }> {
+  return handle<{ id: string; status: string }>(
+    await fetch(`${API_BASE}/platform/outreach/${id}/approve`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: authBody({}),
+    })
+  );
+}
+
+export async function rejectOutreach(id: string, reason?: string): Promise<{ id: string; status: string }> {
+  return handle<{ id: string; status: string }>(
+    await fetch(`${API_BASE}/platform/outreach/${id}/reject`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: authBody({ reason }),
+    })
+  );
 }

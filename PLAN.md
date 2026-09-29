@@ -430,6 +430,60 @@ build clean, CI green.
 
 ---
 
+## Stage 21 — Evidence-only outreach + human approval (Priority 4, activation step 3) **[COMPLETE]**
+
+**Goal:** complete the activation path (approve one outreach draft) and give
+Priority 4 "make AI transparent" a real surface. Nothing is sent by a machine,
+and nothing may state a fact the evidence does not carry.
+
+- [x] **Deterministic drafter** (`src/lib/outreachDraft.ts`) — English, Italian
+      and German; cites **exactly one** signal (the strongest) and says so; one
+      clear ask; body capped at 90 words; the signal title is **quoted verbatim**
+      as a citation, so an English signal inside a German draft reads as a
+      citation rather than broken grammar (translating it would need a model,
+      and a mistranslated claim is worse than an untranslated one).
+- [x] **Refuses to draft with no signal to cite** (422) — a message with nothing
+      to point at is exactly the spam this product refuses to produce.
+- [x] **Unsupported claims are blocked, not warned about** — every draft and
+      every human edit is re-validated; invented numbers and names are refused
+      with the offending claim named in the response and rendered in the UI.
+- [x] **Suppressed contacts are never drafted to**, whatever their confidence.
+- [x] **Nothing is queued without a human approver** — enforced by the database
+      (`outreach_approved_before_queue`), not only by the API. Verified by
+      attempting to queue an unapproved draft directly in SQL.
+- [x] **Approval is attributed** and counted toward activation, which is how a
+      workspace reaches "activated".
+- [x] **UI** — the detail panel gains an outreach block: language picker,
+      "Draft from evidence", the editable draft with its word count, the
+      *This draft is based on* evidence list, Save edit, Approve, Reject, and a
+      red panel listing any claim the evidence does not support.
+
+**Bugs found and fixed while building this** (the checker was the hard part)
+1. **The entity checker flagged ordinary prose** — "Best", "Would", "Germany.
+   That" — which would have blocked every legitimate draft and trained users to
+   ignore the guard. Rewritten to check only capitalised words *inside* a
+   sentence, with a prose stoplist.
+2. **An invented "40" passed** because the corpus contained "240" and the test
+   was a substring match. Numbers now match an exact token set.
+3. **German nouns looked like proper nouns** ("Supportlast", "Werkzeugen"),
+   because German capitalises every noun. Rather than ship a word list that
+   rots, single-word entity checks are disabled for German drafts; numbers and
+   multi-word names are still checked, and the limitation is documented in the
+   code and here rather than hidden.
+4. **A closing quote broke matching** — a cited title ends `Germany".`, so the
+   token never matched its evidence.
+5. **The E2E harness discarded error bodies**, so a 422's violation list was
+   invisible and the assertion could never pass. `Call` now parses them.
+
+**Known limitation, stated plainly** — a signal's title is not translated. The
+citation is verbatim in every language. Fixing that properly needs a model.
+
+**Verify:** 75/75 vitest (20 new drafter and checker tests), **104/104
+E2E-REQUIRED** (13 new outreach checks), all other E2E scripts clean, storage
+pass, frontend `tsc` + build clean, CI green.
+
+---
+
 ### Out of scope (not in this plan unless requested)
 
 Live ops map/WebSocket, email/SMS notifications, Stripe billing, multi-org

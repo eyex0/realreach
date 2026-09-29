@@ -9,7 +9,9 @@ import { syncBackendUser } from '../lib/api';
 import {
   listTemplates, listIcps, createIcp, runDiscovery, getFeed, getOpportunity,
   markOpportunity, addOpportunityNote, getActivation, setPlatformUser,
+  createOutreachDraft, editOutreachDraft, approveOutreach, rejectOutreach,
   type FeedItem, type IcpTemplate, type OpportunityDetail, type Activation,
+  type OutreachDraft, type ClaimViolation,
 } from '../lib/platformApi';
 
 const PRIORITY_STYLE: Record<string, string> = {
@@ -127,6 +129,170 @@ function OpportunityCard({ item, onOpen, onSave, onIgnore, busy }: {
   );
 }
 
+function OutreachPanel({ opportunityId, onChanged }: { opportunityId: string; onChanged: () => void }) {
+  const [draft, setDraft] = useState<OutreachDraft | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [language, setLanguage] = useState<'en' | 'it' | 'de'>('en');
+  const [editing, setEditing] = useState<string | null>(null);
+  const [blocked, setBlocked] = useState<ClaimViolation[] | null>(null);
+  const [error, setError] = useState('');
+
+  const run = async (fn: () => Promise<void>) => {
+    setBusy(true);
+    setError('');
+    try {
+      await fn();
+    } catch (e) {
+      const err = e as Error & { violations?: ClaimViolation[] };
+      if (err.violations?.length) setBlocked(err.violations);
+      else setError(err.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50/60 p-3">
+      <div className="flex flex-wrap items-center gap-2">
+        <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Outreach</p>
+        {!draft && (
+          <>
+            <select
+              value={language}
+              onChange={(e) => setLanguage(e.target.value as 'en' | 'it' | 'de')}
+              className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-[11px] outline-none"
+            >
+              <option value="en">English</option>
+              <option value="it">Italiano</option>
+              <option value="de">Deutsch</option>
+            </select>
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() =>
+                void run(async () => {
+                  setBlocked(null);
+                  setDraft(await createOutreachDraft(opportunityId, { language }));
+                })
+              }
+              className="inline-flex items-center gap-1.5 rounded-lg bg-[#0a0a0b] text-white px-3 py-1.5 text-[11px] font-bold disabled:opacity-40 cursor-pointer"
+            >
+              {busy ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
+              Draft from evidence
+            </button>
+          </>
+        )}
+      </div>
+
+      {error && <p className="mt-2 text-[11px] text-red-700">{error}</p>}
+
+      {draft && (
+        <div className="mt-3 space-y-2">
+          <div className="rounded-lg bg-white border border-slate-200 p-3">
+            <p className="text-[11px] font-bold">{draft.subject}</p>
+            <textarea
+              value={editing ?? draft.body}
+              onChange={(e) => setEditing(e.target.value)}
+              rows={7}
+              className="mt-1.5 w-full rounded-lg border border-slate-100 p-2 text-[11px] leading-relaxed outline-none focus:border-slate-300"
+            />
+            <p className="mt-1 text-[10px] text-slate-400">
+              {draft.word_count} words · {draft.language.toUpperCase()} · status {draft.status}
+            </p>
+          </div>
+
+          <div className="rounded-lg bg-white border border-slate-200 p-3">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">This draft is based on</p>
+            <ul className="mt-1 space-y-0.5">
+              {draft.evidence.map((e) => (
+                <li key={e.signal_id} className="text-[11px] text-slate-600">
+                  <span className="font-bold">{e.type.replace('_', ' ')}</span>: {e.title}
+                  {e.source_url && (
+                    <a href={e.source_url} target="_blank" rel="noreferrer" className="ml-1 text-blue-600 underline">
+                      source
+                    </a>
+                  )}
+                </li>
+              ))}
+            </ul>
+            {draft.omitted_signals ? (
+              <p className="mt-1 text-[10px] text-slate-400">
+                {draft.omitted_signals} other signal(s) were not mentioned: one message, one reason.
+              </p>
+            ) : null}
+          </div>
+
+          {blocked && blocked.length > 0 && (
+            <div className="rounded-lg bg-red-50 border border-red-200 p-3">
+              <p className="text-[11px] font-bold text-red-800">Blocked: this text claims things the evidence does not support</p>
+              <ul className="mt-1 space-y-0.5">
+                {blocked.map((v) => (
+                  <li key={`${v.reason}-${v.claim}`} className="text-[11px] text-red-700">
+                    “{v.claim}” — {v.reason === 'number_not_in_evidence' ? 'number not in evidence' : 'name not in evidence'}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {draft.status === 'draft' && (
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                disabled={busy || editing === null}
+                onClick={() =>
+                  void run(async () => {
+                    setBlocked(null);
+                    setDraft(await editOutreachDraft(draft.id, editing ?? draft.body));
+                    setEditing(null);
+                  })
+                }
+                className="rounded-lg border border-slate-200 px-3 py-1.5 text-[11px] font-bold disabled:opacity-40 cursor-pointer"
+              >
+                Save edit
+              </button>
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() =>
+                  void run(async () => {
+                    await approveOutreach(draft.id);
+                    setDraft({ ...draft, status: 'approved' });
+                    onChanged();
+                  })
+                }
+                className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 text-white px-3 py-1.5 text-[11px] font-bold disabled:opacity-40 cursor-pointer"
+              >
+                <CheckCircle2 className="h-3 w-3" />
+                Approve
+              </button>
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() =>
+                  void run(async () => {
+                    await rejectOutreach(draft.id, 'not the right angle');
+                    setDraft({ ...draft, status: 'rejected' });
+                  })
+                }
+                className="inline-flex items-center gap-1.5 rounded-lg border border-red-200 text-red-600 px-3 py-1.5 text-[11px] font-bold disabled:opacity-40 cursor-pointer"
+              >
+                <X className="h-3 w-3" />
+                Reject
+              </button>
+            </div>
+          )}
+          {draft.status !== 'draft' && (
+            <p className="text-[11px] font-bold text-slate-500">
+              This draft is {draft.status} — it can no longer be edited.
+            </p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function DetailPanel({ id, onClose, onChanged }: { id: string; onClose: () => void; onChanged: () => void }) {
   const [detail, setDetail] = useState<OpportunityDetail | null>(null);
   const [error, setError] = useState('');
@@ -241,6 +407,8 @@ function DetailPanel({ id, onClose, onChanged }: { id: string; onClose: () => vo
           ))}
         </ul>
       </div>
+
+      <OutreachPanel opportunityId={o.id} onChanged={onChanged} />
 
       <div className="flex gap-2">
         <input

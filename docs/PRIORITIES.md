@@ -20,7 +20,7 @@ workflow — not another tool they tried once.
 | 1 | Perfect the first-run experience | `[~]` template -> discovery -> feed -> save works; NL ICP needs an LLM |
 | 2 | Make data trustworthy and sourced | `[x]` confidence, freshness, unknown-marker and bad-data reporting all shipped |
 | 3 | Make the opportunity feed the home screen | `[x]` `/opportunities`: score, why it matters, next action, save/dismiss |
-| 4 | Make AI transparent and evidence-based | `[~]` machine verdict shows checks and a reason code; no rationale/confidence UI |
+| 4 | Make AI transparent and evidence-based | `[~]` verdict + outreach evidence shown, unsupported claims blocked; LLM outputs not yet |
 | 5 | Add monitoring and alerts | `[~]` `notifications` table + API exist; no signal alerts, digest, or saved-company monitoring |
 | 6 | Build admin and support tools | `[~]` ops console covers campaigns, proofs, payouts, reports; no feature flags, job retry, or support tickets |
 | 7 | Improve data coverage by market | `[ ]` Italy only (Milan); no external sources |
