@@ -13,6 +13,7 @@ import CampaignReportPage from './pages/CampaignReportPage';
 import ClientDashboardPage from './pages/ClientDashboardPage';
 import AdminLayout from './pages/admin/AdminLayout';
 import AdminHomePage from './pages/admin/AdminHomePage';
+import AdminCampaignsPage from './pages/admin/AdminCampaignsPage';
 import ForDistributorsPage from './pages/ForDistributorsPage';
 import AboutPage from './pages/AboutPage';
 import BlogPage from './pages/BlogPage';
@@ -157,6 +158,7 @@ function AppContent() {
         <Route path="/campaigns/:id/report" element={<CampaignReportPage />} />
         <Route path="/client" element={<RequireAuth><ClientDashboardPage /></RequireAuth>} />
         <Route path="/admin" element={<AdminLayout><AdminHomePage /></AdminLayout>} />
+        <Route path="/admin/campaigns" element={<AdminLayout><AdminCampaignsPage /></AdminLayout>} />
           <Route path="/print" element={<RequireAuth><PrintStorePage /></RequireAuth>} />
           <Route path="/campaigns/new" element={<RequireAuth><CampaignBuilderPage /></RequireAuth>} />
           <Route path="/distribution-portal" element={<RequireAuth><DistributionPortalPage /></RequireAuth>} />
