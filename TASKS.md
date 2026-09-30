@@ -5,6 +5,7 @@ Companion documents: [`PLAN.md`](./PLAN.md) (stage-by-stage engineering plan for
 the field-ops pilot), [`docs/PRIORITIES.md`](./docs/PRIORITIES.md) (the order to
 build the wider platform in) and the per-area briefs in [`docs/`](./docs).
 
+The path to production, with gates and blockers, is [docs/ROADMAP_PRODUCTION.md](./ROADMAP_PRODUCTION.md).
 Deferred work, the decisions we owe, and the known limits are tracked in
 [docs/WISHLIST.md](./docs/WISHLIST.md).
 

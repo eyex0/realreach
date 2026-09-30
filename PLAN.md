@@ -721,6 +721,33 @@ a decision to make by guessing. What is done:
 
 ---
 
+## Stage 28 — Production roadmap **[COMPLETE]**
+
+**Goal:** a plan from here to something we would put in front of a paying
+client, ordered by dependency rather than enthusiasm.
+
+- [x] A definition of production that is measurable: real customer, real
+      campaign, recoverable failure, traceable numbers, server-side
+      enforcement, all four UI states, tests at the level where a bug hurts,
+      and the decisions written down.
+- [x] Current state of all three products stated plainly, including what the
+      field-ops app already achieves.
+- [x] The **critical path** identified: address data, payments and the GPS
+      retention decision gate the launch; the LLM work does not.
+- [x] Eight phases, each with an exit gate, so the next phase cannot start
+      while a gate is open.
+- [x] Ownership table, including the roles currently **unassigned** — host,
+      database, backups — because unowned infrastructure is the quiet way a
+      launch dies.
+- [x] Per-section definition of done, covering every section in the project.
+- [x] The five risks that would actually stop a launch, with mitigations.
+- [x] What is parallelisable, what is strictly ordered, and what must not be
+      started yet.
+
+Full plan: [`docs/ROADMAP_PRODUCTION.md`](./docs/ROADMAP_PRODUCTION.md).
+
+---
+
 ### Out of scope (not in this plan unless requested)
 
 Live ops map/WebSocket, email/SMS notifications, Stripe billing, multi-org
