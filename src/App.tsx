@@ -94,6 +94,7 @@ function AppContent() {
       '/distribution-portal',
       '/ops',
       '/reports',
+      '/demo',
     ].includes(location.pathname);
 
   return (
