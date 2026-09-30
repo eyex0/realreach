@@ -72,7 +72,7 @@ function Row({ s, onChanged }: { s: AdminWishlistSignup; onChanged: () => void }
           onClick={() => setOpen(!open)}
           className="flex min-w-[200px] flex-1 flex-col text-left cursor-pointer"
         >
-          <span className="text-xs font-bold text-[#0a0a0b]">
+          <span className="text-xs font-bold text-[var(--rr-brand)]">
             {s.full_name ?? s.email}
             {s.company ? <span className="font-normal text-slate-500"> · {s.company}</span> : null}
           </span>
@@ -178,7 +178,7 @@ export function AdminWishlistPage() {
   return (
     <main className="mx-auto max-w-[1600px] px-4 py-6 sm:px-6">
       <header>
-        <h1 className="text-2xl font-extrabold tracking-tight text-[#0a0a0b]">Wishlist</h1>
+        <h1 className="text-2xl font-extrabold tracking-tight text-[var(--rr-brand)]">Wishlist</h1>
         <p className="mt-1 text-xs text-slate-500">
           Chi si e registrato dalla landing. Il punto non e il numero, e chi vale una telefonata.
         </p>
@@ -201,7 +201,7 @@ export function AdminWishlistPage() {
             type="button"
             onClick={() => setFilter(f.key)}
             className={`rounded-full px-3.5 py-1.5 text-[11px] font-bold cursor-pointer ${
-              filter === f.key ? 'bg-[#0a0a0b] text-white' : 'border border-slate-200 hover:bg-slate-50'
+              filter === f.key ? 'bg-[var(--rr-brand)] text-white' : 'border border-slate-200 hover:bg-slate-50'
             }`}
           >
             {f.label}

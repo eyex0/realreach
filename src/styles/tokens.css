@@ -1,0 +1,152 @@
+/*
+ * REALREACH design tokens.
+ *
+ * One source of truth for colour, radius, shadow, type and spacing. Extracted
+ * from the values that were already in use rather than invented, so nothing
+ * moves visually today and the next change has exactly one place to happen.
+ *
+ * Why this file exists: the app had two design systems. The landing used custom
+ * properties; the admin console hardcoded #0a0a0b 34 times and leaned on the
+ * default Tailwind palette for everything else, so "the brand colour" was a
+ * value you had to grep for. That is not a design system, it is a habit.
+ *
+ * Rule going forward: no raw hex in a component. If a value is needed, add a
+ * token here first. A token that is used once and is not part of the language
+ * is not a token.
+ *
+ * This is also the file to sync with Figma when there is a Figma file. The
+ * names are semantic, not literal, so a brand colour changing from near-black
+ * to navy is a value change, not a 34-occurrence find and replace.
+ */
+
+:root {
+  /* ------------------------------------------------------------- brand */
+  /* The console is deliberately near-black, not a saturated brand colour.
+     Staff look at this all day next to a map; the loud colour is reserved for
+     status, where it has to mean something. */
+  --rr-brand: #0a0a0b;
+  --rr-brand-hover: #1a1a1d;
+  --rr-brand-emphasis: #0c2016;
+
+  --rr-accent: #006de4;
+  --rr-accent-strong: #0060ca;
+
+  /* ----------------------------------------------------------- surface */
+  --rr-surface: #ffffff;
+  --rr-surface-subtle: #fafafa;
+  --rr-surface-muted: #f1f5f9;
+  --rr-surface-sunken: #eef1f4;
+  --rr-surface-inverse: #0a0a0b;
+  --rr-surface-inverse-card: #1a1a1d;
+
+  /* -------------------------------------------------------------- text */
+  /* Four levels, named for their job. The console leans on these far more
+     than on the old text-primary/secondary/tertiary trio, which mapped poorly
+     onto a page that is mostly tables and secondary text. */
+  --rr-text-strong: #0a0a0b;   /* headings, names, money */
+  --rr-text-body: #4b5563;     /* table cells, descriptions */
+  --rr-text-muted: #94a3b8;    /* timestamps, labels, hints */
+  --rr-text-inverse: #f9fafb;
+  --rr-text-inverse-muted: #64748b;
+
+  /* ------------------------------------------------------------ border */
+  --rr-border: #e5e7eb;
+  --rr-border-subtle: #f3f4f6;
+  --rr-border-strong: #d1d5db;
+  --rr-border-inverse: rgb(255 255 255 / 0.1);
+
+  /* ------------------------------------------------------------ status */
+  /* Reserved. If a colour is not saying "this is fine" / "this is broken" /
+     "this needs attention", it should not be one of these. Keeping them in one
+     block is what stops a second shade of green creeping in. */
+  --rr-status-success: #10b981;
+  --rr-status-success-deep: #059669;
+  --rr-status-success-bg: #ecfdf5;
+  --rr-status-success-text: #047857;
+
+  --rr-status-warning: #f59e0b;
+  --rr-status-warning-bg: #fffbeb;
+  --rr-status-warning-text: #b45309;
+
+  --rr-status-danger: #ef4444;
+  --rr-status-danger-bg: #fef2f2;
+  --rr-status-danger-text: #b91c1c;
+
+  --rr-status-info: #006de4;
+  --rr-status-info-bg: #eff6ff;
+  --rr-status-info-text: #1d4ed8;
+
+  --rr-status-neutral-bg: #f1f5f9;
+  --rr-status-neutral-text: #475569;
+
+  --rr-highlight: #fbbf24; /* map pins, the one warm accent */
+
+  /* ------------------------------------------------------------ radius */
+  --rr-radius-sm: 4px;
+  --rr-radius-md: 8px;
+  --rr-radius-lg: 12px;
+  --rr-radius-xl: 16px;
+  --rr-radius-full: 9999px;
+
+  /* ----------------------------------------------------------- spacing */
+  --rr-space-1: 4px;
+  --rr-space-2: 8px;
+  --rr-space-3: 12px;
+  --rr-space-4: 16px;
+  --rr-space-5: 20px;
+  --rr-space-6: 24px;
+  --rr-space-8: 32px;
+  --rr-space-10: 40px;
+
+  /* ----------------------------------------------------------- shadows */
+  /* Very light. A console is a dense grid of white cards; a heavy shadow turns
+     a screen of 40 cards into visual noise. */
+  --rr-shadow-card: 0 1px 3px rgb(15 23 42 / 0.06);
+  --rr-shadow-raised: 0 4px 12px rgb(15 23 42 / 0.08);
+  --rr-shadow-overlay: 0 25px 50px rgb(0 0 0 / 0.12);
+
+  /* --------------------------------------------------------------- type */
+  --rr-font-sans: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --rr-font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+
+  --rr-text-2xs: 10px;
+  --rr-text-xs: 11px;
+  --rr-text-sm: 12px;
+  --rr-text-base: 14px;
+  --rr-text-lg: 18px;
+  --rr-text-xl: 24px;
+  --rr-text-2xl: 30px;
+
+  /* ------------------------------------------------------ route speeds */
+  /* Shared with the map legend and the report page so a colour can never mean
+     two different speeds in two different components. */
+  --rr-speed-low: #10b981;
+  --rr-speed-mid: #f59e0b;
+  --rr-speed-high: #ef4444;
+}
+
+/*
+ * Semantic utilities.
+ *
+ * Tailwind v4 generates utilities from @theme; these are the handful of
+ * semantic names the console actually needs, so a component can say
+ * `text-strong` instead of `text-[var(--rr-text-strong)]`. Defined here rather
+ * than in JSX so the class name stays short and the value stays in one file.
+ */
+@utility bg-surface { background-color: var(--rr-surface); }
+@utility bg-subtle { background-color: var(--rr-surface-subtle); }
+@utility bg-muted { background-color: var(--rr-surface-muted); }
+@utility bg-inverse { background-color: var(--rr-surface-inverse); }
+
+@utility text-strong { color: var(--rr-text-strong); }
+@utility text-body { color: var(--rr-text-body); }
+@utility text-muted { color: var(--rr-text-muted); }
+@utility text-inverse { color: var(--rr-text-inverse); }
+
+@utility border-hairline { border-color: var(--rr-border); }
+@utility border-inverse { border-color: var(--rr-border-inverse); }
+
+@utility text-success { color: var(--rr-status-success-text); }
+@utility text-warning { color: var(--rr-status-warning-text); }
+@utility text-danger { color: var(--rr-status-danger-text); }
+@utility text-info { color: var(--rr-status-info-text); }

@@ -53,7 +53,7 @@ function ActivityChart({ series }: { series: AdminOverview['series'] }) {
               onMouseLeave={() => setLabel(null)}
             >
               {active && (
-                <div className="absolute -top-1 z-10 whitespace-nowrap rounded-lg bg-[#0a0a0b] px-2.5 py-1.5 text-[10px] font-semibold text-white shadow-lg">
+                <div className="absolute -top-1 z-10 whitespace-nowrap rounded-lg bg-[var(--rr-brand)] px-2.5 py-1.5 text-[10px] font-semibold text-white shadow-lg">
                   <div>
                     {month}/{year} · {t('common.deliveries')}: {num(s.letterboxes)}
                   </div>
@@ -63,7 +63,7 @@ function ActivityChart({ series }: { series: AdminOverview['series'] }) {
                 </div>
               )}
               <div
-                className="w-full rounded-t-md bg-[#006de4] transition-all"
+                className="w-full rounded-t-md bg-[var(--rr-accent)] transition-all"
                 style={{ height: `${Math.max(2, hPieces)}%` }}
               />
               <div
@@ -79,7 +79,7 @@ function ActivityChart({ series }: { series: AdminOverview['series'] }) {
       </div>
       <div className="mt-3 flex items-center gap-4 text-[10px] text-slate-500">
         <span className="inline-flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-sm bg-[#006de4]" />
+          <span className="h-2 w-2 rounded-sm bg-[var(--rr-accent)]" />
           {t('common.deliveries')}
         </span>
         <span className="inline-flex items-center gap-1.5">
@@ -99,7 +99,7 @@ function KpiCard({
       <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{label}</p>
       <p
         className={`mt-1.5 text-[28px] font-extrabold leading-none tabular-nums ${
-          tone === 'alert' ? 'text-red-600' : tone === 'positive' ? 'text-emerald-600' : 'text-[#0a0a0b]'
+          tone === 'alert' ? 'text-red-600' : tone === 'positive' ? 'text-emerald-600' : 'text-[var(--rr-brand)]'
         }`}
       >
         {value}
@@ -198,7 +198,7 @@ export function AdminHomePage() {
                   <button
                     type="button"
                     onClick={() => navigate('/admin/campaigns?status=active')}
-                    className="ml-auto inline-flex items-center gap-1 text-[11px] font-bold text-[#006de4] hover:underline cursor-pointer"
+                    className="ml-auto inline-flex items-center gap-1 text-[11px] font-bold text-[var(--rr-accent)] hover:underline cursor-pointer"
                   >
                     {t('home.openLiveMap')}
                     <ArrowUpRight className="h-3.5 w-3.5" />
@@ -214,7 +214,7 @@ export function AdminHomePage() {
                   <button
                     type="button"
                     onClick={() => navigate('/campaigns/new')}
-                    className="mt-4 rounded-full bg-[#0a0a0b] px-5 py-2.5 text-xs font-bold text-white cursor-pointer"
+                    className="mt-4 rounded-full bg-[var(--rr-brand)] px-5 py-2.5 text-xs font-bold text-white cursor-pointer"
                   >
                     {t('home.createFirst')}
                   </button>
@@ -232,7 +232,7 @@ export function AdminHomePage() {
                 <button
                   type="button"
                   onClick={() => navigate('/admin/billing')}
-                  className="ml-auto inline-flex items-center gap-1 text-[11px] font-bold text-[#006de4] hover:underline cursor-pointer"
+                  className="ml-auto inline-flex items-center gap-1 text-[11px] font-bold text-[var(--rr-accent)] hover:underline cursor-pointer"
                 >
                   {t('home.viewAllInvoices')}
                   <ArrowRight className="h-3 w-3" />
@@ -254,7 +254,7 @@ export function AdminHomePage() {
                     return (
                       <li key={inv.id} className="flex flex-wrap items-center gap-3 px-5 py-3">
                         <div className="min-w-[140px] flex-1">
-                          <p className="truncate text-xs font-bold text-[#0a0a0b]">
+                          <p className="truncate text-xs font-bold text-[var(--rr-brand)]">
                             {inv.campaign_title ?? inv.number}
                           </p>
                           <p className="mt-0.5 text-[10px] text-slate-400">
@@ -309,7 +309,7 @@ export function AdminHomePage() {
                     type="button"
                     onClick={() => setMonths(m)}
                     className={`rounded-full px-3 py-1 text-[11px] font-bold transition-colors cursor-pointer ${
-                      months === m ? 'bg-white text-[#0a0a0b] shadow-sm' : 'text-slate-500'
+                      months === m ? 'bg-white text-[var(--rr-brand)] shadow-sm' : 'text-slate-500'
                     }`}
                   >
                     {m === 1 ? '1m' : m === 3 ? '3m' : '12m'}

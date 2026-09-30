@@ -64,13 +64,13 @@ function StaffGate({ children }: { children: (staff: { name: string; role: strin
       <div className="flex min-h-screen items-center justify-center bg-white p-6">
         <div className="max-w-sm rounded-2xl bg-white p-8 text-center shadow-[0_1px_3px_rgba(15,23,42,0.06)] ring-1 ring-slate-200/70">
           <ShieldAlert className="mx-auto h-8 w-8 text-amber-500" />
-          <h1 className="mt-3 text-lg font-extrabold text-[#0a0a0b]">{t('common.noAccess')}</h1>
+          <h1 className="mt-3 text-lg font-extrabold text-[var(--rr-brand)]">{t('common.noAccess')}</h1>
           <p className="mt-1.5 text-xs leading-relaxed text-slate-500">
             {t('common.back')}
           </p>
           <a
             href="/"
-            className="mt-5 inline-flex rounded-full bg-[#0a0a0b] px-5 py-2.5 text-xs font-bold text-white"
+            className="mt-5 inline-flex rounded-full bg-[var(--rr-brand)] px-5 py-2.5 text-xs font-bold text-white"
           >
             Realreach
           </a>

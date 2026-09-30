@@ -1,4 +1,7 @@
 @import "tailwindcss";
+/* Design tokens: the single source of truth. Imported after Tailwind so the
+   @utility rules below are processed, and before anything that reads them. */
+@import "./styles/tokens.css";
 
 :root {
   --color-bg-primary: #ffffff;

@@ -132,7 +132,7 @@ export function AdminCampaignBuilderPage() {
   }, [clientId, title, activity, objective, lat, lng, radius, targeting, houses, units, startDate, endDate, pickup, budget]);
 
   const field =
-    'w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-[#0a0a0b] ' +
+    'w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-[var(--rr-brand)] ' +
     'outline-none transition focus:border-slate-400';
   const label = 'mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-400';
 
@@ -179,7 +179,7 @@ export function AdminCampaignBuilderPage() {
             <button
               type="button"
               onClick={() => navigate('/admin/campaigns')}
-              className="rounded-full bg-[#0a0a0b] px-5 py-2.5 text-xs font-bold text-white cursor-pointer"
+              className="rounded-full bg-[var(--rr-brand)] px-5 py-2.5 text-xs font-bold text-white cursor-pointer"
             >
               Apri la lista campagne
             </button>
@@ -203,7 +203,7 @@ export function AdminCampaignBuilderPage() {
   return (
     <main className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
       <header>
-        <h1 className="text-2xl font-extrabold tracking-tight text-[#0a0a0b]">Nuova campagna</h1>
+        <h1 className="text-2xl font-extrabold tracking-tight text-[var(--rr-brand)]">Nuova campagna</h1>
         <p className="mt-1 text-xs text-slate-500">
           Tre passaggi: cliente, territorio, preventivo. Le aree vengono create già pronte da
           assegnare.
@@ -219,13 +219,13 @@ export function AdminCampaignBuilderPage() {
               onClick={() => i < step && setStep(i)}
               disabled={i > step}
               className={`flex items-center gap-2 text-[11px] font-bold disabled:cursor-default cursor-pointer ${
-                i === step ? 'text-[#0a0a0b]' : i < step ? 'text-emerald-600' : 'text-slate-300'
+                i === step ? 'text-[var(--rr-brand)]' : i < step ? 'text-emerald-600' : 'text-slate-300'
               }`}
             >
               <span
                 className={`flex h-6 w-6 items-center justify-center rounded-full text-[10px] ${
                   i === step
-                    ? 'bg-[#0a0a0b] text-white'
+                    ? 'bg-[var(--rr-brand)] text-white'
                     : i < step
                       ? 'bg-emerald-100 text-emerald-700'
                       : 'bg-slate-100 text-slate-400'
@@ -348,7 +348,7 @@ export function AdminCampaignBuilderPage() {
               <div>
                 <span className={label}>Centro e raggio</span>
                 <div
-                  className="relative h-64 overflow-hidden rounded-xl border border-slate-200 bg-[#eef1f4]"
+                  className="relative h-64 overflow-hidden rounded-xl border border-slate-200 bg-[var(--rr-surface-sunken)]"
                   onClick={(e) => {
                     // Click the map to move the centre. No geocoder, no
                     // pretending the pin was found from an address string.
@@ -364,7 +364,7 @@ export function AdminCampaignBuilderPage() {
                     </p>
                   </div>
                   <div
-                    className="pointer-events-none absolute rounded-full border-2 border-[#0a0a0b] bg-[#0a0a0b]/10"
+                    className="pointer-events-none absolute rounded-full border-2 border-[var(--rr-brand)] bg-[var(--rr-brand)]/10"
                     style={{
                       // Radius is a real distance; this is a proportional
                       // projection of it onto the box, not a true map scale.
@@ -374,7 +374,7 @@ export function AdminCampaignBuilderPage() {
                       height: `${(radius / 30) * 100}%`,
                     }}
                   />
-                  <div className="pointer-events-none absolute left-1/2 top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#0a0a0b]" />
+                  <div className="pointer-events-none absolute left-1/2 top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--rr-brand)]" />
                 </div>
                 <p className="mt-1.5 text-[10px] text-slate-400">
                   Clicca per spostare il centro · {lat.toFixed(4)}, {lng.toFixed(4)}
@@ -540,7 +540,7 @@ export function AdminCampaignBuilderPage() {
                 type="button"
                 disabled={!canAdvance}
                 onClick={() => setStep(step + 1)}
-                className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-[#0a0a0b] px-5 py-2.5 text-xs font-bold text-white disabled:opacity-30 cursor-pointer"
+                className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-[var(--rr-brand)] px-5 py-2.5 text-xs font-bold text-white disabled:opacity-30 cursor-pointer"
               >
                 Avanti
                 <ArrowRight className="h-3.5 w-3.5" />
@@ -560,7 +560,7 @@ export function AdminCampaignBuilderPage() {
         </section>
 
         {/* Live summary, always visible so step 3 is never a surprise. */}
-        <aside className="h-fit rounded-2xl bg-[#0a0a0b] p-5 text-white">
+        <aside className="h-fit rounded-2xl bg-[var(--rr-brand)] p-5 text-white">
           <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Riepilogo</p>
           <dl className="mt-3 space-y-2.5 text-[11px]">
             {[

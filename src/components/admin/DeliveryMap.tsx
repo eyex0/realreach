@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
+import { tokens } from '../../lib/tokens';
 import { Globe2, Crosshair, Loader2 } from 'lucide-react';
 
 /**
@@ -30,13 +31,22 @@ const AERIAL_TILES =
 const OSM_ATTR =
   'Tiles &copy; <a href="https://www.esri.com/">Esri</a> · Data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
-/** Speed bands, matching src/lib/routeSpeed.ts on the API side. */
+/**
+ * Speed bands, matching src/lib/routeSpeed.ts on the API side.
+ *
+ * These come from the TypeScript token mirror, not CSS variables, because they
+ * are handed to Leaflet as SVG `stroke` attributes. A `var(--x)` string is
+ * valid in a stylesheet and meaningless in an attribute: the route lines would
+ * have rendered unstyled. The legend swatch below *is* styled, so it uses the
+ * variables. Same colour, two mechanisms, and `tools/check-tokens.mjs` is what
+ * guarantees the two lists cannot drift apart.
+ */
 const SPEED_COLOURS: Record<string, string> = {
-  stationary: '#94a3b8',
-  normal: '#10b981',
-  slightly_fast: '#f59e0b',
-  very_fast: '#ef4444',
-  extremely_fast: '#7c3aed',
+  stationary: tokens.text.muted,
+  normal: tokens.speed.low,
+  slightly_fast: tokens.speed.mid,
+  very_fast: tokens.speed.high,
+  extremely_fast: tokens.status.dangerText,
 };
 
 export interface MapArea {
@@ -64,7 +74,7 @@ export interface MapCampaign {
 }
 
 const PROGRESS_COLOUR = (done: number, total: number) =>
-  total === 0 ? '#94a3b8' : done >= total ? '#10b981' : done > 0 ? '#006de4' : '#f59e0b';
+  total === 0 ? 'var(--rr-text-muted)' : done >= total ? 'var(--rr-status-success)' : done > 0 ? 'var(--rr-accent)' : 'var(--rr-status-warning)';
 
 function haversine(a: [number, number], b: [number, number]): number {
   const R = 6_371_008.8;

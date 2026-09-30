@@ -54,7 +54,7 @@ function Progress({ done, total }: { done: number; total: number }) {
     <span className="inline-flex items-center gap-2">
       <span className="h-1.5 w-16 overflow-hidden rounded-full bg-slate-100">
         <span
-          className={`block h-full rounded-full ${done >= total && total > 0 ? 'bg-emerald-500' : 'bg-[#006de4]'}`}
+          className={`block h-full rounded-full ${done >= total && total > 0 ? 'bg-emerald-500' : 'bg-[var(--rr-accent)]'}`}
           style={{ width: `${pct}%` }}
         />
       </span>
@@ -235,7 +235,7 @@ export function AdminCampaignsPage() {
     <main className="mx-auto max-w-[1600px] px-4 py-6 sm:px-6">
       <header className="flex flex-wrap items-end gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-[#0a0a0b]">
+          <h1 className="text-2xl font-extrabold tracking-tight text-[var(--rr-brand)]">
             {t('nav.campaigns')}
           </h1>
           <p className="mt-1 text-xs text-slate-500">
@@ -251,7 +251,7 @@ export function AdminCampaignsPage() {
                 type="button"
                 onClick={() => setStatus(f.key)}
                 className={`rounded-full px-3.5 py-1.5 text-[11px] font-bold transition-colors cursor-pointer ${
-                  status === f.key ? 'bg-white text-[#0a0a0b] shadow-sm' : 'text-slate-500'
+                  status === f.key ? 'bg-white text-[var(--rr-brand)] shadow-sm' : 'text-slate-500'
                 }`}
               >
                 {t(f.labelKey)}
@@ -377,7 +377,7 @@ export function AdminCampaignsPage() {
                               className={`h-4 w-4 transition-transform ${open ? 'rotate-180' : ''}`}
                             />
                           </button>
-                          <span className="font-bold text-[#0a0a0b]">{r.title}</span>
+                          <span className="font-bold text-[var(--rr-brand)]">{r.title}</span>
                           <button
                             type="button"
                             onClick={() => setRenaming({ id: r.id, title: r.title })}
@@ -495,7 +495,7 @@ export function AdminCampaignsPage() {
       {renaming && (
         <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/40 p-4">
           <div className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-2xl">
-            <h2 className="text-sm font-bold text-[#0a0a0b]">Rinomina campagna</h2>
+            <h2 className="text-sm font-bold text-[var(--rr-brand)]">Rinomina campagna</h2>
             <input
               autoFocus
               value={renaming.title}
@@ -518,7 +518,7 @@ export function AdminCampaignsPage() {
                 type="button"
                 disabled={busy}
                 onClick={() => void rename()}
-                className="rounded-full bg-[#0a0a0b] px-4 py-2 text-xs font-bold text-white disabled:opacity-40 cursor-pointer"
+                className="rounded-full bg-[var(--rr-brand)] px-4 py-2 text-xs font-bold text-white disabled:opacity-40 cursor-pointer"
               >
                 {busy ? '…' : t('common.save')}
               </button>

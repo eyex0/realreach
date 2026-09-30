@@ -68,7 +68,7 @@ function Profile({ id }: { id: string }) {
         ].map(([label, value]) => (
           <div key={label} className="rounded-xl border border-slate-100 p-3">
             <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{label}</p>
-            <p className="mt-1 text-lg font-extrabold tabular-nums text-[#0a0a0b]">{value}</p>
+            <p className="mt-1 text-lg font-extrabold tabular-nums text-[var(--rr-brand)]">{value}</p>
           </div>
         ))}
       </div>
@@ -164,7 +164,7 @@ export function AdminDistributorsPage() {
     <main className="mx-auto max-w-[1600px] px-4 py-6 sm:px-6">
       <header className="flex flex-wrap items-end gap-3">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-[#0a0a0b]">
+          <h1 className="text-2xl font-extrabold tracking-tight text-[var(--rr-brand)]">
             Distributori
           </h1>
           <p className="mt-1 text-xs text-slate-500">
@@ -213,7 +213,7 @@ export function AdminDistributorsPage() {
                       {(d.display_name ?? d.email).slice(0, 2).toUpperCase()}
                     </span>
                     <div className="min-w-[160px] flex-1">
-                      <p className="text-xs font-bold text-[#0a0a0b]">
+                      <p className="text-xs font-bold text-[var(--rr-brand)]">
                         {d.display_name ?? d.email}
                       </p>
                       <p className="text-[10px] text-slate-400">{d.email}</p>

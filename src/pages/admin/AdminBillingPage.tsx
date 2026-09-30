@@ -106,7 +106,7 @@ export function AdminBillingPage() {
   return (
     <main className="mx-auto max-w-[1600px] px-4 py-6 sm:px-6">
       <header>
-        <h1 className="text-2xl font-extrabold tracking-tight text-[#0a0a0b]">
+        <h1 className="text-2xl font-extrabold tracking-tight text-[var(--rr-brand)]">
           {t('nav.billing')}
         </h1>
         <p className="mt-1 text-xs text-slate-500">
@@ -129,7 +129,7 @@ export function AdminBillingPage() {
       <section className="mt-6 overflow-hidden rounded-2xl bg-white shadow-[0_1px_3px_rgba(15,23,42,0.06)] ring-1 ring-slate-200/70">
         <div className="flex flex-wrap items-center gap-3 border-b border-slate-100 px-5 py-4">
           <Receipt className="h-4 w-4 text-slate-400" />
-          <h2 className="text-sm font-bold">Fatture clienti</h2>
+          <h2 className="text-sm font-bold text-strong">Fatture clienti</h2>
           {overdueTotal > 0 && (
             <span className="rounded-full bg-red-50 px-2.5 py-1 text-[10px] font-bold text-red-700">
               {eur(overdueTotal)} scadute
@@ -240,7 +240,7 @@ export function AdminBillingPage() {
               type="button"
               disabled={busy}
               onClick={() => void approve()}
-              className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-[#0a0a0b] px-4 py-2 text-[11px] font-bold text-white disabled:opacity-40 cursor-pointer"
+              className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-[var(--rr-brand)] px-4 py-2 text-[11px] font-bold text-white disabled:opacity-40 cursor-pointer"
             >
               <CheckCircle2 className="h-3.5 w-3.5" />
               Approva selezionati ({selected.size})
@@ -292,7 +292,7 @@ export function AdminBillingPage() {
                         />
                       )}
                     </td>
-                    <td className="px-3 py-2.5 font-bold text-[#0a0a0b]">
+                    <td className="px-3 py-2.5 font-bold text-[var(--rr-brand)]">
                       {p.operator_name ?? '—'}
                       <span className="block text-[10px] font-normal text-slate-400">
                         {p.operator_email}
