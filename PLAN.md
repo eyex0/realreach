@@ -793,3 +793,37 @@ Decided here:
 
 Still blocked by this: a mail provider, without which the list cannot be
 contacted at scale and the GDPR opt-in cannot be completed.
+## Stage 30 - Staff campaign builder
+
+The last P1 console item. `POST /admin/campaigns` plus `/admin/campaigns/new`.
+
+Input is a centre and a radius, because that is how operations staff think
+about a job. The circle is a geography buffer, cut into a grid of assignable
+areas (roughly 1-2 km2 each) so a campaign arrives with work in it.
+
+| Piece | Where |
+|---|---|
+Endpoint | `backend/src/routes/adminCampaigns.ts` |
+UI | `web/src/pages/admin/AdminCampaignBuilderPage.tsx` |
+
+Decided here:
+
+- Grid is generated in JS and passed as one `jsonb` array, not
+  `ST_SquareGrid` - that bounds overload is not in every PostGIS build.
+- All numeric params cast to `double precision`: node-postgres sends `0.8` as
+  a string, which resolved to an integer overload and failed **only on
+  fractional radii**.
+- Area count scales with radius: ~12 areas at 2 km, ~110 at 30 km. Sized to be
+  assignable, not merely correct.
+- `quartiere` left null. No geocoder, so no invented district names.
+- The 220 m2/mailbox density returns a **warning** for small urban radii: it
+  is a national average and a Milan street is nothing like it. The figure is
+  still used (inventing a density would be worse) but cannot be quoted as a
+  count.
+- Budget caps are recorded and warned about, never enforced - blocking
+  creation is a human decision.
+- `VAT_RATE` moved from `admin.ts` to `pricing.ts` so the quote endpoint, the
+  invoice writer and the builder cannot disagree about the tax rate.
+
+Still blocked: a house/unit count needs an address provider; density needs
+real observed data. Both are in `WISHLIST.md` section 1.
