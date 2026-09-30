@@ -827,3 +827,37 @@ Decided here:
 
 Still blocked: a house/unit count needs an address provider; density needs
 real observed data. Both are in `WISHLIST.md` section 1.
+## Stage 31 - Design tokens
+
+There were two design systems in one app. The landing used CSS custom
+properties; the admin console hardcoded `#0a0a0b` 34 times and used the
+default Tailwind palette for 337 more values. The brand colour was a value you
+had to grep for.
+
+| Piece | Where |
+|---|---|
+Source of truth | `web/src/styles/tokens.css` |
+TS mirror | `web/src/lib/tokens.ts` |
+Drift check | `web/tools/check-tokens.mjs` (`npm run tokens`) |
+Gate | `npm run verify` = typecheck + tokens + build |
+
+Decided here:
+
+- Extracted from values already in use, so nothing moves visually. Token names
+  are semantic (`text-strong`, `text-body`, `text-muted`), not literal, so a
+  brand change is one value edit rather than 34.
+- **The TS mirror is not optional convenience, it is required.** Leaflet takes
+  colours as SVG `stroke` attributes, where `var(--x)` is meaningless. The map
+  legend is styled so it uses the CSS variables; the route paths use the
+  mirror. Getting this wrong renders routes invisible while every test passes.
+- Drift is checked, not trusted, and the checker was verified to fail on a
+  one-digit change before being believed.
+
+Known debt, left deliberately:
+
+- The landing page still hardcodes its own values and uses the default Tailwind
+  palette. It is verified working; restyling it is cosmetic risk, not a fix.
+  Do it as a deliberate pass with a visual check, not as a side effect.
+- 337 `slate-*` utility classes in the console still resolve to the default
+  Tailwind palette rather than brand tokens. Mechanical to migrate
+  (`text-slate-500` -> `text-body`), worth doing in one pass.
