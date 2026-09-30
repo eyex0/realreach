@@ -8,6 +8,7 @@ import DashboardPage from './pages/DashboardPage';
 import HomePage from './pages/HomePage';
 import OpportunitiesPage from './pages/OpportunitiesPage';
 import OnboardingPage from './pages/OnboardingPage';
+import DemoPage from './pages/DemoPage';
 import ForDistributorsPage from './pages/ForDistributorsPage';
 import AboutPage from './pages/AboutPage';
 import BlogPage from './pages/BlogPage';
@@ -142,6 +143,7 @@ function AppContent() {
           <Route path="/dashboard" element={<RequireAuth><DashboardPage /></RequireAuth>} />
         <Route path="/opportunities" element={<RequireAuth><OpportunitiesPage /></RequireAuth>} />
         <Route path="/start" element={<RequireAuth><OnboardingPage /></RequireAuth>} />
+        <Route path="/demo" element={<DemoPage />} />
           <Route path="/print" element={<RequireAuth><PrintStorePage /></RequireAuth>} />
           <Route path="/campaigns/new" element={<RequireAuth><CampaignBuilderPage /></RequireAuth>} />
           <Route path="/distribution-portal" element={<RequireAuth><DistributionPortalPage /></RequireAuth>} />
