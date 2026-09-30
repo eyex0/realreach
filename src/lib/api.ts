@@ -403,7 +403,9 @@ export interface CampaignReport {
     id: string;
     title: string;
     status: string;
+    objective?: string | null;
     area_m2: number | null;
+    estimated_mailboxes?: number | null;
     budget_cap: number | null;
     start_date: string | null;
     end_date: string | null;
@@ -426,6 +428,47 @@ export interface CampaignReport {
     started_at: string | null;
     completed_at: string | null;
   }>;
+  /** Per-area detail for the client-facing report, with the route analysis. */
+  areas: CampaignArea[];
+  trust: { scored: number; avg_confidence: number | null; avg_freshness: number | null; open_data_reports: number };
+}
+
+/** One leg of a walked route, coloured on the map by walking speed. */
+export interface RouteSegment {
+  from_lat: number;
+  from_lng: number;
+  to_lat: number;
+  to_lng: number;
+  distance_m: number;
+  duration_s: number;
+  speed_kmh: number;
+  band: 'stationary' | 'normal' | 'slightly_fast' | 'very_fast' | 'extremely_fast';
+  flags: string[];
+}
+
+export interface CampaignArea {
+  task_id: string;
+  sequence: number | null;
+  status: string;
+  distributor: string | null;
+  started_at: string | null;
+  completed_at: string | null;
+  pieces_logged: number;
+  evidence_count: number;
+  verification_status: string | null;
+  confidence: number | null;
+  /** Derived: this area's share of the campaign estimate, by area size. */
+  estimated_letterboxes: number;
+  letterbox_basis: string;
+  route: {
+    points: number;
+    distance_km: number;
+    average_speed_kmh: number;
+    max_speed_kmh: number;
+    anomalies: number;
+    anomaly_share: number;
+    segments: RouteSegment[];
+  };
 }
 
 export async function listReports(): Promise<ReportOverviewItem[]> {
