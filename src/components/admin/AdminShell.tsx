@@ -70,6 +70,7 @@ const TABS = [
   { href: '/admin/campaigns', labelKey: 'nav.campaigns' },
   { href: '/admin/distributors', labelKey: 'nav.distributors' },
   { href: '/admin/billing', labelKey: 'nav.billing' },
+  { href: '/admin/wishlist', labelKey: 'nav.wishlist' },
 ];
 
 /** Paper plane with the sparkle, per the brand spec, at top-bar scale. */

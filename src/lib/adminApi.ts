@@ -346,3 +346,38 @@ export interface AdminDistributorDetail {
 export async function getAdminDistributor(id: string): Promise<AdminDistributorDetail> {
   return handle<AdminDistributorDetail>(await apiFetch(`/admin/distributors/${id}`));
 }
+export interface AdminWishlistSignup {
+  id: string;
+  email: string;
+  full_name: string | null;
+  company: string | null;
+  role: string | null;
+  monthly_volume: string | null;
+  problem: string | null;
+  source: string | null;
+  referrer: string | null;
+  status: string;
+  notes: string | null;
+  consent_at: string | null;
+  confirmed_at: string | null;
+  created_at: string;
+}
+
+export async function listAdminWishlist(
+  status?: string | null
+): Promise<{ signups: AdminWishlistSignup[]; counts: Record<string, number>; marketable: number }> {
+  const q = status ? `?status=${encodeURIComponent(status)}` : '';
+  return handle(await apiFetch(`/admin/wishlist${q}`));
+}
+
+export async function setAdminWishlistStatus(
+  id: string,
+  status: string,
+  notes?: string
+): Promise<{ ok: boolean }> {
+  return handle(await apiFetch(`/admin/wishlist/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status, notes }),
+  }));
+}

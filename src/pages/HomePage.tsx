@@ -7,6 +7,7 @@ import VerifyChain from '../components/landing/VerifyChain';
 import MeasureSection from '../components/landing/MeasureSection';
 import PlatformSection from '../components/landing/PlatformSection';
 import InfraSection from '../components/landing/InfraSection';
+import WishlistSection from '../components/landing/WishlistSection';
 
 interface HomePageProps {
   onOpenOrder: () => void;
@@ -43,6 +44,9 @@ export const HomePage: React.FC<HomePageProps> = ({
 
       {/* 06 — THE INFRASTRUCTURE: architecture flow */}
       <InfraSection />
+
+      {/* Wishlist: let people register interest before there is a product to sell */}
+      <WishlistSection source="landing" />
 
       {/* Social proof */}
       <AgencyCaseStudies />
