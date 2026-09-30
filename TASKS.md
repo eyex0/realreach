@@ -5,6 +5,9 @@ Companion documents: [`PLAN.md`](./PLAN.md) (stage-by-stage engineering plan for
 the field-ops pilot), [`docs/PRIORITIES.md`](./docs/PRIORITIES.md) (the order to
 build the wider platform in) and the per-area briefs in [`docs/`](./docs).
 
+Deferred work, the decisions we owe, and the known limits are tracked in
+[docs/WISHLIST.md](./docs/WISHLIST.md).
+
 **Status legend** — `[x]` verified working · `[~]` built, not yet verified ·
 `[ ]` not started.
 

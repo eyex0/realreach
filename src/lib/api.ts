@@ -591,6 +591,72 @@ export async function getProofDetail(id: string): Promise<ProofDetail> {
 }
 
 /** Fetch protected bytes (e.g. proof photos) with the session token. */
+export interface DashboardCampaign {
+  id: string;
+  title: string;
+  status: string;
+  activity_type: string | null;
+  created_at: string;
+  start_date: string | null;
+  end_date: string | null;
+  estimated_mailboxes: number | null;
+  budget_cap: number | null;
+  areas: number;
+  areas_verified: number;
+  pieces: number;
+  proofs_pending: number;
+}
+
+export interface DashboardPayout {
+  id: string;
+  campaign_id: string;
+  campaign_title: string;
+  pieces: number;
+  rate_eur: number;
+  amount_eur: number;
+  status: string;
+  generated_at: string;
+  approved_at: string | null;
+  paid_at: string | null;
+  operator_name: string | null;
+}
+
+export interface DashboardActivity {
+  id: string;
+  action: string;
+  entity_type: string;
+  new_status: string | null;
+  reason: string | null;
+  created_at: string;
+  subject: string | null;
+}
+
+export interface ClientDashboard {
+  window_months: number;
+  currency: string;
+  operator_rate_per_piece: number;
+  totals: {
+    campaigns_total: number;
+    campaigns_active: number;
+    areas: number;
+    areas_verified: number;
+    pieces_logged: number;
+    verification_rate: number | null;
+    paid_to_operators: number;
+    pending_to_operators: number;
+    open_data_reports: number;
+  };
+  campaigns: DashboardCampaign[];
+  /** Money owed to field operators. Not a client invoice. */
+  operator_payouts: DashboardPayout[];
+  activity: DashboardActivity[];
+}
+
+export async function getClientDashboard(months: 1 | 3 | 12): Promise<ClientDashboard> {
+  return handle<ClientDashboard>(await apiFetch(`/client/dashboard?months=${months}`));
+}
+
+/** Fetch protected bytes (e.g. proof photos) with the session token. */
 export async function fetchBlob(path: string): Promise<Blob> {
   const headers: Record<string, string> = {};
   if (tokenProvider) {

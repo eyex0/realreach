@@ -611,6 +611,116 @@ frontend `tsc` + build clean, operator `tsc` clean, CI green.
 
 ---
 
+## Stage 24 — Product demo simulation **[COMPLETE]**
+
+**Goal:** the 45–60 second interactive simulation the brief asks for, at `/demo`.
+
+- [x] One campaign (`Milano Local Launch`) across four real Milan districts
+      (Duomo, Navigli, Porta Romana, Centrale) with six field operators.
+- [x] The narrative runs Campaign created → area split → operators deployed →
+      executing routes → GPS/time/photo verification → coverage consolidating →
+      analytics and report, with play/pause/restart.
+- [x] **Every figure is counted from the simulation, never typed in.** The four
+      zone letterbox counts sum to exactly the 25,000 target, so 100% coverage at
+      the end is arithmetic rather than a marketing number. Verified outside the
+      browser: deterministic for the same timestamp, monotonic, and no operator
+      ever leaves its zone.
+- [x] End state measured: 25,000 executed, 23,077 verified, 92.3% verification
+      rate, €0.21 per verified reach.
+- [x] Assumptions are **labelled on the page** — target reach, modelled zone
+      sizes, operator count, price per reach. The brief requires a viewer to be
+      able to tell a modelled number from a measured one.
+- [x] Public route with no sign-up: a demo is a sales tool.
+
+## Stage 25 — Client campaign report with speed-coloured routes **[COMPLETE]**
+
+**Goal:** the screen a buyer actually reads, which the reference demo has and we
+did not.
+
+- [x] `/campaigns/:id/report`: per-area progress, distributor, timestamps,
+      distance, average pace, proof status, verification panel, payout estimate.
+- [x] **Route speed analysis** (`src/lib/routeSpeed.ts`): pace per segment,
+      banded stationary → extremely fast, with three anomaly flags —
+      `vehicle_speed`, `gps_jump`, `long_gap`. An anomaly is evidence, not a
+      verdict; a human decides.
+- [x] The map draws the recorded route coloured by pace, with a legend that
+      matches the backend bands, and marks flagged segments.
+- [x] Missing figures are **omitted, not zeroed**: a campaign with no letterbox
+      estimate shows a dash and the reason, because the number would be derived
+      from area size rather than counted from an address database.
+- [x] Route simplification (Douglas-Peucker) for display, with full points kept
+      for verification.
+- [x] `docs/CLIENT_PRODUCT_SPEC.md` records the spec, the status of every
+      screen, where we deliberately differ from the reference, and a position on
+      each of the ten unresolved questions.
+
+**Bugs found and fixed**
+- **PostGIS coordinates were silently `NaN`.** node-postgres returns geometry as
+  opaque WKB, not `{lat, lng}`, so every point was filtered out as untrustworthy
+  and all routes measured 0 km. Coordinates are now extracted with `ST_X`/`ST_Y`
+  in SQL.
+- **The GPS teleport window was 4 s** — shorter than a normal sampling interval,
+  so a legitimate fast walk was mislabelled a glitch. 120 m cannot be covered on
+  foot in 10 s, so the window is 10 s.
+- **Two isolation assertions were wrong**, not the code: they tested that another
+  workspace sees an *empty* feed, a proxy that breaks the first time that
+  workspace owns data of its own. They now assert it cannot see **this**
+  workspace's rows, which is the real invariant.
+
+## Stage 26 — Client dashboard **[COMPLETE]**
+
+**Goal:** the client home screen from the spec — active campaigns, money,
+activity and time filters, with an empty-state CTA. EUR throughout.
+
+- [x] `GET /client/dashboard?months=1|3|12` — campaign summary, operator
+      payouts, activity feed and totals in **one call**, so the tiles cannot
+      disagree with the rows beneath them.
+- [x] **Money is named for what it is.** The `payouts` table is money owed to
+      *field operators*, not an invoice the client owes us. The panels say so on
+      screen, because calling it "invoices" is the most misleading thing the page
+      could do. There is no client invoicing because there is no payment
+      provider (wishlist D2).
+- [x] Time filter is a **parameter into `make_interval`**, never a string
+      spliced into SQL.
+- [x] Campaign rows link straight to the per-area report, so coverage and the
+      walked route are one click away.
+- [x] Empty state offers the first-campaign CTA, which is the only call to
+      action that matters before a workspace has any history.
+- [x] Open bad-data reports are surfaced on the dashboard, because a disputed
+      record is something a client should be able to see rather than discover
+      later.
+
+**Bugs found by running it, not reading it**
+1. The window was spliced into a string, producing `12 months interval`, which
+   Postgres rejects — the dashboard 500'd on every request.
+2. `audit_log.entity_id` is `text` while `campaigns.id` is `uuid`, so the
+   activity join failed with `operator does not exist: uuid = text`.
+3. **`campaigns.client_id` holds a user id, not an organization id.** Filtering
+   by organization returned an *empty dashboard rather than an error* — the
+   quietest kind of wrong, and the reason the panels now scope explicitly:
+   campaigns and payouts are user-scoped, audit rows and data reports are
+   org-scoped.
+4. A bare `Promise.all` reported one message for four queries, which turned a
+   five-minute bug into an hour. Each panel is now named when it fails.
+
+## Stage 27 — Deployment **[PREPARED, NOT DEPLOYED]**
+
+Stage 15 stays open. Deploying needs an account and a hostname, and that is not
+a decision to make by guessing. What is done:
+
+- [x] `Dockerfile`: multi-stage, non-root, tini for signal handling, healthcheck
+      on `/health`, no dev dependencies in the runtime image.
+- [x] `.dockerignore` so the image carries `dist` and `db` and nothing else.
+- [x] `docs/DEPLOYMENT.md`: environment contract, migration-as-a-deliberate-step
+      policy, pre-traffic verification, and the open decisions.
+- [x] **The one value that must change in production is `AUTH_MODE=required`.**
+      It defaults to `optional` so local work is painless, and in optional mode
+      a request without a token falls back to a body-supplied actor id. That
+      fallback is fine on a laptop and unacceptable on a public host.
+- [ ] Choosing a host, a database, and who owns backups. Unblocked by you.
+
+---
+
 ### Out of scope (not in this plan unless requested)
 
 Live ops map/WebSocket, email/SMS notifications, Stripe billing, multi-org
