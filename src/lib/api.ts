@@ -1,4 +1,4 @@
-﻿// Tiny client for the Realreach backend API.
+// Tiny client for the Realreach backend API.
 // Base URL defaults to the local dev API; override with VITE_API_URL.
 
 const env = (import.meta as unknown as { env?: Record<string, string> }).env ?? {};
@@ -58,7 +58,7 @@ export interface CampaignDetail extends CampaignSummary {
   history: CampaignStatusHistoryEntry[];
 }
 
-async function handle<T>(res: Response): Promise<T> {
+export async function handle<T>(res: Response): Promise<T> {
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
     throw new Error((body as { error?: string }).error ?? `API error ${res.status}`);
@@ -540,7 +540,7 @@ export function setClerkTokenProvider(fn: (() => Promise<string | null>) | null)
 }
 
 /** All backend calls funnel through here so the session token rides along. */
-async function apiFetch(path: string, init: RequestInit = {}): Promise<Response> {
+export async function apiFetch(path: string, init: RequestInit = {}): Promise<Response> {
   const headers: Record<string, string> = {};
   for (const [k, v] of Object.entries(init.headers ?? {})) headers[k] = String(v);
   if (tokenProvider) {

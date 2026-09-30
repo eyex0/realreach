@@ -11,6 +11,8 @@ import OnboardingPage from './pages/OnboardingPage';
 import DemoPage from './pages/DemoPage';
 import CampaignReportPage from './pages/CampaignReportPage';
 import ClientDashboardPage from './pages/ClientDashboardPage';
+import AdminLayout from './pages/admin/AdminLayout';
+import AdminHomePage from './pages/admin/AdminHomePage';
 import ForDistributorsPage from './pages/ForDistributorsPage';
 import AboutPage from './pages/AboutPage';
 import BlogPage from './pages/BlogPage';
@@ -99,11 +101,16 @@ function AppContent() {
       '/demo',
     ].includes(location.pathname);
 
+  // The internal console has its own dark top bar, so it opts out of the
+  // marketing chrome the same way /ops and /demo do. Prefix match, because it
+  // grows sub-routes (/admin/campaigns).
+  const isAdminConsole = location.pathname.startsWith('/admin');
+
   return (
     <div className="min-h-screen bg-white text-[#0a0a0b] flex flex-col selection:bg-[#0a0a0b] selection:text-white">
       
       {/* Sticky Realreach Navbar (hidden on dedicated full-screen auth / builder pages) */}
-      {!isDedicatedAppPage && <Navbar />}
+      {!isDedicatedAppPage && !isAdminConsole && <Navbar />}
 
       {/* Multi-Page Routes */}
       <main className="flex-1">
@@ -149,6 +156,7 @@ function AppContent() {
         <Route path="/demo" element={<DemoPage />} />
         <Route path="/campaigns/:id/report" element={<CampaignReportPage />} />
         <Route path="/client" element={<RequireAuth><ClientDashboardPage /></RequireAuth>} />
+        <Route path="/admin" element={<AdminLayout><AdminHomePage /></AdminLayout>} />
           <Route path="/print" element={<RequireAuth><PrintStorePage /></RequireAuth>} />
           <Route path="/campaigns/new" element={<RequireAuth><CampaignBuilderPage /></RequireAuth>} />
           <Route path="/distribution-portal" element={<RequireAuth><DistributionPortalPage /></RequireAuth>} />
@@ -167,7 +175,7 @@ function AppContent() {
       </main>
 
       {/* PDF Page 11: Realreach Footer (hidden on dedicated app pages) */}
-      {!isDedicatedAppPage && <Footer />}
+      {!isDedicatedAppPage && !isAdminConsole && <Footer />}
 
       {/* Global Modals */}
       <OrderModal
