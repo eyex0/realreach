@@ -381,3 +381,45 @@ export async function setAdminWishlistStatus(
     body: JSON.stringify({ status, notes }),
   }));
 }
+export interface StaffCampaignResult {
+  campaign_id: string;
+  title: string;
+  area_m2: number;
+  areas_created: number;
+  grid_cell_km: number;
+  estimated_mailboxes: number;
+  subtotal_eur: number;
+  vat_rate: number;
+  vat_eur: number;
+  total_eur: number;
+  warnings: string[];
+  basis: string;
+}
+
+export interface StaffCampaignInput {
+  client_id: string;
+  title: string;
+  activity_type?: string;
+  objective?: string;
+  centre: { lat: number; lng: number };
+  radius_km: number;
+  targeting?: string;
+  houses?: number;
+  units?: number;
+  start_date?: string;
+  end_date?: string;
+  pickup_address?: string;
+  budget_cap?: number;
+}
+
+export async function createStaffCampaign(
+  input: StaffCampaignInput
+): Promise<StaffCampaignResult> {
+  return handle<StaffCampaignResult>(
+    await apiFetch('/admin/campaigns', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(input),
+    })
+  );
+}

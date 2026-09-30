@@ -17,6 +17,7 @@ import AdminCampaignsPage from './pages/admin/AdminCampaignsPage';
 import AdminDistributorsPage from './pages/admin/AdminDistributorsPage';
 import AdminBillingPage from './pages/admin/AdminBillingPage';
 import AdminWishlistPage from './pages/admin/AdminWishlistPage';
+import AdminCampaignBuilderPage from './pages/admin/AdminCampaignBuilderPage';
 import ForDistributorsPage from './pages/ForDistributorsPage';
 import AboutPage from './pages/AboutPage';
 import BlogPage from './pages/BlogPage';
@@ -165,6 +166,7 @@ function AppContent() {
         <Route path="/admin/distributors" element={<AdminLayout><AdminDistributorsPage /></AdminLayout>} />
         <Route path="/admin/billing" element={<AdminLayout><AdminBillingPage /></AdminLayout>} />
         <Route path="/admin/wishlist" element={<AdminLayout><AdminWishlistPage /></AdminLayout>} />
+        <Route path="/admin/campaigns/new" element={<AdminLayout><AdminCampaignBuilderPage /></AdminLayout>} />
           <Route path="/print" element={<RequireAuth><PrintStorePage /></RequireAuth>} />
           <Route path="/campaigns/new" element={<RequireAuth><CampaignBuilderPage /></RequireAuth>} />
           <Route path="/distribution-portal" element={<RequireAuth><DistributionPortalPage /></RequireAuth>} />

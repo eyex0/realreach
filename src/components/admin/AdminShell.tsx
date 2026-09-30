@@ -162,7 +162,7 @@ export function AdminShell({
           <div className="ml-auto flex items-center gap-2">
             <button
               type="button"
-              onClick={() => navigate('/campaigns/new')}
+              onClick={() => navigate('/admin/campaigns/new')}
               className="hidden items-center gap-1.5 rounded-full bg-white px-4 py-2 text-[12px] font-semibold text-[#0a0a0b] transition-opacity hover:opacity-90 cursor-pointer sm:inline-flex"
             >
               <Plus className="h-3.5 w-3.5" />
