@@ -766,3 +766,30 @@ matching**, not natural-language understanding. Priority 1's "type a sentence,
 get filters" step needs an LLM provider, which is not configured in this
 environment. The wizard therefore starts from curated templates, and the
 scoring, evidence and activation loop behind it is the real implementation.
+## Stage 29 - Wishlist (public registration)
+
+Public signup plus the staff pipeline, so demand is collected before there is
+anything to sell and the collected context decides who gets called first.
+
+| Piece | Where |
+|---|---|
+`POST /waitlist` (public, unauthenticated) | `backend/src/routes/waitlist.ts` |
+`GET /admin/wishlist`, `PATCH /admin/wishlist/:id` | `backend/src/routes/admin.ts` |
+Signup form | `web/src/components/landing/WishlistSection.tsx` (bottom of landing) |
+Queue | `web/src/pages/admin/AdminWishlistPage.tsx` (`/admin/wishlist`) |
+
+Decided here:
+
+- Bots are accepted and silently discarded (honeypot) so a response never
+  teaches a scraper what to avoid.
+- One row per email, upserted on re-submission.
+- `consent_at` and `confirmed_at` are separate. `confirmed_at` stays null:
+  without a mail provider there is no double opt-in, so **nobody on this list
+  may be emailed yet** and first contact is a phone call. The queue shows that
+  count instead of hiding it.
+- IP stored salted-hashed, never raw.
+- Status is a pipeline (new -> contacted -> converted/closed), ops/admin only,
+  audited in `staff_audit`.
+
+Still blocked by this: a mail provider, without which the list cannot be
+contacted at scale and the GDPR opt-in cannot be completed.
