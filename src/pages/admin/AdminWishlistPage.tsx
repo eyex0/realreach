@@ -20,10 +20,10 @@ import { listAdminWishlist, setAdminWishlistStatus, type AdminWishlistSignup } f
 const STATUSES = ['new', 'contacted', 'converted', 'closed'] as const;
 
 const STATUS_STYLE: Record<string, string> = {
-  new: 'bg-amber-50 text-amber-700',
-  contacted: 'bg-blue-50 text-blue-700',
-  converted: 'bg-emerald-50 text-emerald-700',
-  closed: 'bg-slate-100 text-slate-500',
+  new: 'bg-warning-bg text-warning',
+  contacted: 'bg-info-bg text-info',
+  converted: 'bg-success-bg text-success',
+  closed: 'bg-muted text-body',
 };
 
 const VOLUME_LABEL: Record<string, string> = {
@@ -74,39 +74,39 @@ function Row({ s, onChanged }: { s: AdminWishlistSignup; onChanged: () => void }
         >
           <span className="text-xs font-bold text-[var(--rr-brand)]">
             {s.full_name ?? s.email}
-            {s.company ? <span className="font-normal text-slate-500"> · {s.company}</span> : null}
+            {s.company ? <span className="font-normal text-body"> · {s.company}</span> : null}
           </span>
-          <span className="text-[10px] text-slate-400">{s.email}</span>
+          <span className="text-[10px] text-muted">{s.email}</span>
         </button>
 
-        <span className="rounded bg-slate-100 px-2 py-1 text-[10px] font-bold text-slate-600">
+        <span className="rounded bg-muted px-2 py-1 text-[10px] font-bold text-body">
           {VOLUME_LABEL[s.monthly_volume ?? ''] ?? '—'}
         </span>
-        <span className="w-20 text-right text-[10px] text-slate-400">
+        <span className="w-20 text-right text-[10px] text-muted">
           {s.source ? s.source.slice(0, 18) : '—'}
         </span>
         <span
           className={`rounded-full px-2.5 py-1 text-[10px] font-bold ${
-            STATUS_STYLE[s.status] ?? 'bg-slate-100 text-slate-600'
+            STATUS_STYLE[s.status] ?? 'bg-muted text-body'
           }`}
         >
           {s.status}
         </span>
-        <span className="w-20 text-right text-[10px] text-slate-400">{date(s.created_at)}</span>
+        <span className="w-20 text-right text-[10px] text-muted">{date(s.created_at)}</span>
         <ChevronDown
-          className={`h-4 w-4 text-slate-300 transition-transform ${open ? 'rotate-180' : ''}`}
+          className={`h-4 w-4 text-muted transition-transform ${open ? 'rotate-180' : ''}`}
         />
       </div>
 
       {open && (
-        <div className="mt-3 space-y-3 rounded-xl border border-slate-100 bg-slate-50/60 p-3">
+        <div className="mt-3 space-y-3 rounded-xl border border-hairline bg-subtle/60 p-3">
           {s.problem && (
-            <p className="text-[11px] leading-relaxed text-slate-700">
+            <p className="text-[11px] leading-relaxed text-strong">
               <span className="font-bold">In their words: </span>
               {s.problem}
             </p>
           )}
-          <p className="text-[10px] text-slate-500">
+          <p className="text-[10px] text-body">
             {s.role ? `${s.role} · ` : ''}
             {s.referrer ? `da ${s.referrer}` : 'nessun referrer'}
             {s.consent_at ? ` · consenso ${date(s.consent_at)}` : ''}
@@ -114,7 +114,7 @@ function Row({ s, onChanged }: { s: AdminWishlistSignup; onChanged: () => void }
           </p>
 
           {error && (
-            <p className="flex items-center gap-1.5 text-[10px] text-red-600">
+            <p className="flex items-center gap-1.5 text-[10px] text-danger">
               <AlertCircle className="h-3 w-3" /> {error}
             </p>
           )}
@@ -124,7 +124,7 @@ function Row({ s, onChanged }: { s: AdminWishlistSignup; onChanged: () => void }
             onChange={(e) => setNotes(e.target.value)}
             rows={2}
             placeholder="Note: cosa hai detto, cosa manca, prossimo passo"
-            className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-[11px] outline-none focus:border-slate-400"
+            className="w-full rounded-lg border border-hairline bg-surface px-3 py-2 text-[11px] outline-none focus:border-strong"
           />
 
           <div className="flex flex-wrap gap-1.5">
@@ -136,8 +136,8 @@ function Row({ s, onChanged }: { s: AdminWishlistSignup; onChanged: () => void }
                 onClick={() => void move(st)}
                 className={`rounded-full px-3 py-1.5 text-[10px] font-bold disabled:opacity-30 cursor-pointer ${
                   st === 'converted'
-                    ? 'bg-emerald-600 text-white'
-                    : 'border border-slate-200 bg-white hover:bg-slate-50'
+                    ? 'bg-success text-white'
+                    : 'border border-hairline bg-surface hover:bg-subtle'
                 }`}
               >
                 {st}
@@ -179,12 +179,12 @@ export function AdminWishlistPage() {
     <main className="mx-auto max-w-[1600px] px-4 py-6 sm:px-6">
       <header>
         <h1 className="text-2xl font-extrabold tracking-tight text-[var(--rr-brand)]">Wishlist</h1>
-        <p className="mt-1 text-xs text-slate-500">
+        <p className="mt-1 text-xs text-body">
           Chi si e registrato dalla landing. Il punto non e il numero, e chi vale una telefonata.
         </p>
       </header>
 
-      <p className="mt-4 flex items-start gap-2 rounded-xl bg-amber-50 px-4 py-3 text-[11px] leading-relaxed text-amber-800">
+      <p className="mt-4 flex items-start gap-2 rounded-xl bg-warning-bg px-4 py-3 text-[11px] leading-relaxed text-warning">
         <MailWarning className="mt-0.5 h-4 w-4 shrink-0" />
         <span>
           <strong>{num(marketable)}</strong> contatti confermati, quindi{' '}
@@ -201,7 +201,7 @@ export function AdminWishlistPage() {
             type="button"
             onClick={() => setFilter(f.key)}
             className={`rounded-full px-3.5 py-1.5 text-[11px] font-bold cursor-pointer ${
-              filter === f.key ? 'bg-[var(--rr-brand)] text-white' : 'border border-slate-200 hover:bg-slate-50'
+              filter === f.key ? 'bg-[var(--rr-brand)] text-white' : 'border border-hairline hover:bg-subtle'
             }`}
           >
             {f.label}
@@ -211,26 +211,26 @@ export function AdminWishlistPage() {
       </div>
 
       {error && (
-        <p className="mt-4 flex items-center gap-2 rounded-xl bg-red-50 px-3 py-2 text-xs text-red-700">
+        <p className="mt-4 flex items-center gap-2 rounded-xl bg-danger-bg px-3 py-2 text-xs text-danger">
           <AlertCircle className="h-4 w-4" /> {error}
         </p>
       )}
 
-      <section className="mt-4 overflow-hidden rounded-2xl bg-white shadow-[0_1px_3px_rgba(15,23,42,0.06)] ring-1 ring-slate-200/70">
+      <section className="mt-4 overflow-hidden rounded-2xl bg-surface shadow-[0_1px_3px_rgba(15,23,42,0.06)] ring-1 ring-[var(--rr-border)]/70">
         {rows === null ? (
-          <p className="px-5 py-12 text-center text-xs text-slate-400">
+          <p className="px-5 py-12 text-center text-xs text-muted">
             <Loader2 className="mx-auto h-4 w-4 animate-spin" />
           </p>
         ) : rows.length === 0 ? (
           <div className="px-5 py-12 text-center">
-            <Inbox className="mx-auto h-6 w-6 text-slate-300" />
+            <Inbox className="mx-auto h-6 w-6 text-muted" />
             <p className="mt-3 text-sm font-bold">Nessuna iscrizione</p>
-            <p className="mt-1 text-xs text-slate-500">
+            <p className="mt-1 text-xs text-body">
               Il modulo e in fondo alla landing. Condividi il link, non il numero.
             </p>
           </div>
         ) : (
-          <ul className="divide-y divide-slate-50">
+          <ul className="divide-y divide-hairline">
             {rows.map((s) => (
               <Row key={s.id} s={s} onChanged={() => void load()} />
             ))}

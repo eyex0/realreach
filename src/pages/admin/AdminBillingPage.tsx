@@ -19,18 +19,18 @@ import {
  */
 
 const INVOICE_STATUS: Record<string, { labelKey: string; cls: string }> = {
-  draft: { labelKey: 'invoices.draft', cls: 'bg-slate-100 text-slate-600' },
-  sent: { labelKey: 'invoices.sent', cls: 'bg-blue-50 text-blue-700' },
-  paid: { labelKey: 'invoices.paid', cls: 'bg-emerald-50 text-emerald-700' },
-  overdue: { labelKey: 'invoices.overdue', cls: 'bg-red-50 text-red-700' },
-  cancelled: { labelKey: 'invoices.cancelled', cls: 'bg-slate-100 text-slate-500' },
+  draft: { labelKey: 'invoices.draft', cls: 'bg-muted text-body' },
+  sent: { labelKey: 'invoices.sent', cls: 'bg-info-bg text-info' },
+  paid: { labelKey: 'invoices.paid', cls: 'bg-success-bg text-success' },
+  overdue: { labelKey: 'invoices.overdue', cls: 'bg-danger-bg text-danger' },
+  cancelled: { labelKey: 'invoices.cancelled', cls: 'bg-muted text-body' },
 };
 
 const PAYOUT_STATUS: Record<string, string> = {
-  pending: 'bg-amber-50 text-amber-700',
-  approved: 'bg-blue-50 text-blue-700',
-  paid: 'bg-emerald-50 text-emerald-700',
-  cancelled: 'bg-slate-100 text-slate-500',
+  pending: 'bg-warning-bg text-warning',
+  approved: 'bg-info-bg text-info',
+  paid: 'bg-success-bg text-success',
+  cancelled: 'bg-muted text-body',
 };
 
 function StatusPill({ label, cls }: { label: string; cls: string }) {
@@ -109,44 +109,44 @@ export function AdminBillingPage() {
         <h1 className="text-2xl font-extrabold tracking-tight text-[var(--rr-brand)]">
           {t('nav.billing')}
         </h1>
-        <p className="mt-1 text-xs text-slate-500">
+        <p className="mt-1 text-xs text-body">
           Fatture ai clienti e mandati ai distributori. Due registri separati di proposito.
         </p>
       </header>
 
       {error && (
-        <p className="mt-4 flex items-center gap-2 rounded-xl bg-red-50 px-3 py-2 text-xs text-red-700">
+        <p className="mt-4 flex items-center gap-2 rounded-xl bg-danger-bg px-3 py-2 text-xs text-danger">
           <AlertCircle className="h-4 w-4" /> {error}
         </p>
       )}
       {flash && (
-        <p className="mt-4 flex items-center gap-2 rounded-xl bg-emerald-50 px-3 py-2 text-xs text-emerald-800">
+        <p className="mt-4 flex items-center gap-2 rounded-xl bg-success-bg px-3 py-2 text-xs text-success">
           <CheckCircle2 className="h-4 w-4" /> {flash}
         </p>
       )}
 
       {/* Invoices */}
-      <section className="mt-6 overflow-hidden rounded-2xl bg-white shadow-[0_1px_3px_rgba(15,23,42,0.06)] ring-1 ring-slate-200/70">
-        <div className="flex flex-wrap items-center gap-3 border-b border-slate-100 px-5 py-4">
-          <Receipt className="h-4 w-4 text-slate-400" />
+      <section className="mt-6 overflow-hidden rounded-2xl bg-surface shadow-[0_1px_3px_rgba(15,23,42,0.06)] ring-1 ring-[var(--rr-border)]/70">
+        <div className="flex flex-wrap items-center gap-3 border-b border-hairline px-5 py-4">
+          <Receipt className="h-4 w-4 text-muted" />
           <h2 className="text-sm font-bold text-strong">Fatture clienti</h2>
           {overdueTotal > 0 && (
-            <span className="rounded-full bg-red-50 px-2.5 py-1 text-[10px] font-bold text-red-700">
+            <span className="rounded-full bg-danger-bg px-2.5 py-1 text-[10px] font-bold text-danger">
               {eur(overdueTotal)} scadute
             </span>
           )}
         </div>
 
         {invoices === null ? (
-          <p className="px-5 py-10 text-center text-xs text-slate-400">
+          <p className="px-5 py-10 text-center text-xs text-muted">
             <Loader2 className="mx-auto h-4 w-4 animate-spin" />
           </p>
         ) : invoices.length === 0 ? (
-          <p className="px-5 py-10 text-center text-xs text-slate-400">{t('invoices.none')}</p>
+          <p className="px-5 py-10 text-center text-xs text-muted">{t('invoices.none')}</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[940px] text-left text-xs">
-              <thead className="bg-slate-50 text-[10px] uppercase tracking-wider text-slate-400">
+              <thead className="bg-subtle text-[10px] uppercase tracking-wider text-muted">
                 <tr>
                   <th className="px-5 py-2.5 font-bold">Numero</th>
                   <th className="px-3 py-2.5 font-bold">{t('invoices.client')}</th>
@@ -160,32 +160,32 @@ export function AdminBillingPage() {
                   <th className="px-5 py-2.5 text-right font-bold">Azioni</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-50">
+              <tbody className="divide-y divide-hairline">
                 {invoices.map((inv) => {
                   const meta = INVOICE_STATUS[inv.overdue ? 'overdue' : inv.status] ?? INVOICE_STATUS.draft;
                   return (
-                    <tr key={inv.id} className={inv.overdue ? 'bg-red-50/40' : ''}>
-                      <td className="px-5 py-2.5 font-mono text-[11px] text-slate-600">
+                    <tr key={inv.id} className={inv.overdue ? 'bg-danger-bg/40' : ''}>
+                      <td className="px-5 py-2.5 font-mono text-[11px] text-body">
                         {inv.number}
                       </td>
-                      <td className="px-3 py-2.5 text-slate-700">{inv.client_name ?? '—'}</td>
-                      <td className="px-3 py-2.5 text-slate-600">{inv.campaign_title ?? '—'}</td>
-                      <td className="px-3 py-2.5 tabular-nums text-slate-500">
+                      <td className="px-3 py-2.5 text-strong">{inv.client_name ?? '—'}</td>
+                      <td className="px-3 py-2.5 text-body">{inv.campaign_title ?? '—'}</td>
+                      <td className="px-3 py-2.5 tabular-nums text-body">
                         {date(inv.issued_at)}
                       </td>
                       <td
                         className={`px-3 py-2.5 tabular-nums ${
-                          inv.overdue ? 'font-bold text-red-600' : 'text-slate-500'
+                          inv.overdue ? 'font-bold text-danger' : 'text-body'
                         }`}
                       >
                         {date(inv.due_date)}
                       </td>
-                      <td className="px-3 py-2.5 text-right tabular-nums text-slate-600">
+                      <td className="px-3 py-2.5 text-right tabular-nums text-body">
                         {eur(inv.subtotal_eur)}
                       </td>
-                      <td className="px-3 py-2.5 text-right tabular-nums text-slate-500">
+                      <td className="px-3 py-2.5 text-right tabular-nums text-body">
                         {eur(inv.vat_eur)}
-                        <span className="ml-1 text-[9px] text-slate-400">
+                        <span className="ml-1 text-[10px] text-muted">
                           {num(Number(inv.vat_rate) * 100, 0)}%
                         </span>
                       </td>
@@ -200,7 +200,7 @@ export function AdminBillingPage() {
                           type="button"
                           onClick={() => window.print()}
                           title="PDF"
-                          className="mr-1.5 inline-flex items-center gap-1 rounded-full border border-slate-200 px-2.5 py-1 text-[10px] font-bold hover:bg-slate-50 cursor-pointer"
+                          className="mr-1.5 inline-flex items-center gap-1 rounded-full border border-hairline px-2.5 py-1 text-[10px] font-bold hover:bg-subtle cursor-pointer"
                         >
                           <Printer className="h-3 w-3" />
                         </button>
@@ -209,7 +209,7 @@ export function AdminBillingPage() {
                             type="button"
                             disabled={busy}
                             onClick={() => void pay(inv.id)}
-                            className="inline-flex items-center gap-1 rounded-full border border-slate-200 px-2.5 py-1 text-[10px] font-bold hover:bg-slate-50 disabled:opacity-40 cursor-pointer"
+                            className="inline-flex items-center gap-1 rounded-full border border-hairline px-2.5 py-1 text-[10px] font-bold hover:bg-subtle disabled:opacity-40 cursor-pointer"
                           >
                             {t('invoices.markPaid')}
                           </button>
@@ -225,13 +225,13 @@ export function AdminBillingPage() {
       </section>
 
       {/* Payouts */}
-      <section className="mt-6 overflow-hidden rounded-2xl bg-white shadow-[0_1px_3px_rgba(15,23,42,0.06)] ring-1 ring-slate-200/70">
-        <div className="flex flex-wrap items-center gap-3 border-b border-slate-100 px-5 py-4">
-          <Wallet className="h-4 w-4 text-slate-400" />
+      <section className="mt-6 overflow-hidden rounded-2xl bg-surface shadow-[0_1px_3px_rgba(15,23,42,0.06)] ring-1 ring-[var(--rr-border)]/70">
+        <div className="flex flex-wrap items-center gap-3 border-b border-hairline px-5 py-4">
+          <Wallet className="h-4 w-4 text-muted" />
           <h2 className="text-sm font-bold">Mandati ai distributori</h2>
-          <span className="text-[10px] text-slate-400">per area completata</span>
+          <span className="text-[10px] text-muted">per area completata</span>
           {pendingPayouts.length > 0 && (
-            <span className="rounded-full bg-amber-50 px-2.5 py-1 text-[10px] font-bold text-amber-700">
+            <span className="rounded-full bg-warning-bg px-2.5 py-1 text-[10px] font-bold text-warning">
               {num(pendingPayouts.length)} da approvare · {eur(pendingTotal)}
             </span>
           )}
@@ -249,17 +249,17 @@ export function AdminBillingPage() {
         </div>
 
         {payouts === null ? (
-          <p className="px-5 py-10 text-center text-xs text-slate-400">
+          <p className="px-5 py-10 text-center text-xs text-muted">
             <Loader2 className="mx-auto h-4 w-4 animate-spin" />
           </p>
         ) : payouts.length === 0 ? (
-          <p className="px-5 py-10 text-center text-xs text-slate-400">
+          <p className="px-5 py-10 text-center text-xs text-muted">
             Nessun mandato generato. Genera dal report di una campagna con lavoro approvato.
           </p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[900px] text-left text-xs">
-              <thead className="bg-slate-50 text-[10px] uppercase tracking-wider text-slate-400">
+              <thead className="bg-subtle text-[10px] uppercase tracking-wider text-muted">
                 <tr>
                   <th className="w-8 px-3 py-2.5" />
                   <th className="px-3 py-2.5 font-bold">Distributore</th>
@@ -272,7 +272,7 @@ export function AdminBillingPage() {
                   <th className="px-5 py-2.5 font-bold">Generato</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-50">
+              <tbody className="divide-y divide-hairline">
                 {payouts.map((p) => (
                   <tr key={p.id}>
                     <td className="px-3 py-2.5">
@@ -294,26 +294,26 @@ export function AdminBillingPage() {
                     </td>
                     <td className="px-3 py-2.5 font-bold text-[var(--rr-brand)]">
                       {p.operator_name ?? '—'}
-                      <span className="block text-[10px] font-normal text-slate-400">
+                      <span className="block text-[10px] font-normal text-muted">
                         {p.operator_email}
                       </span>
                     </td>
-                    <td className="px-3 py-2.5 text-slate-600">{p.campaign_title}</td>
+                    <td className="px-3 py-2.5 text-body">{p.campaign_title}</td>
                     <td className="px-3 py-2.5">
                       <span className="flex flex-wrap gap-1">
                         {(p.areas ?? []).map((a, i) => (
                           <span
                             key={`${p.id}-${i}`}
                             title={a.cap ? `CAP ${a.cap}` : undefined}
-                            className="rounded bg-slate-100 px-1.5 py-0.5 text-[9px] font-bold text-slate-600"
+                            className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-bold text-body"
                           >
                             {a.area ?? `#${a.seq}`}
                           </span>
                         ))}
                       </span>
                     </td>
-                    <td className="px-3 py-2.5 tabular-nums text-slate-600">{num(p.pieces)}</td>
-                    <td className="px-3 py-2.5 tabular-nums text-slate-500">
+                    <td className="px-3 py-2.5 tabular-nums text-body">{num(p.pieces)}</td>
+                    <td className="px-3 py-2.5 tabular-nums text-body">
                       {eur(p.rate_eur)}
                     </td>
                     <td className="px-3 py-2.5 text-right font-bold tabular-nums">
@@ -322,10 +322,10 @@ export function AdminBillingPage() {
                     <td className="px-3 py-2.5">
                       <StatusPill
                         label={p.status}
-                        cls={PAYOUT_STATUS[p.status] ?? 'bg-slate-100 text-slate-600'}
+                        cls={PAYOUT_STATUS[p.status] ?? 'bg-muted text-body'}
                       />
                     </td>
-                    <td className="px-5 py-2.5 text-[10px] text-slate-400">
+                    <td className="px-5 py-2.5 text-[10px] text-muted">
                       {p.approved_at ? `Appr. ${dateTime(p.approved_at)}` : date(p.generated_at)}
                     </td>
                   </tr>
@@ -335,7 +335,7 @@ export function AdminBillingPage() {
           </div>
         )}
 
-        <p className="border-t border-slate-100 px-5 py-3 text-[10px] text-slate-400">
+        <p className="border-t border-hairline px-5 py-3 text-[10px] text-muted">
           Un mandato per operatore e campagna, non per area. Le aree elencate mostrano come e
           quando è stato creato. L'approvazione ignora i mandati gia approvati.
         </p>

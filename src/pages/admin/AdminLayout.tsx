@@ -52,8 +52,8 @@ function StaffGate({ children }: { children: (staff: { name: string; role: strin
 
   if (state === 'loading') {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-white">
-        <p className="flex items-center gap-2 text-sm text-slate-500">
+      <div className="flex min-h-screen items-center justify-center bg-surface">
+        <p className="flex items-center gap-2 text-sm text-body">
           <Loader2 className="h-4 w-4 animate-spin" /> {t('common.loading')}
         </p>
       </div>
@@ -61,11 +61,11 @@ function StaffGate({ children }: { children: (staff: { name: string; role: strin
   }
   if (state === 'denied') {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-white p-6">
-        <div className="max-w-sm rounded-2xl bg-white p-8 text-center shadow-[0_1px_3px_rgba(15,23,42,0.06)] ring-1 ring-slate-200/70">
-          <ShieldAlert className="mx-auto h-8 w-8 text-amber-500" />
+      <div className="flex min-h-screen items-center justify-center bg-surface p-6">
+        <div className="max-w-sm rounded-2xl bg-surface p-8 text-center shadow-[0_1px_3px_rgba(15,23,42,0.06)] ring-1 ring-[var(--rr-border)]/70">
+          <ShieldAlert className="mx-auto h-8 w-8 text-warning" />
           <h1 className="mt-3 text-lg font-extrabold text-[var(--rr-brand)]">{t('common.noAccess')}</h1>
-          <p className="mt-1.5 text-xs leading-relaxed text-slate-500">
+          <p className="mt-1.5 text-xs leading-relaxed text-body">
             {t('common.back')}
           </p>
           <a

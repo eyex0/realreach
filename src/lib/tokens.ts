@@ -35,9 +35,9 @@ export const tokens = {
   text: {
     strong: '#0a0a0b',
     body: '#4b5563',
-    muted: '#94a3b8',
+    muted: '#6b7280',
     inverse: '#f9fafb',
-    inverseMuted: '#64748b',
+    inverseMuted: '#9ca3af',
   },
   border: {
     base: '#e5e7eb',
@@ -45,11 +45,11 @@ export const tokens = {
     strong: '#d1d5db',
   },
   status: {
-    success: '#10b981',
-    successDeep: '#059669',
+    success: '#059669',
+    successDeep: '#065f46',
     successBg: '#ecfdf5',
     successText: '#047857',
-    warning: '#f59e0b',
+    warning: '#b45309',
     warningBg: '#fffbeb',
     warningText: '#b45309',
     danger: '#ef4444',
@@ -61,12 +61,12 @@ export const tokens = {
     neutralBg: '#f1f5f9',
     neutralText: '#475569',
   },
-  highlight: '#fbbf24',
+  highlight: '#b45309',
 
   /** Route speed bands, matching the legend and the verification report. */
   speed: {
-    low: '#10b981',
-    mid: '#f59e0b',
+    low: '#059669',
+    mid: '#b45309',
     high: '#ef4444',
   },
 } as const;

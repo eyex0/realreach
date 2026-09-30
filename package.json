@@ -5,12 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",
-    "build": "vite build",
+    "build": "node node_modules/vite/bin/vite.js build",
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
-    "lint": "tsc --noEmit",
-    "tokens": "node tools/check-tokens.mjs",
-    "verify": "tsc --noEmit && node tools/check-tokens.mjs && vite build"
+    "lint": "node node_modules/typescript/bin/tsc --noEmit",
+    "tokens": "node tools/check-tokens.mjs && node tools/check-contrast.mjs && node tools/check-console.mjs",
+    "verify": "node node_modules/typescript/bin/tsc --noEmit && npm run tokens && node node_modules/vite/bin/vite.js build"
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.61.10",

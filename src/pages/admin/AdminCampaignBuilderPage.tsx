@@ -132,17 +132,17 @@ export function AdminCampaignBuilderPage() {
   }, [clientId, title, activity, objective, lat, lng, radius, targeting, houses, units, startDate, endDate, pickup, budget]);
 
   const field =
-    'w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-[var(--rr-brand)] ' +
-    'outline-none transition focus:border-slate-400';
-  const label = 'mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-400';
+    'w-full rounded-xl border border-hairline bg-surface px-4 py-3 text-sm text-[var(--rr-brand)] ' +
+    'outline-none transition focus:border-strong';
+  const label = 'mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-muted';
 
   if (result) {
     return (
       <main className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
-        <div className="rounded-2xl bg-white p-8 shadow-[0_1px_3px_rgba(15,23,42,0.06)] ring-1 ring-slate-200/70">
-          <Check className="h-9 w-9 text-emerald-500" />
+        <div className="rounded-2xl bg-surface p-8 shadow-[0_1px_3px_rgba(15,23,42,0.06)] ring-1 ring-[var(--rr-border)]/70">
+          <Check className="h-9 w-9 text-success" />
           <h1 className="mt-4 text-2xl font-extrabold tracking-tight">Campagna creata</h1>
-          <p className="mt-2 text-sm text-slate-500">
+          <p className="mt-2 text-sm text-body">
             {result.title} · {result.areas_created} aree pronte da assegnare.
           </p>
 
@@ -155,17 +155,17 @@ export function AdminCampaignBuilderPage() {
               ['IVA 22%', eur(result.vat_eur)],
               ['Totale', eur(result.total_eur)],
             ].map(([k, v]) => (
-              <div key={k} className="rounded-xl border border-slate-100 p-3">
-                <dt className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{k}</dt>
+              <div key={k} className="rounded-xl border border-hairline p-3">
+                <dt className="text-[10px] font-bold uppercase tracking-wider text-muted">{k}</dt>
                 <dd className="mt-1 text-lg font-extrabold tabular-nums">{v}</dd>
               </div>
             ))}
           </dl>
 
           {result.warnings.length > 0 && (
-            <div className="mt-5 rounded-xl bg-amber-50 p-4">
+            <div className="mt-5 rounded-xl bg-warning-bg p-4">
               {result.warnings.map((w) => (
-                <p key={w} className="flex items-start gap-2 text-[11px] leading-relaxed text-amber-800">
+                <p key={w} className="flex items-start gap-2 text-[11px] leading-relaxed text-warning">
                   <TriangleAlert className="mt-0.5 h-3.5 w-3.5 shrink-0" />
                   {w}
                 </p>
@@ -173,7 +173,7 @@ export function AdminCampaignBuilderPage() {
             </div>
           )}
 
-          <p className="mt-5 text-[10px] leading-relaxed text-slate-400">{result.basis}</p>
+          <p className="mt-5 text-[10px] leading-relaxed text-muted">{result.basis}</p>
 
           <div className="mt-6 flex flex-wrap gap-2">
             <button
@@ -190,7 +190,7 @@ export function AdminCampaignBuilderPage() {
                 setStep(0);
                 setTitle('');
               }}
-              className="rounded-full border border-slate-200 px-5 py-2.5 text-xs font-bold hover:bg-slate-50 cursor-pointer"
+              className="rounded-full border border-hairline px-5 py-2.5 text-xs font-bold hover:bg-subtle cursor-pointer"
             >
               Nuova campagna
             </button>
@@ -204,7 +204,7 @@ export function AdminCampaignBuilderPage() {
     <main className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
       <header>
         <h1 className="text-2xl font-extrabold tracking-tight text-[var(--rr-brand)]">Nuova campagna</h1>
-        <p className="mt-1 text-xs text-slate-500">
+        <p className="mt-1 text-xs text-body">
           Tre passaggi: cliente, territorio, preventivo. Le aree vengono create già pronte da
           assegnare.
         </p>
@@ -219,7 +219,7 @@ export function AdminCampaignBuilderPage() {
               onClick={() => i < step && setStep(i)}
               disabled={i > step}
               className={`flex items-center gap-2 text-[11px] font-bold disabled:cursor-default cursor-pointer ${
-                i === step ? 'text-[var(--rr-brand)]' : i < step ? 'text-emerald-600' : 'text-slate-300'
+                i === step ? 'text-[var(--rr-brand)]' : i < step ? 'text-success' : 'text-muted'
               }`}
             >
               <span
@@ -227,27 +227,27 @@ export function AdminCampaignBuilderPage() {
                   i === step
                     ? 'bg-[var(--rr-brand)] text-white'
                     : i < step
-                      ? 'bg-emerald-100 text-emerald-700'
-                      : 'bg-slate-100 text-slate-400'
+                      ? 'bg-success-bg text-success'
+                      : 'bg-muted text-muted'
                 }`}
               >
                 {i < step ? <Check className="h-3 w-3" /> : i + 1}
               </span>
               <span className="hidden sm:inline">{label}</span>
             </button>
-            {i < STEPS.length - 1 && <span className="h-px flex-1 bg-slate-200" />}
+            {i < STEPS.length - 1 && <span className="h-px flex-1 bg-muted" />}
           </li>
         ))}
       </ol>
 
       {error && (
-        <p className="mt-4 flex items-center gap-2 rounded-xl bg-red-50 px-4 py-3 text-xs text-red-700">
+        <p className="mt-4 flex items-center gap-2 rounded-xl bg-danger-bg px-4 py-3 text-xs text-danger">
           <AlertCircle className="h-4 w-4 shrink-0" /> {error}
         </p>
       )}
 
       <div className="mt-5 grid gap-5 lg:grid-cols-[1fr_320px]">
-        <section className="rounded-2xl bg-white p-6 shadow-[0_1px_3px_rgba(15,23,42,0.06)] ring-1 ring-slate-200/70">
+        <section className="rounded-2xl bg-surface p-6 shadow-[0_1px_3px_rgba(15,23,42,0.06)] ring-1 ring-[var(--rr-border)]/70">
           {/* ---------------------------------------------------- STEP 1 */}
           {step === 0 && (
             <div className="space-y-4">
@@ -276,7 +276,7 @@ export function AdminCampaignBuilderPage() {
                     onChange={(e) => setClientId(e.target.value)}
                   />
                 )}
-                <p className="mt-1.5 text-[10px] text-slate-400">
+                <p className="mt-1.5 text-[10px] text-muted">
                   La campagna viene creata per conto del cliente, con te come operatore interno.
                 </p>
               </div>
@@ -348,7 +348,7 @@ export function AdminCampaignBuilderPage() {
               <div>
                 <span className={label}>Centro e raggio</span>
                 <div
-                  className="relative h-64 overflow-hidden rounded-xl border border-slate-200 bg-[var(--rr-surface-sunken)]"
+                  className="relative h-64 overflow-hidden rounded-xl border border-hairline bg-[var(--rr-surface-sunken)]"
                   onClick={(e) => {
                     // Click the map to move the centre. No geocoder, no
                     // pretending the pin was found from an address string.
@@ -358,7 +358,7 @@ export function AdminCampaignBuilderPage() {
                   }}
                 >
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <p className="max-w-xs px-4 text-center text-[10px] text-slate-400">
+                    <p className="max-w-xs px-4 text-center text-[10px] text-muted">
                       Mappa schematica. Il cerchio e il raggio qui sotto sono esattamente
                       la geometria che verra creata.
                     </p>
@@ -376,7 +376,7 @@ export function AdminCampaignBuilderPage() {
                   />
                   <div className="pointer-events-none absolute left-1/2 top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--rr-brand)]" />
                 </div>
-                <p className="mt-1.5 text-[10px] text-slate-400">
+                <p className="mt-1.5 text-[10px] text-muted">
                   Clicca per spostare il centro · {lat.toFixed(4)}, {lng.toFixed(4)}
                 </p>
               </div>
@@ -394,7 +394,7 @@ export function AdminCampaignBuilderPage() {
                     onChange={(e) => setRadius(Number(e.target.value))}
                     className="w-full"
                   />
-                  <p className="text-[11px] tabular-nums text-slate-600">{radius.toFixed(1)} km</p>
+                  <p className="text-[11px] tabular-nums text-body">{radius.toFixed(1)} km</p>
                 </div>
                 <div>
                   <label className={label} htmlFor="cb-target">Destinatari</label>
@@ -408,7 +408,7 @@ export function AdminCampaignBuilderPage() {
                       <option key={t.value} value={t.value}>{t.label}</option>
                     ))}
                   </select>
-                  <p className="mt-1.5 text-[10px] text-slate-400">
+                  <p className="mt-1.5 text-[10px] text-muted">
                     {TARGETING.find((t) => t.value === targeting)?.hint}
                   </p>
                 </div>
@@ -440,7 +440,7 @@ export function AdminCampaignBuilderPage() {
                       />
                     </div>
                   )}
-                  <p className="sm:col-span-2 text-[10px] leading-relaxed text-slate-400">
+                  <p className="sm:col-span-2 text-[10px] leading-relaxed text-muted">
                     Senza un provider di indirizzi non sappiamo contare case o interni. Se non
                     hai un dato reale, torna su &laquo;case e interni&raquo;: e una stima dichiarata,
                     non un numero inventato travestito da conteggio.
@@ -457,7 +457,7 @@ export function AdminCampaignBuilderPage() {
                       setLat(p.lat);
                       setLng(p.lng);
                     }}
-                    className="inline-flex items-center gap-1 rounded-full border border-slate-200 px-3 py-1.5 text-[10px] font-bold hover:bg-slate-50 cursor-pointer"
+                    className="inline-flex items-center gap-1 rounded-full border border-hairline px-3 py-1.5 text-[10px] font-bold hover:bg-subtle cursor-pointer"
                   >
                     <MapPin className="h-3 w-3" />
                     {p.name}
@@ -492,8 +492,8 @@ export function AdminCampaignBuilderPage() {
                   ['Inizio', startDate ? date(startDate) : 'da definire'],
                   ['Fine', endDate ? date(endDate) : 'da definire'],
                 ].map(([k, v]) => (
-                  <div key={k} className="rounded-xl border border-slate-100 p-3">
-                    <dt className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{k}</dt>
+                  <div key={k} className="rounded-xl border border-hairline p-3">
+                    <dt className="text-[10px] font-bold uppercase tracking-wider text-muted">{k}</dt>
                     <dd className="mt-0.5 truncate text-xs font-bold">{v}</dd>
                   </div>
                 ))}
@@ -508,13 +508,13 @@ export function AdminCampaignBuilderPage() {
                   value={budget}
                   onChange={(e) => setBudget(e.target.value)}
                 />
-                <p className="mt-1.5 text-[10px] text-slate-400">
+                <p className="mt-1.5 text-[10px] text-muted">
                   Il tetto viene registrato e avvisato se la stima lo supera. Non blocca la
                   campagna: bloccare la creazione per un tetto e una decisione tua, non del software.
                 </p>
               </div>
 
-              <p className="flex items-start gap-2 rounded-xl bg-blue-50 p-3 text-[10px] leading-relaxed text-blue-800">
+              <p className="flex items-start gap-2 rounded-xl bg-info-bg p-3 text-[10px] leading-relaxed text-info">
                 <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
                 Il preventivo e una stima dall area, calcolata con una densita media nazionale di
                 220 m2 per cassetta. Non e un conteggio di indirizzi: non abbiamo ancora un
@@ -524,12 +524,12 @@ export function AdminCampaignBuilderPage() {
           )}
 
           {/* Footer */}
-          <div className="mt-6 flex items-center gap-2 border-t border-slate-100 pt-5">
+          <div className="mt-6 flex items-center gap-2 border-t border-hairline pt-5">
             {step > 0 && (
               <button
                 type="button"
                 onClick={() => setStep(step - 1)}
-                className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 px-4 py-2.5 text-xs font-bold hover:bg-slate-50 cursor-pointer"
+                className="inline-flex items-center gap-1.5 rounded-full border border-hairline px-4 py-2.5 text-xs font-bold hover:bg-subtle cursor-pointer"
               >
                 <ArrowLeft className="h-3.5 w-3.5" />
                 Indietro
@@ -550,7 +550,7 @@ export function AdminCampaignBuilderPage() {
                 type="button"
                 disabled={busy}
                 onClick={() => void create()}
-                className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-emerald-600 px-5 py-2.5 text-xs font-bold text-white disabled:opacity-40 cursor-pointer"
+                className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-success px-5 py-2.5 text-xs font-bold text-white disabled:opacity-40 cursor-pointer"
               >
                 {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
                 Crea campagna
@@ -561,7 +561,7 @@ export function AdminCampaignBuilderPage() {
 
         {/* Live summary, always visible so step 3 is never a surprise. */}
         <aside className="h-fit rounded-2xl bg-[var(--rr-brand)] p-5 text-white">
-          <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Riepilogo</p>
+          <p className="text-[10px] font-bold uppercase tracking-wider text-body">Riepilogo</p>
           <dl className="mt-3 space-y-2.5 text-[11px]">
             {[
               ['Campagna', title || '—'],
@@ -570,12 +570,12 @@ export function AdminCampaignBuilderPage() {
               ['Destinatari', TARGETING.find((t) => t.value === targeting)?.label ?? targeting],
             ].map(([k, v]) => (
               <div key={k} className="flex justify-between gap-3">
-                <dt className="text-slate-500">{k}</dt>
+                <dt className="text-body">{k}</dt>
                 <dd className="truncate font-bold">{v}</dd>
               </div>
             ))}
           </dl>
-          <p className="mt-4 border-t border-white/10 pt-3 text-[10px] leading-relaxed text-slate-500">
+          <p className="mt-4 border-t border-white/10 pt-3 text-[10px] leading-relaxed text-body">
             Il cerchio viene tagliato in aree da circa 1-2 km quadri, cosi ogni area e assegnabile
             a un distributore. Il numero di aree dipende dal raggio: piu grande il raggio, piu aree
             da gestire.

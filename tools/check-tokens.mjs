@@ -33,8 +33,14 @@ function colorsIn(text) {
   return found;
 }
 
-const css = readFileSync(join(root, 'src/styles/tokens.css'), 'utf8');
-const ts = readFileSync(join(root, 'src/lib/tokens.ts'), 'utf8');
+// Comments are stripped first. A hex quoted inside a comment is
+// documentation, not a token, and counting it as one produces a false failure
+// on exactly the kind of change most worth documenting.
+const stripComments = (s) =>
+  s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
+
+const css = stripComments(readFileSync(join(root, 'src/styles/tokens.css'), 'utf8'));
+const ts = stripComments(readFileSync(join(root, 'src/lib/tokens.ts'), 'utf8'));
 
 const cssSet = colorsIn(css);
 const tsSet = colorsIn(ts);

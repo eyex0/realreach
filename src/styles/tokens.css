@@ -45,9 +45,12 @@
      onto a page that is mostly tables and secondary text. */
   --rr-text-strong: #0a0a0b;   /* headings, names, money */
   --rr-text-body: #4b5563;     /* table cells, descriptions */
-  --rr-text-muted: #94a3b8;    /* timestamps, labels, hints */
+  /* Was #94a3b8 at 2.56:1 on white - a genuine failure, not a preference. This
+     is the grey Tailwind itself uses, and it passes. Timestamps and hints
+     are still the least important text on a page, not the least legible. */
+  --rr-text-muted: #6b7280;
   --rr-text-inverse: #f9fafb;
-  --rr-text-inverse-muted: #64748b;
+  --rr-text-inverse-muted: #9ca3af; /* 4.16:1 -> passes on the near-black top bar */
 
   /* ------------------------------------------------------------ border */
   --rr-border: #e5e7eb;
@@ -59,12 +62,14 @@
   /* Reserved. If a colour is not saying "this is fine" / "this is broken" /
      "this needs attention", it should not be one of these. Keeping them in one
      block is what stops a second shade of green creeping in. */
-  --rr-status-success: #10b981;
-  --rr-status-success-deep: #059669;
+  --rr-status-success: #059669;   /* 2.54:1 -> 3.4:1 as a map/status indicator */
+  --rr-status-success-deep: #065f46;
   --rr-status-success-bg: #ecfdf5;
   --rr-status-success-text: #047857;
 
-  --rr-status-warning: #f59e0b;
+  --rr-status-warning: #b45309;   /* 2.15:1 -> 4.6:1; amber cannot be a
+                                       marker on white, however much it
+                                       reads as 'warning' in isolation */
   --rr-status-warning-bg: #fffbeb;
   --rr-status-warning-text: #b45309;
 
@@ -79,7 +84,8 @@
   --rr-status-neutral-bg: #f1f5f9;
   --rr-status-neutral-text: #475569;
 
-  --rr-highlight: #fbbf24; /* map pins, the one warm accent */
+  --rr-highlight: #b45309;  /* 1.67:1 -> 4.6:1. A map pin you cannot see
+                             against a basemap is worse than no pin. */
 
   /* ------------------------------------------------------------ radius */
   --rr-radius-sm: 4px;
@@ -120,8 +126,8 @@
   /* ------------------------------------------------------ route speeds */
   /* Shared with the map legend and the report page so a colour can never mean
      two different speeds in two different components. */
-  --rr-speed-low: #10b981;
-  --rr-speed-mid: #f59e0b;
+  --rr-speed-low: #059669;
+  --rr-speed-mid: #b45309;
   --rr-speed-high: #ef4444;
 }
 
@@ -144,9 +150,24 @@
 @utility text-inverse { color: var(--rr-text-inverse); }
 
 @utility border-hairline { border-color: var(--rr-border); }
+@utility divide-hairline { border-color: var(--rr-border); }
+@utility border-strong { border-color: var(--rr-text-body); }
 @utility border-inverse { border-color: var(--rr-border-inverse); }
+@utility ring-hairline { --tw-ring-color: var(--rr-border); }
+@utility bg-success { background-color: var(--rr-status-success); }
+@utility bg-danger { background-color: var(--rr-status-danger); }
+
+/* Status pairs. Background and foreground travel together because a status
+   colour used on the wrong surface is the classic way a "green = good" dot
+   ends up as green text on green. */
+@utility bg-success-bg { background-color: var(--rr-status-success-bg); }
+@utility bg-warning-bg { background-color: var(--rr-status-warning-bg); }
+@utility bg-danger-bg { background-color: var(--rr-status-danger-bg); }
+@utility bg-info-bg { background-color: var(--rr-status-info-bg); }
+@utility bg-neutral-bg { background-color: var(--rr-status-neutral-bg); }
 
 @utility text-success { color: var(--rr-status-success-text); }
 @utility text-warning { color: var(--rr-status-warning-text); }
 @utility text-danger { color: var(--rr-status-danger-text); }
 @utility text-info { color: var(--rr-status-info-text); }
+@utility text-neutral { color: var(--rr-status-neutral-text); }

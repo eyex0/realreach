@@ -12,9 +12,9 @@ import { listAdminDistributors, getAdminDistributor, type AdminDistributor } fro
  */
 
 const VERIFICATION: Record<string, { label: string; cls: string }> = {
-  verified: { label: 'Verificato', cls: 'bg-emerald-50 text-emerald-700' },
-  unverified: { label: 'Da verificare', cls: 'bg-amber-50 text-amber-700' },
-  rejected: { label: 'Respinto', cls: 'bg-red-50 text-red-700' },
+  verified: { label: 'Verificato', cls: 'bg-success-bg text-success' },
+  unverified: { label: 'Da verificare', cls: 'bg-warning-bg text-warning' },
+  rejected: { label: 'Respinto', cls: 'bg-danger-bg text-danger' },
 };
 
 function Profile({ id }: { id: string }) {
@@ -39,14 +39,14 @@ function Profile({ id }: { id: string }) {
 
   if (error) {
     return (
-      <p className="flex items-center gap-2 px-5 py-4 text-xs text-red-700">
+      <p className="flex items-center gap-2 px-5 py-4 text-xs text-danger">
         <AlertCircle className="h-4 w-4" /> {error}
       </p>
     );
   }
   if (!data) {
     return (
-      <p className="px-5 py-4 text-xs text-slate-400">
+      <p className="px-5 py-4 text-xs text-muted">
         <Loader2 className="mr-1 inline h-3 w-3 animate-spin" />
         Caricamento…
       </p>
@@ -66,8 +66,8 @@ function Profile({ id }: { id: string }) {
           ['Volantini', num(totalPieces)],
           ['Guadagni', eur(totalEarned)],
         ].map(([label, value]) => (
-          <div key={label} className="rounded-xl border border-slate-100 p-3">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{label}</p>
+          <div key={label} className="rounded-xl border border-hairline p-3">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-muted">{label}</p>
             <p className="mt-1 text-lg font-extrabold tabular-nums text-[var(--rr-brand)]">{value}</p>
           </div>
         ))}
@@ -76,29 +76,29 @@ function Profile({ id }: { id: string }) {
       <div className="grid gap-5 lg:grid-cols-2">
         {/* Job history */}
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-muted">
             Storico lavori
           </p>
           {data.jobs.length === 0 ? (
-            <p className="mt-2 text-xs text-slate-400">Nessun lavoro registrato.</p>
+            <p className="mt-2 text-xs text-muted">Nessun lavoro registrato.</p>
           ) : (
             <ul className="mt-2 space-y-1.5">
               {data.jobs.slice(0, 10).map((j) => (
                 <li key={j.id} className="flex items-center gap-2 text-[11px]">
-                  <span className="font-bold text-slate-700">
+                  <span className="font-bold text-strong">
                     {j.quartiere ?? `Area ${j.campaign_seq ?? ''}`}
                   </span>
-                  <span className="truncate text-slate-400">{j.campaign_title}</span>
+                  <span className="truncate text-muted">{j.campaign_title}</span>
                   <span
-                    className={`ml-auto rounded-full px-2 py-0.5 text-[9px] font-bold ${
+                    className={`ml-auto rounded-full px-2 py-0.5 text-[10px] font-bold ${
                       j.status === 'approved'
-                        ? 'bg-emerald-50 text-emerald-700'
-                        : 'bg-slate-100 text-slate-600'
+                        ? 'bg-success-bg text-success'
+                        : 'bg-muted text-body'
                     }`}
                   >
                     {j.status.replace('_', ' ')}
                   </span>
-                  <span className="w-20 text-right text-[10px] text-slate-400">
+                  <span className="w-20 text-right text-[10px] text-muted">
                     {date(j.completed_at ?? j.started_at)}
                   </span>
                 </li>
@@ -109,25 +109,25 @@ function Profile({ id }: { id: string }) {
 
         {/* Payouts */}
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Mandati</p>
+          <p className="text-[10px] font-bold uppercase tracking-wider text-muted">Mandati</p>
           {data.payouts.length === 0 ? (
-            <p className="mt-2 text-xs text-slate-400">Nessun mandato.</p>
+            <p className="mt-2 text-xs text-muted">Nessun mandato.</p>
           ) : (
             <ul className="mt-2 space-y-1.5">
               {data.payouts.slice(0, 10).map((x) => (
                 <li key={x.id} className="flex items-center gap-2 text-[11px]">
-                  <span className="truncate text-slate-600">{x.campaign_title}</span>
-                  <span className="ml-auto font-bold tabular-nums text-slate-700">
+                  <span className="truncate text-body">{x.campaign_title}</span>
+                  <span className="ml-auto font-bold tabular-nums text-strong">
                     {eur(x.amount_eur)}
                   </span>
-                  <span className="w-16 text-right text-[10px] text-slate-400">
+                  <span className="w-16 text-right text-[10px] text-muted">
                     {x.paid_at ? `paid ${date(x.paid_at)}` : x.status}
                   </span>
                 </li>
               ))}
             </ul>
           )}
-          <p className="mt-3 text-[10px] text-slate-400">
+          <p className="mt-3 text-[10px] text-muted">
             Documenti: {Array.isArray(p.documents) && p.documents.length > 0 ? p.documents.length : '—'} ·
             onboarding {p.onboarded_at ? date(p.onboarded_at) : '—'}
             {p.phone ? ` · ${p.phone}` : ''}
@@ -167,39 +167,39 @@ export function AdminDistributorsPage() {
           <h1 className="text-2xl font-extrabold tracking-tight text-[var(--rr-brand)]">
             Distributori
           </h1>
-          <p className="mt-1 text-xs text-slate-500">
+          <p className="mt-1 text-xs text-body">
             {rows === null ? 'Caricamento…' : `${num(rows.length)} distributori`}
           </p>
         </div>
         <button
           type="button"
           onClick={() => void load()}
-          className="ml-auto rounded-full border border-slate-200 px-4 py-2 text-[11px] font-bold hover:bg-slate-50 cursor-pointer"
+          className="ml-auto rounded-full border border-hairline px-4 py-2 text-[11px] font-bold hover:bg-subtle cursor-pointer"
         >
           Aggiorna
         </button>
       </header>
 
       {error && (
-        <p className="mt-4 flex items-center gap-2 rounded-xl bg-red-50 px-3 py-2 text-xs text-red-700">
+        <p className="mt-4 flex items-center gap-2 rounded-xl bg-danger-bg px-3 py-2 text-xs text-danger">
           <AlertCircle className="h-4 w-4" /> {error}
         </p>
       )}
 
-      <section className="mt-5 overflow-hidden rounded-2xl bg-white shadow-[0_1px_3px_rgba(15,23,42,0.06)] ring-1 ring-slate-200/70">
+      <section className="mt-5 overflow-hidden rounded-2xl bg-surface shadow-[0_1px_3px_rgba(15,23,42,0.06)] ring-1 ring-[var(--rr-border)]/70">
         {rows === null ? (
-          <p className="px-5 py-12 text-center text-xs text-slate-400">
+          <p className="px-5 py-12 text-center text-xs text-muted">
             <Loader2 className="mx-auto h-4 w-4 animate-spin" />
           </p>
         ) : rows.length === 0 ? (
           <div className="px-5 py-12 text-center">
             <p className="text-sm font-bold">Nessun distributore</p>
-            <p className="mt-1 text-xs text-slate-500">
+            <p className="mt-1 text-xs text-body">
               I distributori vengono creati quando un operatore si abbina con un codice.
             </p>
           </div>
         ) : (
-          <ul className="divide-y divide-slate-50">
+          <ul className="divide-y divide-hairline">
             {rows.map((d) => {
               const v = VERIFICATION[d.verification_status] ?? VERIFICATION.unverified;
               return (
@@ -207,16 +207,16 @@ export function AdminDistributorsPage() {
                   <button
                     type="button"
                     onClick={() => setOpen(open === d.id ? null : d.id)}
-                    className="flex w-full flex-wrap items-center gap-3 px-5 py-3.5 text-left hover:bg-slate-50/60 cursor-pointer"
+                    className="flex w-full flex-wrap items-center gap-3 px-5 py-3.5 text-left hover:bg-subtle/60 cursor-pointer"
                   >
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-bold text-slate-600">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-bold text-body">
                       {(d.display_name ?? d.email).slice(0, 2).toUpperCase()}
                     </span>
                     <div className="min-w-[160px] flex-1">
                       <p className="text-xs font-bold text-[var(--rr-brand)]">
                         {d.display_name ?? d.email}
                       </p>
-                      <p className="text-[10px] text-slate-400">{d.email}</p>
+                      <p className="text-[10px] text-muted">{d.email}</p>
                     </div>
 
                     <span
@@ -226,23 +226,23 @@ export function AdminDistributorsPage() {
                       {v.label}
                     </span>
 
-                    <span className="w-24 text-right text-[11px] tabular-nums text-slate-600">
+                    <span className="w-24 text-right text-[11px] tabular-nums text-body">
                       {num(d.completed_jobs)} completati
                     </span>
-                    <span className="w-20 text-right text-[11px] tabular-nums text-slate-500">
+                    <span className="w-20 text-right text-[11px] tabular-nums text-body">
                       {num(d.active_jobs)} attivi
                     </span>
-                    <span className="w-20 text-right text-[11px] tabular-nums text-slate-500">
+                    <span className="w-20 text-right text-[11px] tabular-nums text-body">
                       {num(d.letterboxes)} volantini
                     </span>
-                    <span className="hidden w-32 text-right text-[10px] text-slate-400 md:inline-flex md:items-center md:justify-end md:gap-1">
+                    <span className="hidden w-32 text-right text-[10px] text-muted md:inline-flex md:items-center md:justify-end md:gap-1">
                       <MapPin className="h-3 w-3" />
                       {(d.service_areas ?? []).join(', ') || '—'}
                     </span>
-                    <span className="inline-flex w-16 items-center justify-end gap-1 text-[11px] tabular-nums text-slate-600">
+                    <span className="inline-flex w-16 items-center justify-end gap-1 text-[11px] tabular-nums text-body">
                       {d.rating != null ? (
                         <>
-                          <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+                          <Star className="h-3 w-3 fill-[var(--rr-highlight)] text-warning" />
                           {Number(d.rating).toFixed(1)}
                         </>
                       ) : (
@@ -250,12 +250,12 @@ export function AdminDistributorsPage() {
                       )}
                     </span>
                     {d.open_issues > 0 && (
-                      <span className="w-16 text-right text-[10px] font-bold text-amber-600">
+                      <span className="w-16 text-right text-[10px] font-bold text-warning">
                         {d.open_issues} segnalazioni
                       </span>
                     )}
                     <ChevronRight
-                      className={`h-4 w-4 text-slate-300 transition-transform ${open === d.id ? 'rotate-90' : ''}`}
+                      className={`h-4 w-4 text-muted transition-transform ${open === d.id ? 'rotate-90' : ''}`}
                     />
                   </button>
 
@@ -266,7 +266,7 @@ export function AdminDistributorsPage() {
           </ul>
         )}
 
-        <p className="border-t border-slate-100 px-5 py-3 text-[10px] text-slate-400">
+        <p className="border-t border-hairline px-5 py-3 text-[10px] text-muted">
           I metrici sono derivati dai corse reali, non memorizzati: un profilo non puo dire una
           cosa diversa dal report della campagna da cui proviene.
         </p>

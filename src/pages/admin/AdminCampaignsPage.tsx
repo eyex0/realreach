@@ -29,36 +29,36 @@ const STATUS_FILTERS = [
 ] as const;
 
 const STATUS_STYLE: Record<string, string> = {
-  completed: 'bg-emerald-50 text-emerald-700',
-  in_progress: 'bg-blue-50 text-blue-700',
-  active: 'bg-blue-50 text-blue-700',
-  planned: 'bg-amber-50 text-amber-700',
-  submitted: 'bg-violet-50 text-violet-700',
-  draft: 'bg-slate-100 text-slate-600',
-  paused: 'bg-orange-50 text-orange-700',
-  cancelled: 'bg-slate-100 text-slate-500',
+  completed: 'bg-success-bg text-success',
+  in_progress: 'bg-info-bg text-info',
+  active: 'bg-info-bg text-info',
+  planned: 'bg-warning-bg text-warning',
+  submitted: 'bg-info-bg text-info',
+  draft: 'bg-muted text-body',
+  paused: 'bg-warning-bg text-warning',
+  cancelled: 'bg-muted text-body',
 };
 
 const AREA_STATUS_STYLE: Record<string, string> = {
-  approved: 'bg-emerald-50 text-emerald-700',
-  in_progress: 'bg-blue-50 text-blue-700',
-  assigned: 'bg-amber-50 text-amber-700',
-  available: 'bg-slate-100 text-slate-600',
-  rejected: 'bg-red-50 text-red-700',
-  reported: 'bg-red-50 text-red-700',
+  approved: 'bg-success-bg text-success',
+  in_progress: 'bg-info-bg text-info',
+  assigned: 'bg-warning-bg text-warning',
+  available: 'bg-muted text-body',
+  rejected: 'bg-danger-bg text-danger',
+  reported: 'bg-danger-bg text-danger',
 };
 
 function Progress({ done, total }: { done: number; total: number }) {
   const pct = total > 0 ? Math.round((done / total) * 100) : 0;
   return (
     <span className="inline-flex items-center gap-2">
-      <span className="h-1.5 w-16 overflow-hidden rounded-full bg-slate-100">
+      <span className="h-1.5 w-16 overflow-hidden rounded-full bg-muted">
         <span
-          className={`block h-full rounded-full ${done >= total && total > 0 ? 'bg-emerald-500' : 'bg-[var(--rr-accent)]'}`}
+          className={`block h-full rounded-full ${done >= total && total > 0 ? 'bg-success' : 'bg-[var(--rr-accent)]'}`}
           style={{ width: `${pct}%` }}
         />
       </span>
-      <span className="text-[11px] font-bold tabular-nums text-slate-600">
+      <span className="text-[11px] font-bold tabular-nums text-body">
         {done}/{total}
       </span>
     </span>
@@ -69,15 +69,15 @@ function Progress({ done, total }: { done: number; total: number }) {
 function AreaRow({ area }: { area: AdminArea }) {
   const { t, num, eur, km, dateTime, date } = useAdmin();
   return (
-    <tr className="bg-slate-50/60">
-      <td className="px-5 py-2.5 text-[11px] font-bold text-slate-500">
+    <tr className="bg-subtle/60">
+      <td className="px-5 py-2.5 text-[11px] font-bold text-body">
         {area.quartiere ?? `Area ${area.campaign_seq ?? ''}`}
         {area.cap ? ` · ${area.cap}` : ''}
       </td>
       <td className="px-3 py-2.5">
         <span
           className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
-            AREA_STATUS_STYLE[area.status] ?? 'bg-slate-100 text-slate-600'
+            AREA_STATUS_STYLE[area.status] ?? 'bg-muted text-body'
           }`}
         >
           {area.status.replace('_', ' ')}
@@ -86,29 +86,29 @@ function AreaRow({ area }: { area: AdminArea }) {
       <td className="px-3 py-2.5">
         <Progress done={area.status === 'approved' ? 1 : 0} total={1} />
       </td>
-      <td className="px-3 py-2.5 text-[11px] tabular-nums text-slate-600">
+      <td className="px-3 py-2.5 text-[11px] tabular-nums text-body">
         {area.letterboxes_total != null ? num(area.letterboxes_total) : '—'}
-        <span className="ml-1 text-slate-400">
+        <span className="ml-1 text-muted">
           {area.houses != null || area.units != null
             ? `(${num(area.houses ?? 0)}/${num(area.units ?? 0)})`
             : ''}
         </span>
       </td>
-      <td className="px-3 py-2.5 text-[11px] text-slate-600">
+      <td className="px-3 py-2.5 text-[11px] text-body">
         {area.distributor_name ?? t('common.unassigned')}
       </td>
-      <td className="px-3 py-2.5 text-[10px] tabular-nums text-slate-400">
+      <td className="px-3 py-2.5 text-[10px] tabular-nums text-muted">
         {area.accepted_at ? `A ${dateTime(area.accepted_at)}` : '—'}
         <br />
         {area.completed_at ? `C ${dateTime(area.completed_at)}` : ''}
       </td>
-      <td className="px-3 py-2.5 text-[11px] font-bold tabular-nums text-slate-700">
+      <td className="px-3 py-2.5 text-[11px] font-bold tabular-nums text-strong">
         {area.price_eur != null ? eur(area.price_eur) : '—'}
         {area.distance_km != null && (
-          <span className="ml-1 font-normal text-slate-400">{km(area.distance_km)}</span>
+          <span className="ml-1 font-normal text-muted">{km(area.distance_km)}</span>
         )}
       </td>
-      <td className="px-5 py-2.5 text-right text-[10px] text-slate-400">{area.started_at ? date(area.started_at) : '—'}</td>
+      <td className="px-5 py-2.5 text-right text-[10px] text-muted">{area.started_at ? date(area.started_at) : '—'}</td>
     </tr>
   );
 }
@@ -238,20 +238,20 @@ export function AdminCampaignsPage() {
           <h1 className="text-2xl font-extrabold tracking-tight text-[var(--rr-brand)]">
             {t('nav.campaigns')}
           </h1>
-          <p className="mt-1 text-xs text-slate-500">
+          <p className="mt-1 text-xs text-body">
             {rows === null ? t('common.loading') : `${num(rows.length)} campagne`}
           </p>
         </div>
 
         <div className="ml-auto flex flex-wrap items-center gap-2">
-          <div className="flex items-center gap-1 rounded-full bg-slate-100 p-1">
+          <div className="flex items-center gap-1 rounded-full bg-muted p-1">
             {STATUS_FILTERS.map((f) => (
               <button
                 key={f.key}
                 type="button"
                 onClick={() => setStatus(f.key)}
                 className={`rounded-full px-3.5 py-1.5 text-[11px] font-bold transition-colors cursor-pointer ${
-                  status === f.key ? 'bg-white text-[var(--rr-brand)] shadow-sm' : 'text-slate-500'
+                  status === f.key ? 'bg-surface text-[var(--rr-brand)] shadow-sm' : 'text-body'
                 }`}
               >
                 {t(f.labelKey)}
@@ -259,26 +259,26 @@ export function AdminCampaignsPage() {
             ))}
           </div>
 
-          <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3.5 py-2">
-            <Search className="h-3.5 w-3.5 text-slate-400" />
+          <div className="flex items-center gap-2 rounded-full border border-hairline bg-surface px-3.5 py-2">
+            <Search className="h-3.5 w-3.5 text-muted" />
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder={t('common.search')}
-              className="w-56 bg-transparent text-xs outline-none placeholder:text-slate-400"
+              className="w-56 bg-transparent text-xs outline-none placeholder:text-muted"
             />
           </div>
         </div>
       </header>
 
       {error && (
-        <p className="mt-4 rounded-xl bg-red-50 px-3 py-2 text-xs text-red-700">{error}</p>
+        <p className="mt-4 rounded-xl bg-danger-bg px-3 py-2 text-xs text-danger">{error}</p>
       )}
 
       {/* Bulk actions, only when something is selected. */}
       {selected.size > 0 && (
-        <div className="mt-4 flex flex-wrap items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3">
-          <span className="text-[11px] font-bold text-slate-600">
+        <div className="mt-4 flex flex-wrap items-center gap-2 rounded-2xl border border-hairline bg-surface px-4 py-3">
+          <span className="text-[11px] font-bold text-body">
             {selected.size} selezionate
           </span>
           <select
@@ -287,7 +287,7 @@ export function AdminCampaignsPage() {
               if (e.target.value) void changeStatus(e.target.value);
             }}
             defaultValue=""
-            className="rounded-full border border-slate-200 px-3 py-1.5 text-[11px] font-bold disabled:opacity-40"
+            className="rounded-full border border-hairline px-3 py-1.5 text-[11px] font-bold disabled:opacity-40"
           >
             <option value="">Cambia stato…</option>
             {['planned', 'active', 'in_progress', 'completed', 'paused', 'cancelled'].map((s) => (
@@ -299,7 +299,7 @@ export function AdminCampaignsPage() {
           <button
             type="button"
             onClick={exportCsv}
-            className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 px-3 py-1.5 text-[11px] font-bold hover:bg-slate-50 cursor-pointer"
+            className="inline-flex items-center gap-1.5 rounded-full border border-hairline px-3 py-1.5 text-[11px] font-bold hover:bg-subtle cursor-pointer"
           >
             <Download className="h-3.5 w-3.5" />
             Esporta CSV
@@ -307,7 +307,7 @@ export function AdminCampaignsPage() {
           <button
             type="button"
             onClick={() => setSelected(new Set())}
-            className="ml-auto inline-flex items-center gap-1 text-[11px] font-bold text-slate-400 hover:text-slate-700 cursor-pointer"
+            className="ml-auto inline-flex items-center gap-1 text-[11px] font-bold text-muted hover:text-strong cursor-pointer"
           >
             <X className="h-3.5 w-3.5" />
             Annulla
@@ -315,10 +315,10 @@ export function AdminCampaignsPage() {
         </div>
       )}
 
-      <section className="mt-4 overflow-hidden rounded-2xl bg-white shadow-[0_1px_3px_rgba(15,23,42,0.06)] ring-1 ring-slate-200/70">
+      <section className="mt-4 overflow-hidden rounded-2xl bg-surface shadow-[0_1px_3px_rgba(15,23,42,0.06)] ring-1 ring-[var(--rr-border)]/70">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[1080px] text-left text-xs">
-            <thead className="bg-slate-50 text-[10px] uppercase tracking-wider text-slate-400">
+            <thead className="bg-subtle text-[10px] uppercase tracking-wider text-muted">
               <tr>
                 <th className="w-8 px-3 py-2.5">
                   <input
@@ -341,7 +341,7 @@ export function AdminCampaignsPage() {
             <tbody>
               {rows === null ? (
                 <tr>
-                  <td colSpan={9} className="px-5 py-10 text-center text-xs text-slate-400">
+                  <td colSpan={9} className="px-5 py-10 text-center text-xs text-muted">
                     <Loader2 className="mx-auto h-4 w-4 animate-spin" />
                   </td>
                 </tr>
@@ -349,14 +349,14 @@ export function AdminCampaignsPage() {
                 <tr>
                   <td colSpan={9} className="px-5 py-12 text-center">
                     <p className="text-sm font-bold">{t('home.emptyTitle')}</p>
-                    <p className="mt-1 text-xs text-slate-500">{t('home.emptyBody')}</p>
+                    <p className="mt-1 text-xs text-body">{t('home.emptyBody')}</p>
                   </td>
                 </tr>
               ) : (
                 rows.flatMap((r) => {
                   const open = expanded === r.id;
                   const main = (
-                    <tr key={r.id} className="border-t border-slate-50 hover:bg-slate-50/60">
+                    <tr key={r.id} className="border-t border-hairline hover:bg-subtle/60">
                       <td className="px-3 py-3">
                         <input
                           type="checkbox"
@@ -370,7 +370,7 @@ export function AdminCampaignsPage() {
                           <button
                             type="button"
                             onClick={() => void toggle(r.id)}
-                            className="text-slate-400 hover:text-slate-700 cursor-pointer"
+                            className="text-muted hover:text-strong cursor-pointer"
                             aria-label={open ? 'Collapse areas' : 'Expand areas'}
                           >
                             <ChevronDown
@@ -381,25 +381,25 @@ export function AdminCampaignsPage() {
                           <button
                             type="button"
                             onClick={() => setRenaming({ id: r.id, title: r.title })}
-                            className="text-slate-300 hover:text-slate-600 cursor-pointer"
+                            className="text-muted hover:text-body cursor-pointer"
                             aria-label="Rename"
                           >
                             <Pencil className="h-3 w-3" />
                           </button>
                           {r.material && (
-                            <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[9px] font-bold text-slate-500">
+                            <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-bold text-body">
                               {r.material.replace('_', ' ')}
                             </span>
                           )}
                         </div>
                       </td>
-                      <td className="px-3 py-3 text-slate-600">
+                      <td className="px-3 py-3 text-body">
                         {r.client_name ?? r.client_company ?? '—'}
                       </td>
                       <td className="px-3 py-3">
                         <span
                           className={`rounded-full px-2.5 py-1 text-[10px] font-bold ${
-                            STATUS_STYLE[r.status] ?? 'bg-slate-100 text-slate-600'
+                            STATUS_STYLE[r.status] ?? 'bg-muted text-body'
                           }`}
                         >
                           {r.status.replace('_', ' ')}
@@ -408,18 +408,18 @@ export function AdminCampaignsPage() {
                       <td className="px-3 py-3">
                         <Progress done={r.areas_done} total={r.areas} />
                       </td>
-                      <td className="px-3 py-3 tabular-nums text-slate-600">
+                      <td className="px-3 py-3 tabular-nums text-body">
                         {r.letterboxes > 0 ? num(r.letterboxes) : '—'}
                       </td>
-                      <td className="px-3 py-3 text-[11px] text-slate-500">
+                      <td className="px-3 py-3 text-[11px] text-body">
                         {r.pickup_address ?? '—'}
                         {r.pickup_date ? (
-                          <span className="block text-[10px] text-slate-400">
+                          <span className="block text-[10px] text-muted">
                             {date(r.pickup_date)}
                           </span>
                         ) : null}
                       </td>
-                      <td className="px-3 py-3 text-[11px] text-slate-400">
+                      <td className="px-3 py-3 text-[11px] text-muted">
                         {relative(r.created_at)}
                       </td>
                       <td className="px-5 py-3 text-right">
@@ -427,7 +427,7 @@ export function AdminCampaignsPage() {
                           type="button"
                           onClick={() => navigate(`/campaigns/${r.id}/report`)}
                           title="Mappa"
-                          className="inline-flex items-center gap-1 rounded-full border border-slate-200 px-2.5 py-1 text-[10px] font-bold hover:bg-slate-50 cursor-pointer"
+                          className="inline-flex items-center gap-1 rounded-full border border-hairline px-2.5 py-1 text-[10px] font-bold hover:bg-subtle cursor-pointer"
                         >
                           <Map className="h-3 w-3" />
                           Map
@@ -436,7 +436,7 @@ export function AdminCampaignsPage() {
                           type="button"
                           onClick={() => navigate('/admin/billing')}
                           title="Ricevuta"
-                          className="ml-1.5 inline-flex items-center gap-1 rounded-full border border-slate-200 px-2.5 py-1 text-[10px] font-bold hover:bg-slate-50 cursor-pointer"
+                          className="ml-1.5 inline-flex items-center gap-1 rounded-full border border-hairline px-2.5 py-1 text-[10px] font-bold hover:bg-subtle cursor-pointer"
                         >
                           <Receipt className="h-3 w-3" />
                         </button>
@@ -451,10 +451,10 @@ export function AdminCampaignsPage() {
                     <tr key={`${r.id}-areas`}>
                       <td colSpan={9} className="px-0 py-0">
                         {list.length === 0 ? (
-                          <p className="px-5 py-4 text-[11px] text-slate-400">Caricamento aree…</p>
+                          <p className="px-5 py-4 text-[11px] text-muted">Caricamento aree…</p>
                         ) : (
                           <table className="w-full min-w-[1080px] text-left text-xs">
-                            <thead className="text-[9px] uppercase tracking-wider text-slate-400">
+                            <thead className="text-[10px] uppercase tracking-wider text-muted">
                               <tr>
                                 <th className="px-5 py-2 font-bold">Area</th>
                                 <th className="px-3 py-2 font-bold">{t('common.status')}</th>
@@ -484,7 +484,7 @@ export function AdminCampaignsPage() {
       </section>
 
       {rows !== null && rows.length > 0 && (
-        <p className="mt-3 text-[10px] text-slate-400">
+        <p className="mt-3 text-[10px] text-muted">
           <CheckCircle2 className="mr-1 inline h-3 w-3" />
           I numeri di letterbox sono stime ricavate dall'area finché non scegliamo una fonte
           indirizzi. Le aree senza importo restano senza valore invece di mostrare zero.
@@ -494,7 +494,7 @@ export function AdminCampaignsPage() {
       {/* Rename */}
       {renaming && (
         <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/40 p-4">
-          <div className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-2xl">
+          <div className="w-full max-w-sm rounded-2xl bg-surface p-5 shadow-2xl">
             <h2 className="text-sm font-bold text-[var(--rr-brand)]">Rinomina campagna</h2>
             <input
               autoFocus
@@ -504,13 +504,13 @@ export function AdminCampaignsPage() {
                 if (e.key === 'Enter') void rename();
                 if (e.key === 'Escape') setRenaming(null);
               }}
-              className="mt-3 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-slate-400"
+              className="mt-3 w-full rounded-xl border border-hairline px-3 py-2 text-sm outline-none focus:border-strong"
             />
             <div className="mt-4 flex justify-end gap-2">
               <button
                 type="button"
                 onClick={() => setRenaming(null)}
-                className="rounded-full border border-slate-200 px-4 py-2 text-xs font-bold cursor-pointer"
+                className="rounded-full border border-hairline px-4 py-2 text-xs font-bold cursor-pointer"
               >
                 Annulla
               </button>

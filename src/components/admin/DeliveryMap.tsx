@@ -231,17 +231,17 @@ export function DeliveryMap({
 
   return (
     <div className="relative overflow-hidden rounded-2xl">
-      <div ref={containerRef} style={{ height }} className="w-full bg-slate-100" />
+      <div ref={containerRef} style={{ height }} className="w-full bg-muted" />
 
       {busy && (
-        <div className="absolute inset-0 flex items-center justify-center bg-slate-100">
-          <Loader2 className="h-5 w-5 animate-spin text-slate-400" />
+        <div className="absolute inset-0 flex items-center justify-center bg-muted">
+          <Loader2 className="h-5 w-5 animate-spin text-muted" />
         </div>
       )}
 
       {empty && !busy && (
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-          <p className="rounded-xl bg-white/90 px-4 py-2 text-xs font-semibold text-slate-600 shadow">
+          <p className="rounded-xl bg-surface/90 px-4 py-2 text-xs font-semibold text-body shadow">
             Nessuna campagna da mostrare
           </p>
         </div>
@@ -253,7 +253,7 @@ export function DeliveryMap({
         onClick={() => setAerial((v) => !v)}
         title={aerial ? 'Mappa chiara' : 'Satellitare'}
         aria-label={aerial ? 'Switch to light map' : 'Switch to satellite imagery'}
-        className="absolute right-3 top-3 z-[1000] flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 shadow-sm transition-colors hover:text-slate-900 cursor-pointer"
+        className="absolute right-3 top-3 z-[1000] flex h-8 w-8 items-center justify-center rounded-lg border border-hairline bg-surface text-body shadow-sm transition-colors hover:text-strong cursor-pointer"
       >
         <Globe2 className="h-4 w-4" />
       </button>
@@ -270,21 +270,21 @@ export function DeliveryMap({
         }}
         title="Ricentra"
         aria-label="Recentre the map"
-        className="absolute right-3 top-12 z-[1000] flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 shadow-sm transition-colors hover:text-slate-900 cursor-pointer"
+        className="absolute right-3 top-12 z-[1000] flex h-8 w-8 items-center justify-center rounded-lg border border-hairline bg-surface text-body shadow-sm transition-colors hover:text-strong cursor-pointer"
       >
         <Crosshair className="h-4 w-4" />
       </button>
 
       {/* Legend, only when there is a route to explain. */}
       {campaigns.some((c) => c.areas.some((a) => a.route.length > 1)) && (
-        <ul className="absolute bottom-8 left-3 z-[1000] space-y-1 rounded-xl border border-slate-200 bg-white/95 px-3 py-2 shadow-sm">
+        <ul className="absolute bottom-8 left-3 z-[1000] space-y-1 rounded-xl border border-hairline bg-surface/95 px-3 py-2 shadow-sm">
           {[
             ['normal', 'Andatura normale'],
             ['slightly_fast', 'Un po\u2019 veloce'],
             ['very_fast', 'Molto veloce'],
             ['extremely_fast', 'Estremo (18 km/h+)'],
           ].map(([band, label]) => (
-            <li key={band} className="flex items-center gap-2 text-[10px] font-semibold text-slate-600">
+            <li key={band} className="flex items-center gap-2 text-[10px] font-semibold text-body">
               <span className="h-2.5 w-6 rounded-sm" style={{ backgroundColor: SPEED_COLOURS[band] }} />
               {label}
             </li>
@@ -296,7 +296,7 @@ export function DeliveryMap({
         <select
           onChange={(e) => e.target.value && onSelectCampaign(e.target.value)}
           defaultValue=""
-          className="absolute left-3 top-3 z-[1000] max-w-[260px] rounded-lg border border-slate-200 bg-white/95 px-2.5 py-1.5 text-[11px] font-semibold text-slate-700 shadow-sm"
+          className="absolute left-3 top-3 z-[1000] max-w-[260px] rounded-lg border border-hairline bg-surface/95 px-2.5 py-1.5 text-[11px] font-semibold text-strong shadow-sm"
         >
           <option value="">{campaigns.length} campagne attive</option>
           {campaigns.map((c) => (
