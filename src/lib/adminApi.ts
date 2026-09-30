@@ -157,6 +157,34 @@ export async function getAdminOverview(months: 1 | 3 | 12): Promise<AdminOvervie
   return handle<AdminOverview>(await apiFetch(`/admin/overview?months=${months}`));
 }
 
+/** Real geometry for the delivery map: area polygons plus recorded routes. */
+export async function getAdminMap(status = 'active'): Promise<{ campaigns: AdminMapCampaign[] }> {
+  return handle<{ campaigns: AdminMapCampaign[] }>(await apiFetch(`/admin/map?status=${status}`));
+}
+
+export interface AdminMapArea {
+  id: string;
+  seq: number | null;
+  name: string | null;
+  cap: string | null;
+  status: string;
+  distributor: string | null;
+  letterboxes: number | null;
+  pieces: number;
+  area: { type: string; coordinates: number[][][] } | null;
+  route: { lat: number; lng: number; at: string; accuracy: number | null }[];
+}
+
+export interface AdminMapCampaign {
+  id: string;
+  title: string;
+  status: string;
+  client_name: string | null;
+  areas: AdminMapArea[];
+  areas_done: number;
+  letterboxes: number;
+}
+
 export async function listAdminCampaigns(params: {
   status?: 'all' | 'active' | 'completed' | string;
   q?: string;

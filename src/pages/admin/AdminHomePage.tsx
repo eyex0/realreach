@@ -4,51 +4,26 @@ import L from 'leaflet';
 import { Loader2, AlertCircle, MapPin, Receipt, ArrowUpRight, ArrowRight } from 'lucide-react';
 import { useLeafletMap } from '../../lib/useLeafletMap';
 import { useAdmin } from '../../components/admin/AdminShell';
+import DeliveryMap, { type MapCampaign } from '../../components/admin/DeliveryMap';
 import {
-  getAdminOverview, payInvoice, type AdminOverview, type AdminInvoice,
+  getAdminOverview, getAdminMap, payInvoice, type AdminOverview, type AdminInvoice,
 } from '../../lib/adminApi';
 
 /**
  * The delivery map card.
  *
- * One pin per active campaign, placed at the centroid of its real area, over a
- * light grey basemap. Clicking a pin goes to the live map. It is a preview, so
- * it deliberately has no interaction beyond a marker click.
+ * Real geometry, not pins: each campaign's area polygons, coloured by how much
+ * is done, with any recorded route drawn on top and coloured by walking pace.
  */
-function DeliveryMapCard({ pins }: { pins: AdminOverview['map_pins'] }) {
+function DeliveryMapCard({ campaigns }: { campaigns: MapCampaign[] }) {
   const navigate = useNavigate();
-
-  const { containerRef } = useLeafletMap(
-    (map) => {
-      const layer = L.layerGroup().addTo(map);
-      for (const pin of pins) {
-        if (pin.lat == null || pin.lng == null) continue;
-        L.marker([pin.lat, pin.lng], {
-          icon: L.divIcon({
-            className: '',
-            html: `<span style="display:block;width:14px;height:14px;border-radius:9999px;background:#006de4;border:2.5px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.35)"></span>`,
-            iconSize: [14, 14],
-            iconAnchor: [7, 7],
-          }),
-        })
-          .bindPopup(
-            `<b>${pin.title}</b><br/>${pin.client_name ?? '—'}<br/>` +
-              `${pin.areas_done}/${pin.areas} ${'aree'}<br/>${pin.letterboxes} volantini`
-          )
-          .on('click', () => navigate(`/campaigns/${pin.id}/report`))
-          .addTo(layer);
-      }
-      if (pins.length > 0) {
-        const bounds = L.latLngBounds(
-          pins.filter((p) => p.lat != null).map((p) => [p.lat, p.lng] as [number, number])
-        );
-        if (bounds.isValid()) map.fitBounds(bounds.pad(0.25), { animate: false });
-      }
-    },
-    { center: [45.4642, 9.19], zoom: 11, deps: [pins.length] }
+  return (
+    <DeliveryMap
+      campaigns={campaigns}
+      height={460}
+      onSelectCampaign={(id) => navigate(`/campaigns/${id}/report`)}
+    />
   );
-
-  return <div ref={containerRef} className="h-[300px] w-full rounded-b-2xl bg-slate-100" />;
 }
 
 /** Deliveries and revenue per month, two bars per month, no chart library. */
@@ -152,6 +127,7 @@ export function AdminHomePage() {
   const navigate = useNavigate();
   const [months, setMonths] = useState<1 | 3 | 12>(3);
   const [data, setData] = useState<AdminOverview | null>(null);
+  const [mapCampaigns, setMapCampaigns] = useState<MapCampaign[] | null>(null);
   const [error, setError] = useState('');
   const [busyId, setBusyId] = useState<string | null>(null);
 
@@ -159,6 +135,7 @@ export function AdminHomePage() {
     setError('');
     try {
       setData(await getAdminOverview(m));
+      setMapCampaigns((await getAdminMap('active')).campaigns as MapCampaign[]);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'failed to load');
     }
@@ -215,7 +192,7 @@ export function AdminHomePage() {
                 <MapPin className="h-4 w-4 text-slate-400" />
                 <h2 className="text-sm font-bold">{t('home.deliveryMap')}</h2>
                 <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600">
-                  {num(data.map_pins.length)} {t('home.activeDeliveryCampaigns')}
+                  {num(mapCampaigns?.length ?? 0)} {t('home.activeDeliveryCampaigns')}
                 </span>
                 {data.map_pins.length > 0 && (
                   <button
@@ -228,7 +205,7 @@ export function AdminHomePage() {
                   </button>
                 )}
               </header>
-              {data.map_pins.length === 0 ? (
+              {(mapCampaigns ?? []).length === 0 ? (
                 <div className="px-5 pb-16 pt-10 text-center">
                   <p className="text-sm font-bold">{t('home.emptyTitle')}</p>
                   <p className="mx-auto mt-1 max-w-sm text-xs text-slate-500">
@@ -243,7 +220,7 @@ export function AdminHomePage() {
                   </button>
                 </div>
               ) : (
-                <DeliveryMapCard pins={data.map_pins} />
+                <DeliveryMapCard campaigns={mapCampaigns ?? []} />
               )}
             </section>
 
