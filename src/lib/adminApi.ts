@@ -267,3 +267,82 @@ export async function validateAreaDistance(
 }
 
 export { API_BASE };
+
+export interface AdminPayoutArea {
+  area: string | null;
+  cap: string | null;
+  seq: number | null;
+  pieces: number;
+  fee: number | null;
+}
+
+export interface AdminPayout {
+  id: string;
+  campaign_id: string;
+  campaign_title: string;
+  operator_id: string;
+  operator_name: string | null;
+  operator_email: string;
+  pieces: number;
+  rate_eur: number;
+  amount_eur: number;
+  status: string;
+  generated_at: string;
+  approved_at: string | null;
+  paid_at: string | null;
+  areas: AdminPayoutArea[];
+}
+
+export async function listAdminPayouts(): Promise<AdminPayout[]> {
+  return handle<AdminPayout[]>(await apiFetch('/admin/payouts'));
+}
+
+export async function approvePayoutsBatch(
+  payout_ids: string[]
+): Promise<{ approved: string[]; amount: number; skipped: number }> {
+  return handle(await apiFetch('/admin/payouts/batch-approve', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ payout_ids }),
+  }));
+}
+
+export interface AdminDistributorDetail {
+  profile: {
+    id: string;
+    user_id: string;
+    display_name: string | null;
+    email: string;
+    phone: string | null;
+    status: string;
+    verification_status: string;
+    service_areas: string[];
+    rating: number | null;
+    documents: unknown;
+    onboarded_at: string | null;
+    created_at: string;
+  };
+  jobs: {
+    id: string;
+    campaign_seq: number | null;
+    quartiere: string | null;
+    status: string;
+    letterboxes_total: number | null;
+    started_at: string | null;
+    completed_at: string | null;
+    campaign_title: string;
+    gps_points: number;
+  }[];
+  payouts: {
+    id: string;
+    pieces: number;
+    amount_eur: number;
+    status: string;
+    paid_at: string | null;
+    campaign_title: string | null;
+  }[];
+}
+
+export async function getAdminDistributor(id: string): Promise<AdminDistributorDetail> {
+  return handle<AdminDistributorDetail>(await apiFetch(`/admin/distributors/${id}`));
+}
